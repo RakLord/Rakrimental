@@ -7,4 +7,5 @@ export class Dice extends Layer {
         this.layerColor = "blue";
 
     }
+    
 }

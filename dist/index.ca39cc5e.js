@@ -604,17 +604,20 @@ class Game {
         this.navBar = $("navBar");
         this.mainInterval = 1000;
         this.points = 0;
+        this.highestPoints = 0;
         this.layers = {
             start: new (0, _start.Start)(this),
             dice: new (0, _dice.Dice)(this),
             coin: new (0, _coin.Coin)(this)
         };
+        this.layers.start.unlocked = true;
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
         this.visibleLayer = "start";
         $("save-button").addEventListener("click", this.save.bind(this));
         $("load-button").addEventListener("click", this.load.bind(this));
+        $("tooltip-button").addEventListener("click", this.toggleTooltips.bind(this));
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         this.setupNav();
@@ -622,15 +625,23 @@ class Game {
     update() {
         if (this.autoPointsEnabled) this.points += this.pointsPerClick / this.pointAutoDivisor;
         this.textElements.points.innerText = this.points.toString();
+        if (this.points > this.highestPoints) this.highestPoints = this.points;
     }
     fixedIntervalUpdate() {
         for (const layer of Object.keys(this.layers))try {
             if (!this.layers[layer].unlocked) {
                 const unlocked = this.layers[layer].tryUnlock(this.points);
                 if (unlocked) this.setupNav();
-            }
+            } else this.layers[layer].checkMilestones();
         } catch (err) {
             console.error("Error in fixedIntervalUpdate", err);
+        }
+    }
+    toggleTooltips() {
+        for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
+            const btn = this.layers[layer].elements[element];
+            if (btn.getAttribute("tooltipenabled") === "enabled") btn.setAttribute("tooltipenabled", "disabled");
+            else btn.setAttribute("tooltipenabled", "enabled");
         }
     }
     setupNav() {
@@ -659,12 +670,20 @@ class Game {
         stateToSave["layers"] = {};
         for(const key in this.layers){
             const layer = this.layers[key];
-            for(const layerKey in layer)for (const saveKey of layer.keysToSave){
-                stateToSave.layers[key] = stateToSave.layers[key] || {};
-                stateToSave.layers[key][saveKey] = layer[saveKey];
+            stateToSave.layers[key] = stateToSave.layers[key] || {};
+            // Assuming each layer has a `keysToSave` property
+            for (const saveKey of layer.keysToSave)stateToSave.layers[key][saveKey] = layer[saveKey];
+            // Special handling for milestones - save only necessary data
+            stateToSave.layers[key]["milestones"] = {};
+            for(const milestoneKey in layer.milestones){
+                const milestone = layer.milestones[milestoneKey];
+                // Save only non-function properties, assuming functions are reconstructed on load
+                stateToSave.layers[key]["milestones"][milestoneKey] = {
+                    ...milestone,
+                    function: undefined // Explicitly remove function, or alternatively, save state indicating unlocked/locked status
+                };
             }
         }
-        // Save the state
         try {
             console.log("Saving game state", stateToSave);
             await (0, _localforageDefault.default).setItem("gameState", stateToSave);
@@ -683,6 +702,7 @@ class Game {
                     }
                     else this[key] = gameState[key];
                 }
+                self = gameState;
                 console.log("Game state loaded", gameState);
             } else {
                 console.log("No saved game state to load");
@@ -698,8 +718,8 @@ class Game {
     getText() {
         let textElements;
         textElements = {
-            points: document.getElementById("header-text-points"),
-            pointsPerSec: document.getElementById("header-text-points-per-sec")
+            points: $("header-text-points"),
+            pointsPerSec: $("header-text-points-per-sec")
         };
         return textElements;
     }
@@ -2924,18 +2944,39 @@ var _layer = require("./layer");
 class Start extends (0, _layer.Layer) {
     constructor(game){
         super(game, "start", 0, "green");
-        this.button = document.createElement("button");
+        this.pointsPerClickIncrement = 1;
+        this.keysToSave.push("pointsPerClickIncrement");
+        this.milestones = {
+            "givePoints": {
+                "text": "Gib Points",
+                "unlockPoints": 0,
+                "description": "Give points when clicked",
+                "function": ()=>{
+                    this.game.points += this.game.pointsPerClick;
+                    this.game.updateUI();
+                }
+            },
+            "increasePointsPerClick": {
+                "text": "+PPC",
+                "unlockPoints": 10,
+                "description": "Increase points per click",
+                "function": ()=>{
+                    this.game.pointsPerClick += this.pointsPerClickIncrement;
+                    this.game.updateUI();
+                }
+            },
+            "autoPoints": {
+                "text": "Automates Points",
+                "unlockPoints": 500,
+                "description": "Give points automatically",
+                "function": ()=>{
+                    this.game.autoPointsEnabled = true;
+                    this.game.updateUI();
+                }
+            }
+        };
         this.setup();
         this.toggleVisibility();
-    }
-    setup() {
-        this.button.innerText = "Gib Points";
-        this.button.classList.add("bg-green-500", "hover:bg-green-700", "text-white", "font-bold", "py-2", "px-4", "rounded", "w-1/4", "mx-auto", "mt-4");
-        this.button.addEventListener("click", ()=>{
-            this.game.points += this.game.pointsPerClick;
-            this.game.updateUI();
-        });
-        this.div.appendChild(this.button);
     }
 }
 
@@ -2943,6 +2984,7 @@ class Start extends (0, _layer.Layer) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Layer", ()=>Layer);
+var _utils = require("../utils");
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
 class Layer {
@@ -2955,12 +2997,16 @@ class Layer {
             "unlocked",
             "cost",
             "layerColor",
-            "visible"
+            "visible",
+            "milestonesUnlocked"
         ];
+        this.Button = (0, _utils.Button);
         this.game = game;
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
+        this.milestones = {};
+        this.milestonesUnlocked = {};
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement("div");
         this.parentElement.appendChild(this.div);
@@ -2989,6 +3035,86 @@ class Layer {
             this.div.classList.remove("hidden");
             this.visible = true;
         }
+    }
+    checkMilestones() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            const unlockPoints = parseInt(milestone.unlockPoints);
+            // Set unlocked to true (this is saved in the save file)
+            if (this.game.highestPoints >= unlockPoints) this.milestonesUnlocked[key] = true;
+        }
+        // Loop over the unlocked milestones and add them to the div if they are not already in it
+        for (const key of Object.keys(this.milestonesUnlocked)){
+            if (this.milestonesUnlocked[key]) {
+                if (!this.div.contains(this.elements[key])) this.div.appendChild(this.elements[key]);
+            }
+        }
+    }
+    setup() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            this.elements[key] = this.Button.createMilestoneButton(milestone);
+        }
+        this.milestonesUnlocked["givePoints"] = true; // Always unlocked
+        this.checkMilestones();
+    }
+}
+
+},{"../utils":"gmdam","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gmdam":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Button", ()=>Button);
+class Button {
+    constructor(name, txt, callback, css = ""){
+        this.buttonCSS = "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4";
+        this.buttonCSS = css ? css : this.buttonCSS;
+        this.name = name;
+        this.txt = txt;
+        this.description = "";
+        this.callback = callback;
+        this.button = document.createElement("button");
+        this.init();
+    }
+    init() {
+        this.button.textContent = this.txt;
+        this.button.className = this.buttonCSS;
+        this.button.addEventListener("click", this.callback);
+        this.button.setAttribute("tooltipenabled", "enabled");
+        // Tooltip
+        this.button.addEventListener("mouseover", (event)=>{
+            if (this.button.getAttribute("tooltipenabled") !== "enabled") return;
+            const descriptionDiv = document.createElement("div");
+            descriptionDiv.textContent = this.description;
+            descriptionDiv.className = "absolute bg-gray-900 p-2 rounded z-10 font-bold"; // z-10 to ensure it's above other items
+            document.body.appendChild(descriptionDiv); // Append to body to ensure it's not constrained by button's position
+            const updateTooltipPosition = (mouseEvent)=>{
+                descriptionDiv.style.left = `${mouseEvent.clientX + 10}px`; // +10 for a slight offset from the cursor
+                descriptionDiv.style.top = `${mouseEvent.clientY + 10}px`;
+            };
+            // Initial position update
+            updateTooltipPosition(event);
+            // Update tooltip position on mouse move
+            this.button.addEventListener("mousemove", updateTooltipPosition);
+            // Clean up: remove tooltip and event listener when mouse leaves
+            this.button.addEventListener("mouseleave", ()=>{
+                descriptionDiv.remove();
+                this.button.removeEventListener("mousemove", updateTooltipPosition);
+            }, {
+                once: true
+            }); // Use { once: true } to automatically remove this event listener after it triggers once
+        });
+        return this.button;
+    }
+    // Optionally, create a static factory method to directly return the button element
+    static createButton(name, txt, callback, css = "") {
+        const btn = new Button(name, txt, callback, css);
+        return btn.button;
+    }
+    // Optionally, create a static factory method to directly return the button element
+    static createMilestoneButton(milestone, css = "") {
+        const btn = new Button(milestone.name, milestone.text, milestone.function, css);
+        btn.description = milestone.description;
+        return btn.button;
     }
 }
 

@@ -1,22 +1,44 @@
 import { Layer } from "./layer";
 import { Game } from "../main";
 
+
 export class Start extends Layer {
-    private button: HTMLElement;
+    pointsPerClickIncrement: number;
     constructor(game: Game) {
         super(game, "start", 0, "green");
-        this.button = document.createElement('button');
+        this.pointsPerClickIncrement = 1;
+        this.keysToSave.push('pointsPerClickIncrement');
+
+        this.milestones = { 
+            "givePoints": {
+                "text": "Gib Points",
+                "unlockPoints": 0,
+                "description": "Give points when clicked",
+                "function": () => {
+                    this.game.points += this.game.pointsPerClick;
+                    this.game.updateUI();}
+            },
+            "increasePointsPerClick": {
+                "text": "+PPC",
+                "unlockPoints": 10,
+                "description": "Increase points per click",
+                "function": () => {
+                    this.game.pointsPerClick += this.pointsPerClickIncrement;
+                    this.game.updateUI();
+                }
+            },
+            "autoPoints": {
+                "text": "Automates Points",
+                "unlockPoints": 500,
+                "description": "Give points automatically",
+                "function": () => {
+                    this.game.autoPointsEnabled = true;
+                    this.game.updateUI();}
+            },
+        };
+
+
         this.setup();
         this.toggleVisibility();
-    }
-    setup() {
-        this.button.innerText = "Gib Points";
-        this.button.classList.add('bg-green-500', 'hover:bg-green-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded', 'w-1/4', 'mx-auto', 'mt-4');
-        this.button.addEventListener('click', () => {
-            this.game.points += this.game.pointsPerClick;
-            this.game.updateUI();
-        });
-        this.div.appendChild(this.button);
-    
     }
 }

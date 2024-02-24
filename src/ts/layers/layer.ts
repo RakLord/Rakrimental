@@ -1,4 +1,5 @@
 import { Game } from "../main";
+import { Button } from "../utils";
 
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
@@ -6,10 +7,13 @@ const $ = document.getElementById.bind(document);
 
 export class Layer {
     game: Game;
+    Button: typeof Button;
     name: string;
     unlocked: boolean = false;
     cost: number;
     layerColor: string;
+    milestones: { [key: string]: {[key: string]: any}; };
+    milestonesUnlocked: { [key: string]: boolean; };
 
     parentElement: HTMLElement = $('main')!;
     div: HTMLElement;
@@ -17,13 +21,18 @@ export class Layer {
     elements: { [key: string]: HTMLElement; };
     layerTitle: HTMLElement;
 
-    keysToSave: string[] = ['name', 'unlocked', 'cost', 'layerColor', 'visible'];
+    keysToSave: string[] = ['name', 'unlocked', 'cost', 'layerColor', 'visible',  'milestonesUnlocked'];
 
     constructor(game: Game,name: string, cost: number, layerColor: string) {
+        this.Button = Button;
         this.game = game;
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
+
+        this.milestones = {};
+        this.milestonesUnlocked = {};
+
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement('div');
         this.parentElement.appendChild(this.div);
@@ -60,5 +69,33 @@ export class Layer {
             this.div.classList.remove('hidden');
             this.visible = true;
         }
+    }
+
+    checkMilestones() {
+        for (const key of Object.keys(this.milestones)) {
+            const milestone = this.milestones[key];
+            const unlockPoints = parseInt(milestone.unlockPoints);
+            // Set unlocked to true (this is saved in the save file)
+            if (this.game.highestPoints >= unlockPoints) {
+                this.milestonesUnlocked[key] = true;
+            }
+        }
+        // Loop over the unlocked milestones and add them to the div if they are not already in it
+        for (const key of Object.keys(this.milestonesUnlocked)) {
+            if (this.milestonesUnlocked[key]) {
+                if (!this.div.contains(this.elements[key])) {
+                    this.div.appendChild(this.elements[key]);
+                }
+            }
+        }
+    }
+
+    setup() {
+        for (const key of Object.keys(this.milestones)) {
+            const milestone = this.milestones[key];
+            this.elements[key] = this.Button.createMilestoneButton(milestone);
+        }
+        this.milestonesUnlocked["givePoints"] = true; // Always unlocked
+        this.checkMilestones();
     }
 }

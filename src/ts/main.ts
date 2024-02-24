@@ -9,6 +9,7 @@ const $ = document.getElementById.bind(document);
 
 export class Game {
     points: number;  // Base currency
+    highestPoints: number; // Highest points ever reached
     textElements: { [key: string]: HTMLElement; }; // Hold text displays (may refactor soon)
     mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
     gameTimer: number; // Holds the setInterval function for the mainInterval
@@ -29,11 +30,13 @@ export class Game {
         this.navBar = $('navBar')!;
         this.mainInterval = 1000;
         this.points = 0;
+        this.highestPoints = 0;
         this.layers = { 
             start: new Start(this),
             dice: new Dice(this),
             coin: new Coin(this)
         };
+        this.layers.start.unlocked = true;
 
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
@@ -43,6 +46,8 @@ export class Game {
 
         $('save-button')!.addEventListener('click', this.save.bind(this));
         $('load-button')!.addEventListener('click', this.load.bind(this));
+        $('tooltip-button')!.addEventListener('click', this.toggleTooltips.bind(this));
+
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         
@@ -54,6 +59,9 @@ export class Game {
             this.points += this.pointsPerClick / this.pointAutoDivisor;
         }
         this.textElements.points.innerText = this.points.toString();
+        if (this.points > this.highestPoints) {
+            this.highestPoints = this.points;
+        }
     }
     
     fixedIntervalUpdate () {
@@ -64,12 +72,28 @@ export class Game {
                     if (unlocked) {
                         this.setupNav();
                     }
-                } 
+                } else {
+                    this.layers[layer].checkMilestones();
+                }
+                
             }
             catch (err) {
                 console.error("Error in fixedIntervalUpdate", err);
             }
             
+        }
+    }
+
+    toggleTooltips() {
+        for (const layer of Object.keys(this.layers)) {
+            for (const element of Object.keys(this.layers[layer].elements)) {
+                const btn = this.layers[layer].elements[element];
+                if (btn.getAttribute('tooltipenabled') === 'enabled') {
+                    btn.setAttribute('tooltipenabled', 'disabled');
+                } else {
+                    btn.setAttribute('tooltipenabled', 'enabled');
+                }
+            }
         }
     }
 
@@ -107,35 +131,44 @@ export class Game {
         }
     }
     
-    async save() {
-        const stateToSave: { [key: string]: any } = {};
+async save() {
+    const stateToSave: { [key: string]: any } = {};
 
-        for (const key of this.keysToSave) {
-            stateToSave[key] = (this as any)[key];
+    for (const key of this.keysToSave) {
+        stateToSave[key] = (this as any)[key];
+    }
+
+    stateToSave["layers"] = {};
+
+    for (const key in this.layers) {
+        const layer = this.layers[key];
+
+        stateToSave.layers[key] = stateToSave.layers[key] || {};
+
+        // Assuming each layer has a `keysToSave` property
+        for (const saveKey of layer.keysToSave) {
+            stateToSave.layers[key][saveKey] = (layer as any)[saveKey];
         }
 
-        stateToSave["layers"] = {};
-
-        for (const key in this.layers) {
-            const layer = this.layers[key];
-
-            for (const layerKey in layer) {
-                for (const saveKey of layer.keysToSave) {
-                    stateToSave.layers[key] = stateToSave.layers[key] || {};
-                    stateToSave.layers[key][saveKey] = (layer as any)[saveKey];
-                }
-            }
-        }
-
-        // Save the state
-        try {
-            console.log("Saving game state", stateToSave)
-            await localForage.setItem("gameState", stateToSave);
-        }
-        catch (err) {
-            console.error("Save failed", err);
+        // Special handling for milestones - save only necessary data
+        stateToSave.layers[key]["milestones"] = {};
+        for (const milestoneKey in layer.milestones) {
+            const milestone = layer.milestones[milestoneKey];
+            // Save only non-function properties, assuming functions are reconstructed on load
+            stateToSave.layers[key]["milestones"][milestoneKey] = {
+                ...milestone,
+                function: undefined // Explicitly remove function, or alternatively, save state indicating unlocked/locked status
+            };
         }
     }
+
+    try {
+        console.log("Saving game state", stateToSave);
+        await localForage.setItem("gameState", stateToSave);
+    } catch (err) {
+        console.error("Save failed", err);
+    }
+}
 
     async load() {
         try {
@@ -152,6 +185,7 @@ export class Game {
                         (this as any)[key] = gameState[key];
                     }
                 }
+                self = gameState;
                 console.log('Game state loaded', gameState);
             } else {
                 console.log('No saved game state to load');
@@ -169,8 +203,8 @@ export class Game {
     getText(): { [key: string]: HTMLElement; } {
         let textElements: { [key: string]: HTMLElement; };
         textElements = {
-            points: document.getElementById('header-text-points')!,
-            pointsPerSec: document.getElementById('header-text-points-per-sec')!    
+            points: $('header-text-points')!,
+            pointsPerSec: $('header-text-points-per-sec')!    
         };
         return textElements;
     };

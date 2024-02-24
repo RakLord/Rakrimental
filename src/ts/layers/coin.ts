@@ -6,4 +6,5 @@ export class Coin extends Layer {
         super(game, "coin", 10000, "yellow");
         
     }
+    
 }
