@@ -1,0 +1,25 @@
+{
+  "name": "rakrimental",
+  "version": "1.0.0",
+  "description": "waaa",
+  "scripts": {
+    "start": "parcel ./src/index.html",
+    "build": "parcel build ./src/index.html"
+  },
+  "keywords": [],
+  "author": "Rak",
+  "license": "ISC",
+  "dependencies": {
+    "localforage": "^1.10.0",
+    "lodash": "^4.17.21",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/localforage": "^0.0.34",
+    "@types/lodash": "^4.14.202",
+    "autoprefixer": "^10.4.17",
+    "parcel": "^2.11.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1"
+  }
+}
