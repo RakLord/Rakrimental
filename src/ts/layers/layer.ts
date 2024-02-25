@@ -121,4 +121,8 @@ export class Layer {
         }
         this.checkMilestones();
     }
+
+    update() {
+        
+    }
 }

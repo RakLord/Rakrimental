@@ -582,8 +582,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Game", ()=>Game);
-var _localforage = require("localforage");
-var _localforageDefault = parcelHelpers.interopDefault(_localforage);
+var _saving = require("./saving");
 var _start = require("./layers/start");
 var _dice = require("./layers/dice");
 var _coin = require("./layers/coin");
@@ -593,13 +592,8 @@ class Game {
     constructor(){
         this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
         ;
-        this.keysToSave = [
-            "points",
-            "visibleLayer",
-            "mainInterval",
-            "fixedInterval"
-        ];
         console.log("Game Constructor");
+        this.saveManager = new (0, _saving.SaveManager)(this);
         this.textElements = this.getText();
         this.navBar = $("navBar");
         this.mainInterval = 1000;
@@ -611,10 +605,8 @@ class Game {
             coin: new (0, _coin.Coin)(this)
         };
         this.layers.start.unlocked = true;
-        this.autoPointsEnabled = false;
-        this.pointAutoDivisor = 100;
-        this.pointsPerClick = 1;
         this.visibleLayer = "start";
+        this.tooltipsEnabled = true;
         $("save-button").addEventListener("click", this.save.bind(this));
         $("load-button").addEventListener("click", this.load.bind(this));
         $("tooltip-button").addEventListener("click", this.toggleTooltips.bind(this));
@@ -622,10 +614,16 @@ class Game {
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         this.setupNav();
     }
+    save() {
+        this.saveManager.save(this);
+    }
+    load() {
+        this.saveManager.load(this);
+    }
     update() {
-        if (this.autoPointsEnabled) this.points += this.pointsPerClick / this.pointAutoDivisor;
-        this.textElements.points.innerText = this.points.toString();
+        for (const layer of Object.keys(this.layers))this.layers[layer].update();
         if (this.points > this.highestPoints) this.highestPoints = this.points;
+        this.updateUI();
     }
     fixedIntervalUpdate() {
         for (const layer of Object.keys(this.layers))try {
@@ -638,10 +636,20 @@ class Game {
         }
     }
     toggleTooltips() {
-        for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
-            const btn = this.layers[layer].elements[element];
-            if (btn.getAttribute("tooltipenabled") === "enabled") btn.setAttribute("tooltipenabled", "disabled");
-            else btn.setAttribute("tooltipenabled", "enabled");
+        this.tooltipsEnabled = !this.tooltipsEnabled;
+        this.setTooltipsState();
+    }
+    setTooltipsState() {
+        if (this.tooltipsEnabled) {
+            for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
+                const btn = this.layers[layer].elements[element];
+                btn.setAttribute("tooltipenabled", "enabled");
+            }
+        } else {
+            for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
+                const btn = this.layers[layer].elements[element];
+                btn.setAttribute("tooltipenabled", "disabled");
+            }
         }
     }
     setupNav() {
@@ -665,95 +673,6 @@ class Game {
         for (const button of this.navBar.children)if (button.id === layerName) button.classList.add("border-b", `border-${this.layers[layerName].layerColor}-500`);
         else button.classList.remove("border-b", `border-${this.layers[button.id].layerColor}-500`);
     }
-    async save() {
-        const stateToSave = {};
-        stateToSave["points"] = this.points;
-        stateToSave["visibleLayer"] = this.visibleLayer;
-        stateToSave["mainInterval"] = this.mainInterval;
-        stateToSave["fixedInterval"] = this.fixedInterval;
-        stateToSave["layers"] = {
-            start: {
-                unlocked: this.layers.start.unlocked,
-                cost: this.layers.start.cost,
-                milestones: parseMilestones(this.layers.start.milestones)
-            },
-            dice: {
-                unlocked: this.layers.dice.unlocked,
-                cost: this.layers.dice.cost,
-                milestones: parseMilestones(this.layers.dice.milestones)
-            },
-            coin: {
-                unlocked: this.layers.coin.unlocked,
-                cost: this.layers.coin.cost,
-                milestones: parseMilestones(this.layers.coin.milestones)
-            }
-        };
-        // Parse the milestones to save them, Remove the function code and reference the function by name
-        function parseMilestones(milestones) {
-            console.log("Input", milestones);
-            const parsedMilestones = {};
-            for (const key of Object.keys(milestones)){
-                const milestone = milestones[key];
-                for (const milestoneKey of Object.keys(milestone)){
-                    if (milestoneKey === "function") milestone[milestoneKey] = milestone[milestoneKey].name;
-                    if (milestoneKey === "unlockPoints") milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
-                }
-                parsedMilestones[key] = milestone;
-            }
-            return parsedMilestones;
-        }
-        // Actually save the state
-        try {
-            console.log("Saving game state", stateToSave);
-            await (0, _localforageDefault.default).setItem("gameState", stateToSave);
-        } catch (err) {
-            console.error("Save failed", err);
-        }
-    }
-    async load() {
-        try {
-            const gameState = await (0, _localforageDefault.default).getItem("gameState");
-            console.log("STATE LOAD: ", gameState);
-            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
-            function parseMilestones(thisGame, milestones) {
-                const parsedMilestones = {};
-                // Loop over each actual Milestone
-                for (const key of Object.keys(milestones)){
-                    const milestone = milestones[key];
-                    // Loop over each value in the milestone
-                    for (const milestoneKey of Object.keys(milestone))// If it is a function, set the milestone to the actual function
-                    if (milestoneKey === "function") milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
-                    else milestone[milestoneKey] = milestone[milestoneKey];
-                    parsedMilestones[key] = milestone;
-                }
-                return parsedMilestones;
-            }
-            if (gameState) {
-                this.points = gameState.points;
-                this.visibleLayer = gameState.visibleLayer;
-                this.mainInterval = gameState.mainInterval;
-                this.fixedInterval = gameState.fixedInterval;
-                this.layers.start.unlocked = gameState.layers.start.unlocked;
-                this.layers.start.cost = gameState.layers.start.cost;
-                this.layers.start.milestones = parseMilestones(this.layers.start, gameState.layers.start.milestones);
-                this.layers.dice.unlocked = gameState.layers.dice.unlocked;
-                this.layers.dice.cost = gameState.layers.dice.cost;
-                this.layers.dice.milestones = parseMilestones(this.layers.dice, gameState.layers.dice.milestones);
-                this.layers.coin.unlocked = gameState.layers.coin.unlocked;
-                this.layers.coin.cost = gameState.layers.coin.cost;
-                this.layers.coin.milestones = parseMilestones(this.layers.coin, gameState.layers.coin.milestones);
-                this.setupNav();
-                for (const layer of Object.keys(this.layers))this.layers[layer].toggleVisibility(true);
-                this.switchLayer(this.visibleLayer);
-                this.updateUI();
-            } else {
-                console.log("No saved game state to load");
-                this.save(); // Save initial state if nothing to load
-            }
-        } catch (err) {
-            console.error("Load failed", err);
-        }
-    }
     updateUI() {
         this.textElements.points.innerText = this.points.toString();
     }
@@ -772,7 +691,377 @@ document.addEventListener("DOMContentLoaded", function() {
     window.game = game;
 });
 
-},{"localforage":"cTE28","./layers/start":"8H89C","./layers/dice":"isy6N","./layers/coin":"aXwEX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cTE28":[function(require,module,exports) {
+},{"./layers/start":"8H89C","./layers/dice":"isy6N","./layers/coin":"aXwEX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./saving":"LpBZE"}],"8H89C":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Start", ()=>Start);
+var _layer = require("./layer");
+class Start extends (0, _layer.Layer) {
+    constructor(game){
+        super(game, "start", 0, "green");
+        this.pointsPerClickIncrement = 1;
+        this.autoPointsEnabled = false;
+        this.pointAutoDivisor = 100;
+        this.pointsPerClick = 1;
+        this.milestoneFunctions = {
+            "givePoints": ()=>{
+                this.game.points += this.pointsPerClick;
+                this.game.updateUI();
+            },
+            "increasePointsPerClick": ()=>{
+                this.pointsPerClick += this.pointsPerClickIncrement;
+                this.game.updateUI();
+            },
+            "autoPoints": ()=>{
+                this.autoPointsEnabled = true;
+                this.game.updateUI();
+            }
+        };
+        this.milestones = {
+            "givePoints": {
+                "text": "Gib Points",
+                "unlockPoints": 0,
+                "unlocked": false,
+                "description": "Give points when clicked",
+                "function": this.milestoneFunctions.givePoints
+            },
+            "increasePointsPerClick": {
+                "text": "+PPC",
+                "unlockPoints": 10,
+                "unlocked": false,
+                "description": "Increase points per click",
+                "function": this.milestoneFunctions.increasePointsPerClick
+            },
+            "autoPoints": {
+                "text": "Automates Points",
+                "unlockPoints": 500,
+                "unlocked": false,
+                "description": "Give points automatically",
+                "function": this.milestoneFunctions.autoPoints
+            }
+        };
+        this.setup();
+        this.toggleVisibility();
+    }
+    update() {
+        if (this.autoPointsEnabled) this.game.points += this.pointsPerClick / this.pointAutoDivisor;
+    }
+}
+
+},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bX7Wa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Layer", ()=>Layer);
+var _utils = require("../utils");
+// bind document.getElementById to $
+const $ = document.getElementById.bind(document);
+class Layer {
+    constructor(game, name, cost, layerColor){
+        this.unlocked = false;
+        this.parentElement = $("main");
+        this.visible = false;
+        this.Button = (0, _utils.Button);
+        this.game = game;
+        this.name = name;
+        this.cost = cost;
+        this.layerColor = layerColor;
+        this.milestones = {
+        };
+        // this.milestonesUnlocked = {};
+        this.milestoneFunctions = {
+            "test": ()=>{
+                console.log("Test Milestone");
+                console.log("End Test Milestone");
+            }
+        };
+        // create a blank div that fills the entire parent, and add it to the parent which is main
+        this.div = document.createElement("div");
+        this.parentElement.appendChild(this.div);
+        this.div.classList.add("flex", "flex-col", "w-full", "h-full", "hidden");
+        this.div.setAttribute("id", this.name);
+        // create a title for the layer
+        this.layerTitle = document.createElement("div");
+        this.div.appendChild(this.layerTitle);
+        this.layerTitle.innerText = this.name.toUpperCase();
+        this.layerTitle.classList.add("text-2xl", "text-center", "mb-4", "font-bold", "w-full", "border-b-2", `border-${this.layerColor}-500`);
+        this.elements = {};
+    }
+    tryUnlock(currentPoints) {
+        // console.log("Trying to unlock", this.name, "with", currentPoints, "/", this.cost, "points");
+        if (currentPoints >= this.cost) {
+            this.unlocked = true;
+            console.log("Unlocked Layer", this.name);
+            return true;
+        } else return false;
+    }
+    toggleVisibility(forceHide) {
+        if (forceHide) {
+            if (this.div.classList.contains("hidden")) {
+                this.visible = false;
+                return;
+            } else {
+                this.div.classList.add("hidden");
+                this.visible = false;
+                return;
+            }
+        } else if (this.visible) {
+            this.div.classList.add("hidden");
+            this.visible = false;
+        } else {
+            this.div.classList.remove("hidden");
+            this.visible = true;
+        }
+    }
+    checkMilestones() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            const unlockPoints = parseInt(milestone.unlockPoints);
+            // Set unlocked to true (this is saved in the save file)
+            if (this.game.highestPoints >= unlockPoints) milestone.unlocked = true;
+        }
+        // Loop over the unlocked milestones and add them to the div if they are not already in it
+        for (const key of Object.keys(this.milestones)){
+            if (this.milestones[key].unlocked) {
+                if (!this.div.contains(this.elements[key])) this.div.appendChild(this.elements[key]);
+            }
+        }
+    }
+    setup() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            this.elements[key] = this.Button.createMilestoneButton(milestone);
+        }
+        this.checkMilestones();
+    }
+    update() {}
+}
+
+},{"../utils":"gmdam","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gmdam":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Button", ()=>Button);
+class Button {
+    constructor(name, txt, callback, css = ""){
+        this.buttonCSS = "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4";
+        this.buttonCSS = css ? css : this.buttonCSS;
+        this.name = name;
+        this.txt = txt;
+        this.description = "";
+        this.callback = callback;
+        this.button = document.createElement("button");
+        this.init();
+    }
+    init() {
+        this.button.textContent = this.txt;
+        this.button.className = this.buttonCSS;
+        this.button.addEventListener("click", this.callback);
+        this.button.setAttribute("tooltipenabled", "enabled");
+        // Tooltip
+        this.button.addEventListener("mouseover", (event)=>{
+            if (this.button.getAttribute("tooltipenabled") !== "enabled") return;
+            const descriptionDiv = document.createElement("div");
+            descriptionDiv.textContent = this.description;
+            descriptionDiv.className = "absolute bg-gray-900 p-2 rounded z-10 font-bold"; // z-10 to ensure it's above other items
+            document.body.appendChild(descriptionDiv); // Append to body to ensure it's not constrained by button's position
+            const updateTooltipPosition = (mouseEvent)=>{
+                descriptionDiv.style.left = `${mouseEvent.clientX + 10}px`; // +10 for a slight offset from the cursor
+                descriptionDiv.style.top = `${mouseEvent.clientY + 10}px`;
+            };
+            // Initial position update
+            updateTooltipPosition(event);
+            // Update tooltip position on mouse move
+            this.button.addEventListener("mousemove", updateTooltipPosition);
+            // Clean up: remove tooltip and event listener when mouse leaves
+            this.button.addEventListener("mouseleave", ()=>{
+                descriptionDiv.remove();
+                this.button.removeEventListener("mousemove", updateTooltipPosition);
+            }, {
+                once: true
+            }); // Use { once: true } to automatically remove this event listener after it triggers once
+        });
+        return this.button;
+    }
+    // Optionally, create a static factory method to directly return the button element
+    static createButton(name, txt, callback, css = "") {
+        const btn = new Button(name, txt, callback, css);
+        return btn.button;
+    }
+    // Optionally, create a static factory method to directly return the button element
+    static createMilestoneButton(milestone, css = "") {
+        const btn = new Button(milestone.name, milestone.text, milestone.function, css);
+        btn.description = milestone.description;
+        return btn.button;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"isy6N":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Dice", ()=>Dice);
+var _layer = require("./layer");
+class Dice extends (0, _layer.Layer) {
+    constructor(game){
+        super(game, "dice", 1000, "white");
+        this.layerColor = "blue";
+    }
+}
+
+},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aXwEX":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Coin", ()=>Coin);
+var _layer = require("./layer");
+class Coin extends (0, _layer.Layer) {
+    constructor(game){
+        super(game, "coin", 10000, "yellow");
+    }
+}
+
+},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"LpBZE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SaveManager", ()=>SaveManager);
+var _localforage = require("localforage");
+var _localforageDefault = parcelHelpers.interopDefault(_localforage);
+class SaveManager {
+    constructor(game){
+        this.game = game;
+        console.log("Save Manager Constructor");
+        console.log(this.game);
+    }
+    async save(game) {
+        this.game = game;
+        console.log("Saving game");
+        console.log(this.game);
+        const stateToSave = {};
+        stateToSave["points"] = this.game.points;
+        stateToSave["visibleLayer"] = this.game.visibleLayer;
+        stateToSave["mainInterval"] = this.game.mainInterval;
+        stateToSave["fixedInterval"] = this.game.fixedInterval;
+        stateToSave["highestPoints"] = this.game.highestPoints;
+        stateToSave["tooltipsEnabled"] = this.game.tooltipsEnabled;
+        stateToSave["layers"] = {
+            start: {
+                unlocked: this.game.layers.start.unlocked,
+                cost: this.game.layers.start.cost,
+                milestones: parseMilestones(this.game.layers.start.milestones)
+            },
+            dice: {
+                unlocked: this.game.layers.dice.unlocked,
+                cost: this.game.layers.dice.cost,
+                milestones: parseMilestones(this.game.layers.dice.milestones)
+            },
+            coin: {
+                unlocked: this.game.layers.coin.unlocked,
+                cost: this.game.layers.coin.cost,
+                milestones: parseMilestones(this.game.layers.coin.milestones)
+            }
+        };
+        // Parse the milestones to save them, Remove the function code and reference the function by name
+        function parseMilestones(milestones) {
+            const parsedMilestones = {};
+            for (const key of Object.keys(milestones)){
+                const milestone = milestones[key];
+                for (const milestoneKey of Object.keys(milestone)){
+                    if (milestoneKey === "function") {
+                        console.log(milestone[milestoneKey]);
+                        milestone[milestoneKey] = milestone[milestoneKey].name;
+                    }
+                    if (milestoneKey === "unlockPoints") milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
+                }
+                parsedMilestones[key] = milestone;
+            }
+            return parsedMilestones;
+        }
+        // Actually save the state
+        try {
+            console.log("Saving game state", stateToSave);
+            await (0, _localforageDefault.default).setItem("gameState", stateToSave);
+        } catch (err) {
+            console.error("Save failed", err);
+        }
+    }
+    async load(game) {
+        this.game = game;
+        try {
+            const gameState = await (0, _localforageDefault.default).getItem("gameState");
+            console.log("STATE LOAD: ", gameState);
+            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
+            function parseMilestones(thisGame, milestones) {
+                const parsedMilestones = {};
+                // Loop over each actual Milestone
+                for (const key of Object.keys(milestones)){
+                    const milestone = milestones[key];
+                    // Loop over each value in the milestone
+                    for (const milestoneKey of Object.keys(milestone))// If it is a function, set the milestone to the actual function
+                    if (milestoneKey === "function") milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
+                    else milestone[milestoneKey] = milestone[milestoneKey];
+                    parsedMilestones[key] = milestone;
+                }
+                return parsedMilestones;
+            }
+            if (gameState) {
+                this.game.points = gameState.points;
+                this.game.visibleLayer = gameState.visibleLayer;
+                this.game.mainInterval = gameState.mainInterval;
+                this.game.fixedInterval = gameState.fixedInterval;
+                this.game.highestPoints = gameState.highestPoints;
+                this.game.tooltipsEnabled = gameState.tooltipsEnabled;
+                this.game.layers.start.unlocked = gameState.layers.start.unlocked;
+                this.game.layers.start.cost = gameState.layers.start.cost;
+                this.game.layers.start.milestones = parseMilestones(this.game.layers.start, gameState.layers.start.milestones);
+                this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.game.layers.dice.cost = gameState.layers.dice.cost;
+                this.game.layers.dice.milestones = parseMilestones(this.game.layers.dice, gameState.layers.dice.milestones);
+                this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
+                this.game.layers.coin.cost = gameState.layers.coin.cost;
+                this.game.layers.coin.milestones = parseMilestones(this.game.layers.coin, gameState.layers.coin.milestones);
+                this.game.setupNav();
+                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].toggleVisibility(true);
+                this.game.switchLayer(this.game.visibleLayer);
+                this.game.setTooltipsState();
+                this.game.updateUI();
+            } else {
+                console.log("No saved game state to load");
+                this.save(this.game); // Save initial state if nothing to load
+            }
+        } catch (err) {
+            console.error("Load failed", err);
+        }
+    }
+}
+
+},{"localforage":"cTE28","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cTE28":[function(require,module,exports) {
 var global = arguments[3];
 /*!
     localForage -- Offline Storage, Improved
@@ -2978,255 +3267,6 @@ var global = arguments[3];
     ])(4);
 });
 
-},{}],"8H89C":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Start", ()=>Start);
-var _layer = require("./layer");
-class Start extends (0, _layer.Layer) {
-    constructor(game){
-        super(game, "start", 0, "green");
-        this.pointsPerClickIncrement = 1;
-        this.milestoneFunctions = {
-            "givePoints": ()=>{
-                this.game.points += this.game.pointsPerClick;
-                this.game.updateUI();
-            },
-            "increasePointsPerClick": ()=>{
-                this.game.pointsPerClick += this.pointsPerClickIncrement;
-                this.game.updateUI();
-            },
-            "autoPoints": ()=>{
-                this.game.autoPointsEnabled = true;
-                this.game.updateUI();
-            }
-        };
-        this.milestones = {
-            "givePoints": {
-                "text": "Gib Points",
-                "unlockPoints": 0,
-                "unlocked": false,
-                "description": "Give points when clicked",
-                "function": this.milestoneFunctions.givePoints
-            },
-            "increasePointsPerClick": {
-                "text": "+PPC",
-                "unlockPoints": 10,
-                "unlocked": false,
-                "description": "Increase points per click",
-                "function": this.milestoneFunctions.increasePointsPerClick
-            },
-            "autoPoints": {
-                "text": "Automates Points",
-                "unlockPoints": 500,
-                "unlocked": false,
-                "description": "Give points automatically",
-                "function": this.milestoneFunctions.autoPoints
-            }
-        };
-        this.setup();
-        this.toggleVisibility();
-    }
-}
-
-},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bX7Wa":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Layer", ()=>Layer);
-var _utils = require("../utils");
-// bind document.getElementById to $
-const $ = document.getElementById.bind(document);
-class Layer {
-    constructor(game, name, cost, layerColor){
-        this.unlocked = false;
-        this.parentElement = $("main");
-        this.visible = false;
-        this.Button = (0, _utils.Button);
-        this.game = game;
-        this.name = name;
-        this.cost = cost;
-        this.layerColor = layerColor;
-        this.milestones = {
-        };
-        // this.milestonesUnlocked = {};
-        this.milestoneFunctions = {
-            "test": ()=>{
-                console.log("Test Milestone");
-                console.log("End Test Milestone");
-            }
-        };
-        // create a blank div that fills the entire parent, and add it to the parent which is main
-        this.div = document.createElement("div");
-        this.parentElement.appendChild(this.div);
-        this.div.classList.add("flex", "flex-col", "w-full", "h-full", "hidden");
-        this.div.setAttribute("id", this.name);
-        // create a title for the layer
-        this.layerTitle = document.createElement("div");
-        this.div.appendChild(this.layerTitle);
-        this.layerTitle.innerText = this.name.toUpperCase();
-        this.layerTitle.classList.add("text-2xl", "text-center", "mb-4", "font-bold", "w-full", "border-b-2", `border-${this.layerColor}-500`);
-        this.elements = {};
-    }
-    tryUnlock(currentPoints) {
-        // console.log("Trying to unlock", this.name, "with", currentPoints, "/", this.cost, "points");
-        if (currentPoints >= this.cost) {
-            this.unlocked = true;
-            console.log("Unlocked Layer", this.name);
-            return true;
-        } else return false;
-    }
-    toggleVisibility(forceHide) {
-        if (forceHide) {
-            if (this.div.classList.contains("hidden")) {
-                this.visible = false;
-                return;
-            } else {
-                this.div.classList.add("hidden");
-                this.visible = false;
-                return;
-            }
-        } else if (this.visible) {
-            this.div.classList.add("hidden");
-            this.visible = false;
-        } else {
-            this.div.classList.remove("hidden");
-            this.visible = true;
-        }
-    }
-    checkMilestones() {
-        for (const key of Object.keys(this.milestones)){
-            const milestone = this.milestones[key];
-            const unlockPoints = parseInt(milestone.unlockPoints);
-            // Set unlocked to true (this is saved in the save file)
-            if (this.game.highestPoints >= unlockPoints) milestone.unlocked = true;
-        }
-        // Loop over the unlocked milestones and add them to the div if they are not already in it
-        for (const key of Object.keys(this.milestones)){
-            if (this.milestones[key].unlocked) {
-                if (!this.div.contains(this.elements[key])) this.div.appendChild(this.elements[key]);
-            }
-        }
-    }
-    setup() {
-        for (const key of Object.keys(this.milestones)){
-            const milestone = this.milestones[key];
-            this.elements[key] = this.Button.createMilestoneButton(milestone);
-        }
-        this.checkMilestones();
-    }
-}
-
-},{"../utils":"gmdam","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gmdam":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Button", ()=>Button);
-class Button {
-    constructor(name, txt, callback, css = ""){
-        this.buttonCSS = "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4";
-        this.buttonCSS = css ? css : this.buttonCSS;
-        this.name = name;
-        this.txt = txt;
-        this.description = "";
-        this.callback = callback;
-        this.button = document.createElement("button");
-        this.init();
-    }
-    init() {
-        this.button.textContent = this.txt;
-        this.button.className = this.buttonCSS;
-        this.button.addEventListener("click", this.callback);
-        this.button.setAttribute("tooltipenabled", "enabled");
-        // Tooltip
-        this.button.addEventListener("mouseover", (event)=>{
-            if (this.button.getAttribute("tooltipenabled") !== "enabled") return;
-            const descriptionDiv = document.createElement("div");
-            descriptionDiv.textContent = this.description;
-            descriptionDiv.className = "absolute bg-gray-900 p-2 rounded z-10 font-bold"; // z-10 to ensure it's above other items
-            document.body.appendChild(descriptionDiv); // Append to body to ensure it's not constrained by button's position
-            const updateTooltipPosition = (mouseEvent)=>{
-                descriptionDiv.style.left = `${mouseEvent.clientX + 10}px`; // +10 for a slight offset from the cursor
-                descriptionDiv.style.top = `${mouseEvent.clientY + 10}px`;
-            };
-            // Initial position update
-            updateTooltipPosition(event);
-            // Update tooltip position on mouse move
-            this.button.addEventListener("mousemove", updateTooltipPosition);
-            // Clean up: remove tooltip and event listener when mouse leaves
-            this.button.addEventListener("mouseleave", ()=>{
-                descriptionDiv.remove();
-                this.button.removeEventListener("mousemove", updateTooltipPosition);
-            }, {
-                once: true
-            }); // Use { once: true } to automatically remove this event listener after it triggers once
-        });
-        return this.button;
-    }
-    // Optionally, create a static factory method to directly return the button element
-    static createButton(name, txt, callback, css = "") {
-        const btn = new Button(name, txt, callback, css);
-        return btn.button;
-    }
-    // Optionally, create a static factory method to directly return the button element
-    static createMilestoneButton(milestone, css = "") {
-        const btn = new Button(milestone.name, milestone.text, milestone.function, css);
-        btn.description = milestone.description;
-        return btn.button;
-    }
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, "__esModule", {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"isy6N":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Dice", ()=>Dice);
-var _layer = require("./layer");
-class Dice extends (0, _layer.Layer) {
-    constructor(game){
-        super(game, "dice", 1000, "white");
-        this.layerColor = "blue";
-    }
-}
-
-},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aXwEX":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Coin", ()=>Coin);
-var _layer = require("./layer");
-class Coin extends (0, _layer.Layer) {
-    constructor(game){
-        super(game, "coin", 10000, "yellow");
-    }
-}
-
-},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["bMKAI","4j3ZX"], "4j3ZX", "parcelRequireef97")
+},{}]},["bMKAI","4j3ZX"], "4j3ZX", "parcelRequireef97")
 
 //# sourceMappingURL=index.ca39cc5e.js.map
