@@ -134,34 +134,52 @@ export class Game {
 async save() {
     const stateToSave: { [key: string]: any } = {};
 
-    for (const key of this.keysToSave) {
-        stateToSave[key] = (this as any)[key];
-    }
-
-    stateToSave["layers"] = {};
-
-    for (const key in this.layers) {
-        const layer = this.layers[key];
-
-        stateToSave.layers[key] = stateToSave.layers[key] || {};
-
-        // Assuming each layer has a `keysToSave` property
-        for (const saveKey of layer.keysToSave) {
-            stateToSave.layers[key][saveKey] = (layer as any)[saveKey];
+    stateToSave["points"] = this.points;
+    stateToSave["visibleLayer"] = this.visibleLayer;
+    stateToSave["mainInterval"] = this.mainInterval;
+    stateToSave["fixedInterval"] = this.fixedInterval;
+    
+    stateToSave["layers"] = {
+        start: {
+            unlocked: this.layers.start.unlocked,
+            cost: this.layers.start.cost,
+            milestonesUnlocked: this.layers.start.milestonesUnlocked,
+            milestones: parseMilestones(this.layers.start.milestones),
+        },
+        dice: {
+            unlocked: this.layers.dice.unlocked,
+            cost: this.layers.dice.cost,
+            milestonesUnlocked: this.layers.dice.milestonesUnlocked,
+            milestones: parseMilestones(this.layers.dice.milestones),
+        },
+        coin: {
+            unlocked: this.layers.coin.unlocked,
+            cost: this.layers.coin.cost,
+            milestonesUnlocked: this.layers.coin.milestonesUnlocked,
+            milestones: parseMilestones(this.layers.coin.milestones),
         }
-
-        // Special handling for milestones - save only necessary data
-        stateToSave.layers[key]["milestones"] = {};
-        for (const milestoneKey in layer.milestones) {
-            const milestone = layer.milestones[milestoneKey];
-            // Save only non-function properties, assuming functions are reconstructed on load
-            stateToSave.layers[key]["milestones"][milestoneKey] = {
-                ...milestone,
-                function: undefined // Explicitly remove function, or alternatively, save state indicating unlocked/locked status
-            };
+    };
+    
+    // Parse the milestones to save them, Remove the function code and reference the function by name
+    function parseMilestones(milestones: { [key: string]: any }): { [key: string]: any } {
+        console.log("Input", milestones)
+        const parsedMilestones: { [key: string]: {} } = {};
+        for (const key of Object.keys(milestones)) {
+            const milestone = milestones[key];
+            for (const milestoneKey of Object.keys(milestone)) {
+                if (milestoneKey === 'function') {
+                    milestone[milestoneKey] = milestone[milestoneKey].name;
+                }
+                if (milestoneKey === 'unlockPoints') {
+                    milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
+                }
+            }
+            parsedMilestones[key] = milestone;
         }
-    }
-
+        return parsedMilestones;
+    };
+    
+    // Actually save the state
     try {
         console.log("Saving game state", stateToSave);
         await localForage.setItem("gameState", stateToSave);
@@ -174,19 +192,52 @@ async save() {
         try {
             const gameState = await localForage.getItem<any>('gameState');
             console.log("STATE LOAD: ", gameState);
-            if (gameState) {
-                for (const key of Object.keys(gameState)) {
-                    if (key === 'layers') {
-                        for (const layerKey of Object.keys(gameState.layers)) {
-                            const layer = gameState.layers[layerKey];
-                            
+
+            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
+            function parseMilestones(thisGame: any, milestones: { [key: string]: any }): { [key: string]: any } {
+                const parsedMilestones: { [key: string]: {} } = {};
+                for (const key of Object.keys(milestones)) {
+                    const milestone = milestones[key];
+                    for (const milestoneKey of Object.keys(milestone)) {
+                        if (milestoneKey === 'function') {
+                            milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
                         }
-                    } else {
-                        (this as any)[key] = gameState[key];
+                        else {
+                            milestone[milestoneKey] = milestone[milestoneKey];
+                        }
+
                     }
+                    parsedMilestones[key] = milestone;
                 }
-                self = gameState;
-                console.log('Game state loaded', gameState);
+                return parsedMilestones;
+            };
+
+            if (gameState) {
+                this.points = gameState.points;
+                this.visibleLayer = gameState.visibleLayer;
+                this.mainInterval = gameState.mainInterval;
+                this.fixedInterval = gameState.fixedInterval;
+
+                this.layers.start.unlocked = gameState.layers.start.unlocked;
+                this.layers.start.cost = gameState.layers.start.cost;
+                this.layers.start.milestonesUnlocked = gameState.layers.start.milestonesUnlocked;
+                this.layers.start.milestones = parseMilestones(this.layers.start, gameState.layers.start.milestones);
+
+                this.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.layers.dice.cost = gameState.layers.dice.cost;
+                this.layers.dice.milestonesUnlocked = gameState.layers.dice.milestonesUnlocked;
+                this.layers.dice.milestones = parseMilestones(this.layers.dice, gameState.layers.dice.milestones);
+
+                this.layers.coin.unlocked = gameState.layers.coin.unlocked;
+                this.layers.coin.cost = gameState.layers.coin.cost;
+                this.layers.coin.milestonesUnlocked = gameState.layers.coin.milestonesUnlocked;
+                this.layers.coin.milestones = parseMilestones(this.layers.coin, gameState.layers.coin.milestones);
+
+                this.setupNav();
+                this.switchLayer(this.visibleLayer);
+                this.updateUI();
+                
+
             } else {
                 console.log('No saved game state to load');
                 this.save(); // Save initial state if nothing to load

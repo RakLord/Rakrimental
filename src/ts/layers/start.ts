@@ -8,33 +8,40 @@ export class Start extends Layer {
         super(game, "start", 0, "green");
         this.pointsPerClickIncrement = 1;
         this.keysToSave.push('pointsPerClickIncrement');
+        this.milestoneFunctions = {
+            "givePoints": () => {
+                this.game.points += this.game.pointsPerClick;
+                this.game.updateUI();
+            },
+            "increasePointsPerClick": () => {
+                this.game.pointsPerClick += this.pointsPerClickIncrement;
+                this.game.updateUI();
+            },
+            "autoPoints": () => {
+                this.game.autoPointsEnabled = true;
+                this.game.updateUI();
+            }
+        }
 
         this.milestones = { 
             "givePoints": {
                 "text": "Gib Points",
                 "unlockPoints": 0,
                 "description": "Give points when clicked",
-                "function": () => {
-                    this.game.points += this.game.pointsPerClick;
-                    this.game.updateUI();}
+                "function": this.milestoneFunctions.givePoints,
             },
             "increasePointsPerClick": {
                 "text": "+PPC",
                 "unlockPoints": 10,
                 "description": "Increase points per click",
-                "function": () => {
-                    this.game.pointsPerClick += this.pointsPerClickIncrement;
-                    this.game.updateUI();
-                }
+                "function": this.milestoneFunctions.increasePointsPerClick,
             },
             "autoPoints": {
                 "text": "Automates Points",
                 "unlockPoints": 500,
                 "description": "Give points automatically",
-                "function": () => {
-                    this.game.autoPointsEnabled = true;
-                    this.game.updateUI();}
-            },
+                "function": this.milestoneFunctions.autoPoints,
+            }
         };
 
 

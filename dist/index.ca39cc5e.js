@@ -666,24 +666,45 @@ class Game {
     }
     async save() {
         const stateToSave = {};
-        for (const key of this.keysToSave)stateToSave[key] = this[key];
-        stateToSave["layers"] = {};
-        for(const key in this.layers){
-            const layer = this.layers[key];
-            stateToSave.layers[key] = stateToSave.layers[key] || {};
-            // Assuming each layer has a `keysToSave` property
-            for (const saveKey of layer.keysToSave)stateToSave.layers[key][saveKey] = layer[saveKey];
-            // Special handling for milestones - save only necessary data
-            stateToSave.layers[key]["milestones"] = {};
-            for(const milestoneKey in layer.milestones){
-                const milestone = layer.milestones[milestoneKey];
-                // Save only non-function properties, assuming functions are reconstructed on load
-                stateToSave.layers[key]["milestones"][milestoneKey] = {
-                    ...milestone,
-                    function: undefined // Explicitly remove function, or alternatively, save state indicating unlocked/locked status
-                };
+        stateToSave["points"] = this.points;
+        stateToSave["visibleLayer"] = this.visibleLayer;
+        stateToSave["mainInterval"] = this.mainInterval;
+        stateToSave["fixedInterval"] = this.fixedInterval;
+        stateToSave["layers"] = {
+            start: {
+                unlocked: this.layers.start.unlocked,
+                cost: this.layers.start.cost,
+                milestonesUnlocked: this.layers.start.milestonesUnlocked,
+                milestones: parseMilestones(this.layers.start.milestones)
+            },
+            dice: {
+                unlocked: this.layers.dice.unlocked,
+                cost: this.layers.dice.cost,
+                milestonesUnlocked: this.layers.dice.milestonesUnlocked,
+                milestones: parseMilestones(this.layers.dice.milestones)
+            },
+            coin: {
+                unlocked: this.layers.coin.unlocked,
+                cost: this.layers.coin.cost,
+                milestonesUnlocked: this.layers.coin.milestonesUnlocked,
+                milestones: parseMilestones(this.layers.coin.milestones)
             }
+        };
+        // Parse the milestones to save them, Remove the function code and reference the function by name
+        function parseMilestones(milestones) {
+            console.log("Input", milestones);
+            const parsedMilestones = {};
+            for (const key of Object.keys(milestones)){
+                const milestone = milestones[key];
+                for (const milestoneKey of Object.keys(milestone)){
+                    if (milestoneKey === "function") milestone[milestoneKey] = milestone[milestoneKey].name;
+                    if (milestoneKey === "unlockPoints") milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
+                }
+                parsedMilestones[key] = milestone;
+            }
+            return parsedMilestones;
         }
+        // Actually save the state
         try {
             console.log("Saving game state", stateToSave);
             await (0, _localforageDefault.default).setItem("gameState", stateToSave);
@@ -695,15 +716,37 @@ class Game {
         try {
             const gameState = await (0, _localforageDefault.default).getItem("gameState");
             console.log("STATE LOAD: ", gameState);
-            if (gameState) {
-                for (const key of Object.keys(gameState)){
-                    if (key === "layers") for (const layerKey of Object.keys(gameState.layers)){
-                        const layer = gameState.layers[layerKey];
-                    }
-                    else this[key] = gameState[key];
+            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
+            function parseMilestones(thisGame, milestones) {
+                const parsedMilestones = {};
+                for (const key of Object.keys(milestones)){
+                    const milestone = milestones[key];
+                    for (const milestoneKey of Object.keys(milestone))if (milestoneKey === "function") milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
+                    else milestone[milestoneKey] = milestone[milestoneKey];
+                    parsedMilestones[key] = milestone;
                 }
-                self = gameState;
-                console.log("Game state loaded", gameState);
+                return parsedMilestones;
+            }
+            if (gameState) {
+                this.points = gameState.points;
+                this.visibleLayer = gameState.visibleLayer;
+                this.mainInterval = gameState.mainInterval;
+                this.fixedInterval = gameState.fixedInterval;
+                this.layers.start.unlocked = gameState.layers.start.unlocked;
+                this.layers.start.cost = gameState.layers.start.cost;
+                this.layers.start.milestonesUnlocked = gameState.layers.start.milestonesUnlocked;
+                this.layers.start.milestones = parseMilestones(this.layers.start, gameState.layers.start.milestones);
+                this.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.layers.dice.cost = gameState.layers.dice.cost;
+                this.layers.dice.milestonesUnlocked = gameState.layers.dice.milestonesUnlocked;
+                this.layers.dice.milestones = parseMilestones(this.layers.dice, gameState.layers.dice.milestones);
+                this.layers.coin.unlocked = gameState.layers.coin.unlocked;
+                this.layers.coin.cost = gameState.layers.coin.cost;
+                this.layers.coin.milestonesUnlocked = gameState.layers.coin.milestonesUnlocked;
+                this.layers.coin.milestones = parseMilestones(this.layers.coin, gameState.layers.coin.milestones);
+                this.setupNav();
+                this.switchLayer(this.visibleLayer);
+                this.updateUI();
             } else {
                 console.log("No saved game state to load");
                 this.save(); // Save initial state if nothing to load
@@ -2946,33 +2989,38 @@ class Start extends (0, _layer.Layer) {
         super(game, "start", 0, "green");
         this.pointsPerClickIncrement = 1;
         this.keysToSave.push("pointsPerClickIncrement");
+        this.milestoneFunctions = {
+            "givePoints": ()=>{
+                this.game.points += this.game.pointsPerClick;
+                this.game.updateUI();
+            },
+            "increasePointsPerClick": ()=>{
+                this.game.pointsPerClick += this.pointsPerClickIncrement;
+                this.game.updateUI();
+            },
+            "autoPoints": ()=>{
+                this.game.autoPointsEnabled = true;
+                this.game.updateUI();
+            }
+        };
         this.milestones = {
             "givePoints": {
                 "text": "Gib Points",
                 "unlockPoints": 0,
                 "description": "Give points when clicked",
-                "function": ()=>{
-                    this.game.points += this.game.pointsPerClick;
-                    this.game.updateUI();
-                }
+                "function": this.milestoneFunctions.givePoints
             },
             "increasePointsPerClick": {
                 "text": "+PPC",
                 "unlockPoints": 10,
                 "description": "Increase points per click",
-                "function": ()=>{
-                    this.game.pointsPerClick += this.pointsPerClickIncrement;
-                    this.game.updateUI();
-                }
+                "function": this.milestoneFunctions.increasePointsPerClick
             },
             "autoPoints": {
                 "text": "Automates Points",
                 "unlockPoints": 500,
                 "description": "Give points automatically",
-                "function": ()=>{
-                    this.game.autoPointsEnabled = true;
-                    this.game.updateUI();
-                }
+                "function": this.milestoneFunctions.autoPoints
             }
         };
         this.setup();
@@ -3007,6 +3055,12 @@ class Layer {
         this.layerColor = layerColor;
         this.milestones = {};
         this.milestonesUnlocked = {};
+        this.milestoneFunctions = {
+            "test": ()=>{
+                console.log("Test Milestone");
+                console.log("End Test Milestone");
+            }
+        };
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement("div");
         this.parentElement.appendChild(this.div);

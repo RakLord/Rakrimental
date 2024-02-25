@@ -14,6 +14,7 @@ export class Layer {
     layerColor: string;
     milestones: { [key: string]: {[key: string]: any}; };
     milestonesUnlocked: { [key: string]: boolean; };
+    milestoneFunctions: { [key: string]: () => any; };
 
     parentElement: HTMLElement = $('main')!;
     div: HTMLElement;
@@ -32,6 +33,12 @@ export class Layer {
 
         this.milestones = {};
         this.milestonesUnlocked = {};
+        this.milestoneFunctions = {
+            "test": () => {
+                console.log("Test Milestone");
+                console.log("End Test Milestone");
+            }
+        };
 
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement('div');
@@ -45,9 +52,7 @@ export class Layer {
         this.layerTitle.innerText = this.name.toUpperCase();
         this.layerTitle.classList.add('text-2xl', 'text-center', 'mb-4', 'font-bold', 'w-full', 'border-b-2', `border-${this.layerColor}-500`);
        
-        this.elements = {
-
-        };
+        this.elements = {};
     }
 
     tryUnlock(currentPoints: number): boolean {
