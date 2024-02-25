@@ -98,6 +98,7 @@ export class Game {
     }
 
     setupNav() {
+        this.navBar.innerHTML = '';
         for (const layer of Object.keys(this.layers)) {
             if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
                 const layerButton = document.createElement('button');
@@ -106,6 +107,7 @@ export class Game {
                 layerButton.innerText = this.layers[layer].name.toUpperCase();
                 layerButton.addEventListener('click', () => this.switchLayer(layer));
                 this.navBar.appendChild(layerButton);
+                console.log("Added button for", layer)
             }
         }
         for (const button of this.navBar.children) {
@@ -118,10 +120,11 @@ export class Game {
     }
 
     switchLayer(layerName: string) {
-        if (this.visibleLayer === layerName) return;
-        this.layers[this.visibleLayer].toggleVisibility();
-        this.visibleLayer = layerName;
-        this.layers[this.visibleLayer].toggleVisibility();
+        console.log("Switching to layer", layerName)
+        for (const layer of Object.keys(this.layers)) {
+            this.layers[layer].toggleVisibility(true);
+        }
+        this.layers[layerName].toggleVisibility();
         for (const button of this.navBar.children) {
             if (button.id === layerName) {
                 button.classList.add('border-b', `border-${this.layers[layerName].layerColor}-500`);
@@ -143,19 +146,16 @@ async save() {
         start: {
             unlocked: this.layers.start.unlocked,
             cost: this.layers.start.cost,
-            milestonesUnlocked: this.layers.start.milestonesUnlocked,
             milestones: parseMilestones(this.layers.start.milestones),
         },
         dice: {
             unlocked: this.layers.dice.unlocked,
             cost: this.layers.dice.cost,
-            milestonesUnlocked: this.layers.dice.milestonesUnlocked,
             milestones: parseMilestones(this.layers.dice.milestones),
         },
         coin: {
             unlocked: this.layers.coin.unlocked,
             cost: this.layers.coin.cost,
-            milestonesUnlocked: this.layers.coin.milestonesUnlocked,
             milestones: parseMilestones(this.layers.coin.milestones),
         }
     };
@@ -196,16 +196,17 @@ async save() {
             // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
             function parseMilestones(thisGame: any, milestones: { [key: string]: any }): { [key: string]: any } {
                 const parsedMilestones: { [key: string]: {} } = {};
+                // Loop over each actual Milestone
                 for (const key of Object.keys(milestones)) {
                     const milestone = milestones[key];
+                    // Loop over each value in the milestone
                     for (const milestoneKey of Object.keys(milestone)) {
+                        // If it is a function, set the milestone to the actual function
                         if (milestoneKey === 'function') {
                             milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
                         }
-                        else {
-                            milestone[milestoneKey] = milestone[milestoneKey];
-                        }
-
+                        else milestone[milestoneKey] = milestone[milestoneKey];
+                        
                     }
                     parsedMilestones[key] = milestone;
                 }
@@ -213,6 +214,7 @@ async save() {
             };
 
             if (gameState) {
+
                 this.points = gameState.points;
                 this.visibleLayer = gameState.visibleLayer;
                 this.mainInterval = gameState.mainInterval;
@@ -220,20 +222,20 @@ async save() {
 
                 this.layers.start.unlocked = gameState.layers.start.unlocked;
                 this.layers.start.cost = gameState.layers.start.cost;
-                this.layers.start.milestonesUnlocked = gameState.layers.start.milestonesUnlocked;
                 this.layers.start.milestones = parseMilestones(this.layers.start, gameState.layers.start.milestones);
 
                 this.layers.dice.unlocked = gameState.layers.dice.unlocked;
                 this.layers.dice.cost = gameState.layers.dice.cost;
-                this.layers.dice.milestonesUnlocked = gameState.layers.dice.milestonesUnlocked;
                 this.layers.dice.milestones = parseMilestones(this.layers.dice, gameState.layers.dice.milestones);
 
                 this.layers.coin.unlocked = gameState.layers.coin.unlocked;
                 this.layers.coin.cost = gameState.layers.coin.cost;
-                this.layers.coin.milestonesUnlocked = gameState.layers.coin.milestonesUnlocked;
                 this.layers.coin.milestones = parseMilestones(this.layers.coin, gameState.layers.coin.milestones);
 
                 this.setupNav();
+                for (const layer of Object.keys(this.layers)) {
+                    this.layers[layer].toggleVisibility(true);
+                }
                 this.switchLayer(this.visibleLayer);
                 this.updateUI();
                 

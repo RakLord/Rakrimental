@@ -13,7 +13,7 @@ export class Layer {
     cost: number;
     layerColor: string;
     milestones: { [key: string]: {[key: string]: any}; };
-    milestonesUnlocked: { [key: string]: boolean; };
+    // milestonesUnlocked: { [key: string]: boolean; };
     milestoneFunctions: { [key: string]: () => any; };
 
     parentElement: HTMLElement = $('main')!;
@@ -22,8 +22,6 @@ export class Layer {
     elements: { [key: string]: HTMLElement; };
     layerTitle: HTMLElement;
 
-    keysToSave: string[] = ['name', 'unlocked', 'cost', 'layerColor', 'visible',  'milestonesUnlocked'];
-
     constructor(game: Game,name: string, cost: number, layerColor: string) {
         this.Button = Button;
         this.game = game;
@@ -31,8 +29,16 @@ export class Layer {
         this.cost = cost;
         this.layerColor = layerColor;
 
-        this.milestones = {};
-        this.milestonesUnlocked = {};
+        this.milestones = {
+            // "test": {
+            //     "text": "Test Milestone",
+            //     "unlockPoints": 0,
+            //     "unlocked": false,
+            //     "description": "Test Milestone",
+            //     "function": this.milestoneFunctions.test,
+            // }
+        };
+        // this.milestonesUnlocked = {};
         this.milestoneFunctions = {
             "test": () => {
                 console.log("Test Milestone");
@@ -66,13 +72,26 @@ export class Layer {
         }
     }
 
-    toggleVisibility() {
-        if (this.visible) {
-            this.div.classList.add('hidden');
-            this.visible = false;
-        } else {
-            this.div.classList.remove('hidden');
-            this.visible = true;
+    toggleVisibility(forceHide?: boolean) {
+        if (forceHide) {
+            if (this.div.classList.contains('hidden')) {
+                this.visible = false;
+                return;
+            }
+            else {
+                this.div.classList.add('hidden');
+                this.visible = false;
+                return;
+            }
+        }
+        else {
+            if (this.visible) {
+                this.div.classList.add('hidden');
+                this.visible = false;
+            } else {
+                this.div.classList.remove('hidden');
+                this.visible = true;
+            }
         }
     }
 
@@ -82,12 +101,12 @@ export class Layer {
             const unlockPoints = parseInt(milestone.unlockPoints);
             // Set unlocked to true (this is saved in the save file)
             if (this.game.highestPoints >= unlockPoints) {
-                this.milestonesUnlocked[key] = true;
+                milestone.unlocked = true;
             }
         }
         // Loop over the unlocked milestones and add them to the div if they are not already in it
-        for (const key of Object.keys(this.milestonesUnlocked)) {
-            if (this.milestonesUnlocked[key]) {
+        for (const key of Object.keys(this.milestones)) {
+            if (this.milestones[key].unlocked) {
                 if (!this.div.contains(this.elements[key])) {
                     this.div.appendChild(this.elements[key]);
                 }
@@ -100,7 +119,6 @@ export class Layer {
             const milestone = this.milestones[key];
             this.elements[key] = this.Button.createMilestoneButton(milestone);
         }
-        this.milestonesUnlocked["givePoints"] = true; // Always unlocked
         this.checkMilestones();
     }
 }
