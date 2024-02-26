@@ -2230,36 +2230,28 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
         stateToSave["layers"] = {
             start: {
                 unlocked: this.game.layers.start.unlocked,
-                cost: this.game.layers.start.cost,
-                milestones: parseMilestones(this.game.layers.start.milestones)
+                milestones: {
+                    givePoints: {
+                        level: this.game.layers.start.milestones.givePoints.level
+                    },
+                    increasePointsPerClick: {
+                        level: this.game.layers.start.milestones.increasePointsPerClick.level
+                    },
+                    autoPoints: {
+                        level: this.game.layers.start.milestones.autoPoints.level,
+                        buyable: this.game.layers.start.milestones.autoPoints.buyable
+                    }
+                }
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
-                cost: this.game.layers.dice.cost,
-                milestones: parseMilestones(this.game.layers.dice.milestones)
+                milestones: {}
             },
             coin: {
                 unlocked: this.game.layers.coin.unlocked,
-                cost: this.game.layers.coin.cost,
-                milestones: parseMilestones(this.game.layers.coin.milestones)
+                milestones: {}
             }
         };
-        // Parse the milestones to save them, Remove the function code and reference the function by name
-        function parseMilestones(milestones) {
-            const parsedMilestones = {};
-            for (const key of Object.keys(milestones)){
-                const milestone = milestones[key];
-                for (const milestoneKey of Object.keys(milestone)){
-                    if (milestoneKey === "function") {
-                        console.log(milestone[milestoneKey]);
-                        milestone[milestoneKey] = milestone[milestoneKey].name;
-                    }
-                    if (milestoneKey === "unlockPoints") milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
-                }
-                parsedMilestones[key] = milestone;
-            }
-            return parsedMilestones;
-        }
         // Actually save the state
         try {
             console.log("Saving game state", stateToSave);
@@ -2273,20 +2265,6 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
         try {
             const gameState = await (0, (/*@__PURE__*/$parcel$interopDefault($9c5688bb4ed5d6a8$exports))).getItem("gameState");
             console.log("STATE LOAD: ", gameState);
-            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
-            function parseMilestones(thisGame, milestones) {
-                const parsedMilestones = {};
-                // Loop over each actual Milestone
-                for (const key of Object.keys(milestones)){
-                    const milestone = milestones[key];
-                    // Loop over each value in the milestone
-                    for (const milestoneKey of Object.keys(milestone))// If it is a function, set the milestone to the actual function
-                    if (milestoneKey === "function") milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
-                    else milestone[milestoneKey] = milestone[milestoneKey];
-                    parsedMilestones[key] = milestone;
-                }
-                return parsedMilestones;
-            }
             if (gameState) {
                 this.game.points = gameState.points;
                 this.game.visibleLayer = gameState.visibleLayer;
@@ -2294,19 +2272,29 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 this.game.fixedInterval = gameState.fixedInterval;
                 this.game.highestPoints = gameState.highestPoints;
                 this.game.tooltipsEnabled = gameState.tooltipsEnabled;
+                // Start Layer
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
-                this.game.layers.start.cost = gameState.layers.start.cost;
-                this.game.layers.start.milestones = parseMilestones(this.game.layers.start, gameState.layers.start.milestones);
+                this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
+                this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
+                this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
+                // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
-                this.game.layers.dice.cost = gameState.layers.dice.cost;
-                this.game.layers.dice.milestones = parseMilestones(this.game.layers.dice, gameState.layers.dice.milestones);
+                // Coin Layer
                 this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
-                this.game.layers.coin.cost = gameState.layers.coin.cost;
-                this.game.layers.coin.milestones = parseMilestones(this.game.layers.coin, gameState.layers.coin.milestones);
                 this.game.setupNav();
                 for (const layer of Object.keys(this.game.layers))this.game.layers[layer].toggleVisibility(true);
                 this.game.switchLayer(this.game.visibleLayer);
                 this.game.setTooltipsState();
+                // loop over each layer and update the milestones
+                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].checkMilestones();
+                // update the text and tooltip on each milestone
+                for (const layer of Object.keys(this.game.layers)){
+                    for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) {
+                        console.log("Updating milestone", key, this.game.layers[layer].milestoneFunctions[key]);
+                        this.game.layers[layer].milestoneFunctions[key].update();
+                    }
+                }
                 this.game.updateUI();
             } else {
                 console.log("No saved game state to load");
@@ -2320,26 +2308,32 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
 
 
 class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
-    constructor(name, txt, callback, css = ""){
-        this.buttonCSS = "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4";
+    constructor(milestone, css = ""){
+        this.buttonCSS = "bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4 max-w-50";
+        this.lines = [];
+        this.milestone = milestone;
         this.buttonCSS = css ? css : this.buttonCSS;
-        this.name = name;
-        this.txt = txt;
-        this.description = "";
-        this.callback = callback;
         this.button = document.createElement("button");
+        this.tooltopVisable = true;
+        // add 4 divs to the this.lines array
+        for(let i = 0; i < 4; i++)this.lines.push(document.createElement("div"));
         this.init();
     }
     init() {
-        this.button.textContent = this.txt;
         this.button.className = this.buttonCSS;
-        this.button.addEventListener("click", this.callback);
-        this.button.setAttribute("tooltipenabled", "enabled");
+        this.updateText();
+        this.updateTooltip();
+        for (const line of this.lines)this.button.appendChild(line);
+        this.button.addEventListener("click", ()=>{
+            this.milestone.activate.bind(this.milestone, this.milestone.cost)();
+            this.updateTooltip();
+            this.updateText();
+        });
         // Tooltip
         this.button.addEventListener("mouseover", (event)=>{
-            if (this.button.getAttribute("tooltipenabled") !== "enabled") return;
+            if (!this.tooltopVisable) return;
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.textContent = this.description;
+            descriptionDiv.textContent = this.milestone.description;
             descriptionDiv.className = "absolute bg-gray-900 p-2 rounded z-10 font-bold"; // z-10 to ensure it's above other items
             document.body.appendChild(descriptionDiv); // Append to body to ensure it's not constrained by button's position
             const updateTooltipPosition = (mouseEvent)=>{
@@ -2358,24 +2352,50 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
                 once: true
             }); // Use { once: true } to automatically remove this event listener after it triggers once
         });
-        return this.button;
+        return this;
     }
-    // Optionally, create a static factory method to directly return the button element
-    static createButton(name, txt, callback, css = "") {
-        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(name, txt, callback, css);
-        return btn.button;
+    toggleTooltip() {
+        this.tooltopVisable = !this.tooltopVisable;
+    }
+    updateTooltip() {
+        const tooltip = document.querySelector(".tooltip");
+        if (tooltip) tooltip.textContent = this.milestone.description;
+    }
+    updateText() {
+        this.lines[0].textContent = this.milestone.text;
     }
     // Optionally, create a static factory method to directly return the button element
     static createMilestoneButton(milestone, css = "") {
-        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(milestone.name, milestone.text, milestone.function, css);
-        btn.description = milestone.description;
-        return btn.button;
+        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(milestone, css);
+        return btn; // Return the Button instance
     }
 }
 
 
 // bind document.getElementById to $
 const $33dc7b2aef0a6efa$var$$ = document.getElementById.bind(document);
+class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
+    constructor(name, text, unlockPoints, description, maxLevel, milestoneFunctions){
+        this.name = name;
+        this.text = text;
+        this.unlockPoints = unlockPoints;
+        this.unlocked = false;
+        this.description = description;
+        this.activate = milestoneFunctions.activate;
+        this.level = 0;
+        this.maxLevel = maxLevel;
+        this.costFormula = milestoneFunctions.cost;
+        this.cost = this.costFormula(this.level);
+        this.buyable = true;
+    }
+    levelUp() {
+        console.log("Level Up", this.level, this.maxLevel, this.buyable);
+        if (!this.buyable) return;
+        this.level++;
+        this.cost = this.costFormula(this.level);
+        if (this.level >= this.maxLevel) this.buyable = false;
+    }
+}
 class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
     constructor(game, name, cost, layerColor){
         this.unlocked = false;
@@ -2386,15 +2406,8 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
-        this.milestones = {
-        };
-        // this.milestonesUnlocked = {};
-        this.milestoneFunctions = {
-            "test": ()=>{
-                console.log("Test Milestone");
-                console.log("End Test Milestone");
-            }
-        };
+        this.milestones = {};
+        this.milestoneFunctions = {};
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement("div");
         this.parentElement.appendChild(this.div);
@@ -2405,10 +2418,9 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         this.div.appendChild(this.layerTitle);
         this.layerTitle.innerText = this.name.toUpperCase();
         this.layerTitle.classList.add("text-2xl", "text-center", "mb-4", "font-bold", "w-full", "border-b-2", `border-${this.layerColor}-500`);
-        this.elements = {};
+        this.buttons = {};
     }
     tryUnlock(currentPoints) {
-        // console.log("Trying to unlock", this.name, "with", currentPoints, "/", this.cost, "points");
         if (currentPoints >= this.cost) {
             this.unlocked = true;
             console.log("Unlocked Layer", this.name);
@@ -2443,14 +2455,19 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)){
             if (this.milestones[key].unlocked) {
-                if (!this.div.contains(this.elements[key])) this.div.appendChild(this.elements[key]);
+                if (!this.div.contains(this.buttons[key].button)) {
+                    this.div.appendChild(this.buttons[key].button);
+                    this.milestoneFunctions[key].updateText();
+                }
             }
         }
     }
     setup() {
         for (const key of Object.keys(this.milestones)){
             const milestone = this.milestones[key];
-            this.elements[key] = this.Button.createMilestoneButton(milestone);
+            const milestoneButton = this.Button.createMilestoneButton(milestone);
+            console.log(milestoneButton.button);
+            this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();
     }
@@ -2466,47 +2483,103 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
         this.milestoneFunctions = {
-            "givePoints": ()=>{
-                this.game.points += this.pointsPerClick;
-                this.game.updateUI();
+            "givePoints": {
+                "activate": ()=>{
+                    this.game.addPoints(this.pointsPerClick);
+                    this.milestoneFunctions.givePoints.update();
+                },
+                "cost": (level)=>{
+                    return 0;
+                },
+                "update": ()=>{
+                    this.milestoneFunctions.givePoints.updateText();
+                },
+                "updateText": ()=>{
+                    this.buttons.givePoints.button.innerHTML = this.milestones.givePoints.text;
+                }
             },
-            "increasePointsPerClick": ()=>{
-                this.pointsPerClick += this.pointsPerClickIncrement;
-                this.game.updateUI();
+            // Increase Points Per Click
+            "increasePointsPerClick": {
+                "activate": (cost)=>{
+                    console.log("Increase Points Per Click", cost, this.game.points);
+                    if (this.game.points >= cost) {
+                        this.game.removePoints(cost);
+                        this.game.layers.start.milestones.increasePointsPerClick.levelUp();
+                        this.milestoneFunctions.increasePointsPerClick.update();
+                    }
+                },
+                "cost": (level)=>{
+                    return Math.floor((level + 1) ** 1.2) * 5;
+                },
+                "update": ()=>{
+                    this.pointsPerClick = this.pointsPerClickIncrement * this.game.layers.start.milestones.increasePointsPerClick.level;
+                    this.milestoneFunctions.increasePointsPerClick.updateText();
+                },
+                "updateText": ()=>{
+                    this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.increasePointsPerClick.cost}`;
+                    this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
+                    this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.pointsPerClick}`;
+                }
             },
-            "autoPoints": ()=>{
-                this.autoPointsEnabled = true;
-                this.game.updateUI();
+            // Upgrade Increase Points Per Click
+            "upgradeIncreasePointsPerClick": {
+                "activate": (cost)=>{
+                    if (this.game.points >= cost) {
+                        this.game.removePoints(cost);
+                        this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
+                        this.pointsPerClickIncrement += 1;
+                        this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
+                    }
+                },
+                "cost": (level)=>{
+                    return Math.floor((level + 10) ** 1.8) * 2;
+                },
+                "update": ()=>{
+                    this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
+                },
+                "updateText": ()=>{
+                    console.log("Updating Upgrade Increase Points Per Click");
+                    this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `+${this.pointsPerClickIncrement}`;
+                }
+            },
+            // Auto Points
+            "autoPoints": {
+                "activate": (cost)=>{
+                    if (this.game.points >= cost) {
+                        this.game.removePoints(cost);
+                        this.autoPointsEnabled = true;
+                        this.game.layers.start.milestones.autoPoints.levelUp();
+                        this.milestoneFunctions.autoPoints.update();
+                    }
+                },
+                "cost": (level)=>{
+                    return 500;
+                },
+                "update": ()=>{
+                    if (this.milestones.autoPoints.level >= this.milestones.autoPoints.maxLevel) this.milestones.autoPoints.buyable = false;
+                    this.milestoneFunctions.autoPoints.updateText();
+                },
+                "updateText": ()=>{
+                    if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
+                    else this.buttons.autoPoints.lines[1].textContent = " Bought";
+                    this.buttons.autoPoints.lines[2].textContent = this.autoPointsEnabled ? "Buyable" : "Enabled";
+                }
             }
         };
         this.milestones = {
-            "givePoints": {
-                "text": "Gib Points",
-                "unlockPoints": 0,
-                "unlocked": false,
-                "description": "Give points when clicked",
-                "function": this.milestoneFunctions.givePoints
-            },
-            "increasePointsPerClick": {
-                "text": "+PPC",
-                "unlockPoints": 10,
-                "unlocked": false,
-                "description": "Increase points per click",
-                "function": this.milestoneFunctions.increasePointsPerClick
-            },
-            "autoPoints": {
-                "text": "Automates Points",
-                "unlockPoints": 500,
-                "unlocked": false,
-                "description": "Give points automatically",
-                "function": this.milestoneFunctions.autoPoints
-            }
+            "givePoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("givePoints", "Gib Points", 0, "Give points when clicked", -1, this.milestoneFunctions.givePoints),
+            "increasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("increasePointsPerClick", "+PPC", 10, "Increase points per click", 10000, this.milestoneFunctions.increasePointsPerClick),
+            "upgradeIncreasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("upgradeIncreasePointsPerClick", "++PPC", 100, "Increase the amount that the +PPC upgrade gives", 100, this.milestoneFunctions.upgradeIncreasePointsPerClick),
+            "autoPoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints)
         };
         this.setup();
         this.toggleVisibility();
+        this.milestoneFunctions.givePoints.update();
     }
     update() {
-        if (this.autoPointsEnabled) this.game.points += this.pointsPerClick / this.pointAutoDivisor;
+        if (this.autoPointsEnabled) this.game.addPoints(this.pointsPerClick / this.pointAutoDivisor);
     }
 }
 
@@ -2562,6 +2635,14 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
     load() {
         this.saveManager.load(this);
     }
+    addPoints(points) {
+        this.points += points;
+        this.updateUI();
+    }
+    removePoints(points) {
+        this.points -= points;
+        this.updateUI();
+    }
     update() {
         for (const layer of Object.keys(this.layers))this.layers[layer].update();
         if (this.points > this.highestPoints) this.highestPoints = this.points;
@@ -2582,16 +2663,10 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.setTooltipsState();
     }
     setTooltipsState() {
-        if (this.tooltipsEnabled) {
-            for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
-                const btn = this.layers[layer].elements[element];
-                btn.setAttribute("tooltipenabled", "enabled");
-            }
-        } else {
-            for (const layer of Object.keys(this.layers))for (const element of Object.keys(this.layers[layer].elements)){
-                const btn = this.layers[layer].elements[element];
-                btn.setAttribute("tooltipenabled", "disabled");
-            }
+        for (const layer of Object.keys(this.layers))for (const key of Object.keys(this.layers[layer].buttons)){
+            const btn = this.layers[layer].buttons[key];
+            btn.toggleTooltip();
+        // element.setAttribute('tooltipenabled', 'enabled');
         }
     }
     setupNav() {
@@ -2616,7 +2691,7 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         else button.classList.remove("border-b", `border-${this.layers[button.id].layerColor}-500`);
     }
     updateUI() {
-        this.textElements.points.innerText = this.points.toString();
+        this.textElements.points.innerText = Math.floor(this.points).toString();
     }
     getText() {
         let textElements;
@@ -2634,4 +2709,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//# sourceMappingURL=index.a7ba1c2e.js.map
+//# sourceMappingURL=index.b2229a8c.js.map

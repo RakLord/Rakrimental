@@ -1,34 +1,49 @@
 
 export class Button {
-    private buttonCSS: string = 'bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4';
-    name: string;
-    txt: string;
-    description: string;
-    callback: () => void;
-    button: HTMLElement;
+    private buttonCSS: string = 'bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4 max-w-50';
 
-    constructor(name: string, txt: string, callback: () => void, css: string = '') {
+    button: HTMLButtonElement;
+    tooltopVisable: boolean;
+    milestone: {[key: string]: any};
+
+    lines: HTMLElement[] = [];
+
+    constructor(milestone: {[key: string]:any}, css: string = '') {
+        this.milestone = milestone;
         this.buttonCSS = css ? css : this.buttonCSS;
-        this.name = name;
-        this.txt = txt;
-        this.description = '';
-        this.callback = callback;
         this.button = document.createElement('button');
+        this.tooltopVisable = true;
+
+        // add 4 divs to the this.lines array
+        for (let i = 0; i < 4; i++) {
+            this.lines.push(document.createElement('div'));
+        }
         this.init();
     }
 
-    private init(): HTMLElement {
-        this.button.textContent = this.txt;
+    private init() {
         this.button.className = this.buttonCSS;
-        this.button.addEventListener('click', this.callback);
-        this.button.setAttribute('tooltipenabled', 'enabled');        
+        this.updateText();
+        this.updateTooltip();
+
+
+        for (const line of this.lines) {
+            this.button.appendChild(line);
+        }
+
         
-        
+        this.button.addEventListener('click', () => {
+            this.milestone.activate.bind(this.milestone, this.milestone.cost)();
+            this.updateTooltip();
+            this.updateText();            
+        });
+
+       
         // Tooltip
         this.button.addEventListener('mouseover', (event) => {
-            if (this.button.getAttribute('tooltipenabled') !== 'enabled') return;
+            if (!this.tooltopVisable) return;
             const descriptionDiv = document.createElement('div');
-            descriptionDiv.textContent = this.description;
+            descriptionDiv.textContent = this.milestone.description;
             descriptionDiv.className = 'absolute bg-gray-900 p-2 rounded z-10 font-bold'; // z-10 to ensure it's above other items
             document.body.appendChild(descriptionDiv); // Append to body to ensure it's not constrained by button's position
     
@@ -50,20 +65,27 @@ export class Button {
             }, { once: true }); // Use { once: true } to automatically remove this event listener after it triggers once
         });
     
-        return this.button;
+        return this;
     }
     
-
-    // Optionally, create a static factory method to directly return the button element
-    static createButton(name: string, txt: string, callback: () => void, css: string = ''): HTMLElement {
-        const btn = new Button(name, txt, callback, css);
-        return btn.button;
-    }
-    // Optionally, create a static factory method to directly return the button element
-    static createMilestoneButton(milestone: {[key: string]: any}, css: string = ''): HTMLElement {
-        const btn = new Button(milestone.name, milestone.text, milestone.function, css);
-        btn.description = milestone.description;
-        return btn.button;
+    toggleTooltip() {
+        this.tooltopVisable = !this.tooltopVisable;
     }
 
+    updateTooltip() {
+        const tooltip = document.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.textContent = this.milestone.description;
+        }
+    }
+
+    updateText() {
+        this.lines[0].textContent = this.milestone.text;
+    }    
+    
+    // Optionally, create a static factory method to directly return the button element
+    static createMilestoneButton(milestone: {[key: string]: any}, css: string = ''): Button {
+        const btn = new Button(milestone, css);
+        return btn; // Return the Button instance
+    }
 }

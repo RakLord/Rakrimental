@@ -5,17 +5,39 @@ import { Button } from "../utils";
 const $ = document.getElementById.bind(document);
 
 export class Milestone {
+    name: string;
     text: string;
     unlockPoints: number;
     unlocked: boolean;
     description: string;
-    function: () => any;
-    constructor(text: string, unlockPoints: number, description: string, func: () => any) {
+    level: number;
+    cost: number;
+    buyable: boolean;
+    maxLevel: number;
+
+    costFormula: (level: number) => number;
+    activate: () => any;
+    constructor(name: string, text: string, unlockPoints: number, description: string, maxLevel: number, milestoneFunctions: any) {
+        this.name = name;
         this.text = text;
         this.unlockPoints = unlockPoints;
         this.unlocked = false;
         this.description = description;
-        this.function = func;
+        this.activate = milestoneFunctions.activate;
+        this.level = 0;
+        this.maxLevel = maxLevel;
+        this.costFormula = milestoneFunctions.cost;
+        this.cost = this.costFormula(this.level);
+        this.buyable = true;
+    }
+    levelUp() {
+        console.log("Level Up", this.level, this.maxLevel, this.buyable)
+        if (!this.buyable) return;
+        this.level++;
+        this.cost = this.costFormula(this.level);
+        if (this.level >= this.maxLevel) {
+            this.buyable = false;
+        }
     }
 }
 
@@ -29,12 +51,12 @@ export class Layer {
     layerColor: string;
     milestones: { [key: string]: {[key: string]: any}; };
     // milestonesUnlocked: { [key: string]: boolean; };
-    milestoneFunctions: { [key: string]: () => any; };
+    milestoneFunctions: { [key: string]: any; };
 
     parentElement: HTMLElement = $('main')!;
     div: HTMLElement;
     visible: boolean = false;
-    elements: { [key: string]: HTMLElement; };
+    buttons: { [key: string]: Button; };
     layerTitle: HTMLElement;
 
     constructor(game: Game,name: string, cost: number, layerColor: string) {
@@ -45,14 +67,7 @@ export class Layer {
         this.layerColor = layerColor;
 
         this.milestones = {};
-        
-        // this.milestonesUnlocked = {};
-        this.milestoneFunctions = {
-            "test": () => {
-                console.log("Test Milestone");
-                console.log("End Test Milestone");
-            }
-        };
+        this.milestoneFunctions = {};
 
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement('div');
@@ -66,11 +81,10 @@ export class Layer {
         this.layerTitle.innerText = this.name.toUpperCase();
         this.layerTitle.classList.add('text-2xl', 'text-center', 'mb-4', 'font-bold', 'w-full', 'border-b-2', `border-${this.layerColor}-500`);
        
-        this.elements = {};
+        this.buttons = {};
     }
 
     tryUnlock(currentPoints: number): boolean {
-        // console.log("Trying to unlock", this.name, "with", currentPoints, "/", this.cost, "points");
         if (currentPoints >= this.cost) {
             this.unlocked = true;
             console.log("Unlocked Layer", this.name);
@@ -115,8 +129,9 @@ export class Layer {
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)) {
             if (this.milestones[key].unlocked) {
-                if (!this.div.contains(this.elements[key])) {
-                    this.div.appendChild(this.elements[key]);
+                if (!this.div.contains(this.buttons[key].button)) {
+                    this.div.appendChild(this.buttons[key].button);
+                    this.milestoneFunctions[key].updateText();
                 }
             }
         }
@@ -125,7 +140,9 @@ export class Layer {
     setup() {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
-            this.elements[key] = this.Button.createMilestoneButton(milestone);
+            const milestoneButton = this.Button.createMilestoneButton(milestone);
+            console.log(milestoneButton.button);
+            this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();
     }

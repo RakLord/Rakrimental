@@ -60,6 +60,16 @@ export class Game {
         this.saveManager.load(this);
     }
 
+    addPoints(points: number) {
+        this.points += points;
+        this.updateUI();
+    }
+
+    removePoints(points: number) {
+        this.points -= points;
+        this.updateUI();
+    }
+
     update() {
         for (const layer of Object.keys(this.layers)) {
             this.layers[layer].update();
@@ -96,20 +106,12 @@ export class Game {
     }
 
     setTooltipsState() {
-        if (this.tooltipsEnabled) {
-            for (const layer of Object.keys(this.layers)) {
-                for (const element of Object.keys(this.layers[layer].elements)) {
-                    const btn = this.layers[layer].elements[element];
-                    btn.setAttribute('tooltipenabled', 'enabled');
-                }
-            }
-        }
-        else {
-            for (const layer of Object.keys(this.layers)) {
-                for (const element of Object.keys(this.layers[layer].elements)) {
-                    const btn = this.layers[layer].elements[element];
-                    btn.setAttribute('tooltipenabled', 'disabled');
-                }
+
+        for (const layer of Object.keys(this.layers)) {
+            for (const key of Object.keys(this.layers[layer].buttons)) {
+                const btn = this.layers[layer].buttons[key];
+                btn.toggleTooltip();
+                // element.setAttribute('tooltipenabled', 'enabled');
             }
         }
     }
@@ -152,7 +154,7 @@ export class Game {
     }
         
     updateUI() {
-        this.textElements.points.innerText = this.points.toString();
+        this.textElements.points.innerText = Math.floor(this.points).toString();
     }
 
     getText(): { [key: string]: HTMLElement; } {
