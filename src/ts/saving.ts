@@ -25,40 +25,15 @@ export class SaveManager {
         stateToSave["layers"] = {
             start: {
                 unlocked: this.game.layers.start.unlocked,
-                cost: this.game.layers.start.cost,
-                milestones: parseMilestones(this.game.layers.start.milestones),
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
-                cost: this.game.layers.dice.cost,
-                milestones: parseMilestones(this.game.layers.dice.milestones),
             },
             coin: {
                 unlocked: this.game.layers.coin.unlocked,
-                cost: this.game.layers.coin.cost,
-                milestones: parseMilestones(this.game.layers.coin.milestones),
             }
         };
         
-        // Parse the milestones to save them, Remove the function code and reference the function by name
-        function parseMilestones(milestones: { [key: string]: any }): { [key: string]: any } {
-            const parsedMilestones: { [key: string]: {} } = {};
-            for (const key of Object.keys(milestones)) {
-                const milestone = milestones[key];
-                for (const milestoneKey of Object.keys(milestone)) {
-                    
-                    if (milestoneKey === 'function') {
-                        console.log(milestone[milestoneKey])
-                        milestone[milestoneKey] = milestone[milestoneKey].name;
-                    }
-                    if (milestoneKey === 'unlockPoints') {
-                        milestone[milestoneKey] = parseInt(milestone[milestoneKey]);
-                    }
-                }
-                parsedMilestones[key] = milestone;
-            }
-            return parsedMilestones;
-        };
         
         // Actually save the state
         try {
@@ -75,25 +50,6 @@ export class SaveManager {
             const gameState = await localForage.getItem<any>('gameState');
             console.log("STATE LOAD: ", gameState);
 
-            // Sets the milestones function to the actual function. This is done because the function is not saved in the save file
-            function parseMilestones(thisGame: any, milestones: { [key: string]: any }): { [key: string]: any } {
-                const parsedMilestones: { [key: string]: {} } = {};
-                // Loop over each actual Milestone
-                for (const key of Object.keys(milestones)) {
-                    const milestone = milestones[key];
-                    // Loop over each value in the milestone
-                    for (const milestoneKey of Object.keys(milestone)) {
-                        // If it is a function, set the milestone to the actual function
-                        if (milestoneKey === 'function') {
-                            milestone[milestoneKey] = thisGame.milestoneFunctions[milestone[milestoneKey]];
-                        }
-                        else milestone[milestoneKey] = milestone[milestoneKey];
-                        
-                    }
-                    parsedMilestones[key] = milestone;
-                }
-                return parsedMilestones;
-            };
 
             if (gameState) {
 
@@ -105,16 +61,10 @@ export class SaveManager {
                 this.game.tooltipsEnabled = gameState.tooltipsEnabled;
                 
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
-                this.game.layers.start.cost = gameState.layers.start.cost;
-                this.game.layers.start.milestones = parseMilestones(this.game.layers.start, gameState.layers.start.milestones);
 
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
-                this.game.layers.dice.cost = gameState.layers.dice.cost;
-                this.game.layers.dice.milestones = parseMilestones(this.game.layers.dice, gameState.layers.dice.milestones);
 
                 this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
-                this.game.layers.coin.cost = gameState.layers.coin.cost;
-                this.game.layers.coin.milestones = parseMilestones(this.game.layers.coin, gameState.layers.coin.milestones);
 
                 this.game.setupNav();
                 for (const layer of Object.keys(this.game.layers)) {

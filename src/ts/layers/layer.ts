@@ -4,6 +4,21 @@ import { Button } from "../utils";
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
 
+export class Milestone {
+    text: string;
+    unlockPoints: number;
+    unlocked: boolean;
+    description: string;
+    function: () => any;
+    constructor(text: string, unlockPoints: number, description: string, func: () => any) {
+        this.text = text;
+        this.unlockPoints = unlockPoints;
+        this.unlocked = false;
+        this.description = description;
+        this.function = func;
+    }
+}
+
 
 export class Layer {
     game: Game;
@@ -29,15 +44,8 @@ export class Layer {
         this.cost = cost;
         this.layerColor = layerColor;
 
-        this.milestones = {
-            // "test": {
-            //     "text": "Test Milestone",
-            //     "unlockPoints": 0,
-            //     "unlocked": false,
-            //     "description": "Test Milestone",
-            //     "function": this.milestoneFunctions.test,
-            // }
-        };
+        this.milestones = {};
+        
         // this.milestonesUnlocked = {};
         this.milestoneFunctions = {
             "test": () => {

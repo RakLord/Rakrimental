@@ -4,7 +4,7 @@
   "description": "waaa",
   "scripts": {
     "start": "parcel ./src/index.html",
-    "build": "parcel build ./src/index.html --public-url ./"
+    "build": "parcel build ./src/index.html --public-url ./ --no-optimize"
   },  
   "keywords": [],
   "author": "Rak",
