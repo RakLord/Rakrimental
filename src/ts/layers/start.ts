@@ -7,12 +7,17 @@ export class Start extends Layer {
     pointsPerClick: number;
     pointAutoDivisor: number;
     autoPointsEnabled: boolean;
+    pointsText: HTMLElement;
     constructor(game: Game) {
         super(game, "start", 0, "green");
         this.pointsPerClickIncrement = 1;
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
+        this.pointsText = document.createElement('h2');
+        this.pointsText.classList.add('text-1xl', 'text-white', 'font-bold', 'text-center');
+        this.pointsText.textContent = `Points: ${this.game.points}`;
+        this.div.appendChild(this.pointsText);
 
         this.milestoneFunctions = {
             "givePoints": {
@@ -27,7 +32,7 @@ export class Start extends Layer {
                     this.milestoneFunctions.givePoints.updateText();
                 },
                 "updateText": () => {
-                    this.buttons.givePoints.button.innerHTML = this.milestones.givePoints.text;
+                    this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
                 }
             },
 
@@ -70,6 +75,7 @@ export class Start extends Layer {
                 },
                 "update": () => {
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
+                    this.milestoneFunctions.increasePointsPerClick.update();
                 },
                 "updateText": () => {
                     console.log("Updating Upgrade Increase Points Per Click")
@@ -102,9 +108,8 @@ export class Start extends Layer {
                     if (this.milestones.autoPoints.buyable) {
                         this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
                     } else {
-                        this.buttons.autoPoints.lines[1].textContent = " Bought";
+                        this.buttons.autoPoints.lines[1].textContent = "Enabled";
                     }
-                    this.buttons.autoPoints.lines[2].textContent = (this.autoPointsEnabled ? 'Buyable' : "Enabled")
                 }
             },
         };
@@ -120,7 +125,10 @@ export class Start extends Layer {
         this.toggleVisibility();
 
         this.milestoneFunctions.givePoints.update();
+    }
 
+    updatePointsText() {
+        this.pointsText.textContent = `Points: ${Math.floor(this.game.points)}`;
     }
 
     update() {

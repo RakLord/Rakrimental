@@ -1,6 +1,6 @@
 
 export class Button {
-    private buttonCSS: string = 'bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4 max-w-50';
+    private buttonCSS: string = 'bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white py-2 px04 rounded w-1/4 mx-auto mt-4 max-w-md';
 
     button: HTMLButtonElement;
     tooltopVisable: boolean;
@@ -30,6 +30,15 @@ export class Button {
         for (const line of this.lines) {
             this.button.appendChild(line);
         }
+        if (this.milestone.name === 'givePoints') { 
+            this.lines[0].classList.add('text-base', 'font-bold', 'w-full', 'text-center', 'mb-1');
+        }
+        else {
+            this.lines[0].classList.add('text-base', 'font-bold', 'border-b-2', 'w-full', 'text-center', 'mb-1');
+        }
+        this.lines[1].classList.add('text-sm');
+        this.lines[2].classList.add('text-sm');
+        this.lines[3].classList.add('text-sm');
 
         
         this.button.addEventListener('click', () => {

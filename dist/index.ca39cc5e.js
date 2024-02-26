@@ -677,6 +677,7 @@ class Game {
     }
     updateUI() {
         this.textElements.points.innerText = Math.floor(this.points).toString();
+        this.layers.start.updatePointsText();
     }
     getText() {
         let textElements;
@@ -3043,6 +3044,10 @@ class Start extends (0, _layer.Layer) {
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
+        this.pointsText = document.createElement("h2");
+        this.pointsText.classList.add("text-1xl", "text-white", "font-bold", "text-center");
+        this.pointsText.textContent = `Points: ${this.game.points}`;
+        this.div.appendChild(this.pointsText);
         this.milestoneFunctions = {
             "givePoints": {
                 "activate": ()=>{
@@ -3056,7 +3061,7 @@ class Start extends (0, _layer.Layer) {
                     this.milestoneFunctions.givePoints.updateText();
                 },
                 "updateText": ()=>{
-                    this.buttons.givePoints.button.innerHTML = this.milestones.givePoints.text;
+                    this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
                 }
             },
             // Increase Points Per Click
@@ -3097,6 +3102,7 @@ class Start extends (0, _layer.Layer) {
                 },
                 "update": ()=>{
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
+                    this.milestoneFunctions.increasePointsPerClick.update();
                 },
                 "updateText": ()=>{
                     console.log("Updating Upgrade Increase Points Per Click");
@@ -3124,8 +3130,7 @@ class Start extends (0, _layer.Layer) {
                 },
                 "updateText": ()=>{
                     if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
-                    else this.buttons.autoPoints.lines[1].textContent = " Bought";
-                    this.buttons.autoPoints.lines[2].textContent = this.autoPointsEnabled ? "Buyable" : "Enabled";
+                    else this.buttons.autoPoints.lines[1].textContent = "Enabled";
                 }
             }
         };
@@ -3138,6 +3143,9 @@ class Start extends (0, _layer.Layer) {
         this.setup();
         this.toggleVisibility();
         this.milestoneFunctions.givePoints.update();
+    }
+    updatePointsText() {
+        this.pointsText.textContent = `Points: ${Math.floor(this.game.points)}`;
     }
     update() {
         if (this.autoPointsEnabled) this.game.addPoints(this.pointsPerClick / this.pointAutoDivisor);
@@ -3258,7 +3266,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Button", ()=>Button);
 class Button {
     constructor(milestone, css = ""){
-        this.buttonCSS = "bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white font-bold py-2 px-4 rounded w-1/4 mx-auto mt-4 max-w-50";
+        this.buttonCSS = "bg-blue-900 bg-opacity-20 hover:bg-opacity-50 flex flex-col justify-center items-center text-white py-2 px04 rounded w-1/4 mx-auto mt-4 max-w-md";
         this.lines = [];
         this.milestone = milestone;
         this.buttonCSS = css ? css : this.buttonCSS;
@@ -3273,6 +3281,11 @@ class Button {
         this.updateText();
         this.updateTooltip();
         for (const line of this.lines)this.button.appendChild(line);
+        if (this.milestone.name === "givePoints") this.lines[0].classList.add("text-base", "font-bold", "w-full", "text-center", "mb-1");
+        else this.lines[0].classList.add("text-base", "font-bold", "border-b-2", "w-full", "text-center", "mb-1");
+        this.lines[1].classList.add("text-sm");
+        this.lines[2].classList.add("text-sm");
+        this.lines[3].classList.add("text-sm");
         this.button.addEventListener("click", ()=>{
             this.milestone.activate.bind(this.milestone, this.milestone.cost)();
             this.updateTooltip();

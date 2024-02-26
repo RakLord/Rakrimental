@@ -43,6 +43,7 @@ export class Milestone {
 
 
 export class Layer {
+    [x: string]: any;
     game: Game;
     Button: typeof Button;
     name: string;
@@ -58,7 +59,6 @@ export class Layer {
     visible: boolean = false;
     buttons: { [key: string]: Button; };
     layerTitle: HTMLElement;
-
     constructor(game: Game,name: string, cost: number, layerColor: string) {
         this.Button = Button;
         this.game = game;

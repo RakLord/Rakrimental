@@ -19,7 +19,6 @@ export class Game {
     layers: { [key: string]: Layer; };
     visibleLayer: string; // Holds the name of the currently visible layer
     navBar: HTMLElement;
-
     tooltipsEnabled: boolean;
 
 
@@ -37,8 +36,6 @@ export class Game {
             coin: new Coin(this)
         };
         this.layers.start.unlocked = true;
-
-
 
         this.visibleLayer = "start";
         this.tooltipsEnabled = true;
@@ -155,6 +152,7 @@ export class Game {
         
     updateUI() {
         this.textElements.points.innerText = Math.floor(this.points).toString();
+        this.layers.start.updatePointsText();
     }
 
     getText(): { [key: string]: HTMLElement; } {
