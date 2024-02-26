@@ -96,12 +96,9 @@ export class Start extends Layer {
                     }
                 },
                 "cost": (level: number): number => {
-                    return 500;
+                    return 3000;
                 },
                 "update": () => {
-                    if (this.milestones.autoPoints.level >= this.milestones.autoPoints.maxLevel) {
-                        this.milestones.autoPoints.buyable = false;
-                    }
                     this.milestoneFunctions.autoPoints.updateText();
                 },
                 "updateText": () => {
@@ -109,16 +106,43 @@ export class Start extends Layer {
                         this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
                     } else {
                         this.buttons.autoPoints.lines[1].textContent = "Enabled";
+                        this.buttons.autoPoints.button.classList.add('not-buyable');
                     }
                 }
             },
+
+            // Auto Points Divisor
+            "autoPointsDivisor": {
+                "activate": (cost: number) => {
+                    if (this.game.points >= cost) {
+                        this.game.removePoints(cost);
+                        if (this.pointAutoDivisor >= 2) {
+                            this.pointAutoDivisor -= 1;
+                            this.game.layers.start.milestones.autoPointsDivisor.levelUp();
+                            this.milestoneFunctions.autoPointsDivisor.update();
+                        }
+                    }
+                },
+                "cost": (level: number): number => {
+                    return Math.floor(((level+1) ** 1.2) * (Math.log(level+1) * 1000) + 10000);
+                },
+                "update": () => {
+                    this.milestoneFunctions.autoPointsDivisor.updateText();
+                },
+                "updateText": () => {
+                    this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.milestones.autoPointsDivisor.cost}`;
+                    this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
+                    this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${this.pointAutoDivisor}`;
+                }
+            }
         };
 
         this.milestones = {
             "givePoints": new Milestone("givePoints", "Gib Points", 0, "Give points when clicked", -1, this.milestoneFunctions.givePoints),
             "increasePointsPerClick": new Milestone("increasePointsPerClick", "+PPC", 10, "Increase points per click", 10000, this.milestoneFunctions.increasePointsPerClick),
             "upgradeIncreasePointsPerClick": new Milestone("upgradeIncreasePointsPerClick", "++PPC", 100, "Increase the amount that the +PPC upgrade gives", 100, this.milestoneFunctions.upgradeIncreasePointsPerClick),
-            "autoPoints": new Milestone("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints)
+            "autoPoints": new Milestone("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints),
+            "autoPointsDivisor": new Milestone("autoPointsDivisor", "Auto Points Divisor", 10000, "Lowers the auto-points divider", 100, this.milestoneFunctions.autoPointsDivisor)
         }
 
         this.setup();

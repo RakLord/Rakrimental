@@ -1,0 +1,200 @@
+
+$text: #f7f7f7;
+$text-alt: #ffffff;
+$background: #050705;
+$primary: #42c95d;
+$secondary: #24ac3d;
+$accent: #45e463;
+$danger: #b81919;
+
+// Import Bootstrap and override default colors
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+// Override the Bootstrap color variables before importing the rest of Bootstrap
+$theme-colors: (
+    "text": $text,
+    "text-alt": $text-alt,
+    "background": $background,
+    "primary": $primary,
+    "secondary": $secondary,
+    "accent": $accent,
+    "danger": $danger
+);
+
+// Now import the rest of Bootstrap
+@import "node_modules/bootstrap/scss/bootstrap";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100vh;
+    width: 100vw;
+}
+body {
+    background-color: $background;
+    color: $text;
+    height: 90%;
+    font-family: 'Roboto', sans-serif;
+}
+
+body .btn-hover {
+    border-radius: 0;
+    border-bottom: 2px solid transparent; 
+    transition: all 0.3s ease;
+    color: $text;
+
+    &:hover {
+        border-bottom: 2px solid $accent; 
+    }
+}
+
+// Utility bar with more specific styles
+body .utility-bar {
+    background-color: $background;
+    color: $text;
+
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+
+
+    
+    
+    button {
+        color: $text;
+        &:hover {
+            color: $accent;
+        }
+    }
+
+    * {
+        padding-inline: 1rem;    
+    }
+}
+
+body .nav-bar {
+    background-color: $background;
+    color: $text;
+
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+
+    height: fit-content;
+    
+    button {
+        min-width: fit-content;
+        width: 10%;
+        color: $text;
+        background-color: transparent;
+        border: 1px solid transparent;
+        &:hover {
+            color: $accent;
+
+        }
+    }
+}
+
+.selected {
+    background-color: transparent !important;
+    font-weight: bold !important;
+    border-bottom: 2px solid $accent !important;
+}
+
+button {
+    background-color: $primary;
+    color: $text;
+    border: 1px solid $primary;
+    border-radius: 0;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: $accent;
+        border: 1px solid $accent;
+        color: $text-alt;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+main {
+    width: 100%;
+    height: inherit;
+    border-bottom: 1px solid $text;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    .splitter {
+        height: 2px;
+        background-color: $secondary;
+        width: 100%;
+        margin-block: 0.5rem;
+    }
+
+    .layer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+
+        button {
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            border: 2px solid $secondary;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 30ch !important;
+            color: $text !important;
+
+            &:hover {
+                background-color: $secondary !important;
+                border: 2px solid $accent;
+                color: $text-alt !important;
+            }
+
+            h1 {
+                margin: 0 !important;
+                padding: 0 !important;
+                border-bottom: 2px solid white;
+                font-size: 1.4rem;
+                font-weight: bold !important;
+            }
+            .givePoints {
+                border-bottom: none !important;
+                padding: 0.8rem !important;
+            }
+        }
+    }
+}
+
+.not-buyable {
+    border: 2px solid $danger !important;
+    cursor: not-allowed !important;
+}
+
+
+.dynamic-tooltip {
+    position: absolute !important;
+    z-index: 1000 !important;
+    color: $text !important;
+    background-color: $background !important;
+    border-radius: 0.3rem !important;
+    border: 2px solid $accent !important;
+    padding: 0.4rem !important;
+}

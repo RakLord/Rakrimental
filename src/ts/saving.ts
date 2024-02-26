@@ -36,7 +36,7 @@ export class SaveManager {
                     },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level,
-                        buyable: this.game.layers.start.milestones.autoPoints.buyable
+                        buyable: this.game.layers.start.milestones.autoPoints.buyable,
                     }
                 }
             },
@@ -90,6 +90,7 @@ export class SaveManager {
                 this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
 
                 this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
 
                 // Dice Layer

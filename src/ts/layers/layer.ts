@@ -58,7 +58,6 @@ export class Layer {
     div: HTMLElement;
     visible: boolean = false;
     buttons: { [key: string]: Button; };
-    layerTitle: HTMLElement;
     constructor(game: Game,name: string, cost: number, layerColor: string) {
         this.Button = Button;
         this.game = game;
@@ -72,14 +71,9 @@ export class Layer {
         // create a blank div that fills the entire parent, and add it to the parent which is main
         this.div = document.createElement('div');
         this.parentElement.appendChild(this.div);
-        this.div.classList.add('flex', 'flex-col', 'w-full', 'h-full', 'hidden');
+        this.div.classList.add('layer', 'hidden');
         this.div.setAttribute('id', this.name);
 
-        // create a title for the layer
-        this.layerTitle = document.createElement('div');
-        this.div.appendChild(this.layerTitle);
-        this.layerTitle.innerText = this.name.toUpperCase();
-        this.layerTitle.classList.add('text-2xl', 'text-center', 'mb-4', 'font-bold', 'w-full', 'border-b-2', `border-${this.layerColor}-500`);
        
         this.buttons = {};
     }

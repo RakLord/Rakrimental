@@ -1,3 +1,4 @@
+import * as bootstrap from 'bootstrap';
 import { SaveManager } from './saving';
 import { Layer } from './layers/layer';
 import { Start } from './layers/start';
@@ -118,7 +119,6 @@ export class Game {
         for (const layer of Object.keys(this.layers)) {
             if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
                 const layerButton = document.createElement('button');
-                layerButton.classList.add('hover:mb-1', 'font-bold');
                 layerButton.setAttribute('id', layer);
                 layerButton.innerText = this.layers[layer].name.toUpperCase();
                 layerButton.addEventListener('click', () => this.switchLayer(layer));
@@ -128,9 +128,9 @@ export class Game {
         }
         for (const button of this.navBar.children) {
             if (button.id === this.visibleLayer) {
-                button.classList.add('border-b', `border-${this.layers[this.visibleLayer].layerColor}-500`);
+                button.classList.add('selected');
             } else {
-                button.classList.remove('border-b', `border-${this.layers[button.id].layerColor}-500`);
+                button.classList.remove('selected');
             }
         }
     }
@@ -143,9 +143,9 @@ export class Game {
         this.layers[layerName].toggleVisibility();
         for (const button of this.navBar.children) {
             if (button.id === layerName) {
-                button.classList.add('border-b', `border-${this.layers[layerName].layerColor}-500`);
+                button.classList.add('selected');
             } else {
-                button.classList.remove('border-b', `border-${this.layers[button.id].layerColor}-500`);
+                button.classList.remove('selected');
             }
         }
     }
