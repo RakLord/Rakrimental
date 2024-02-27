@@ -109,15 +109,30 @@ export class SaveManager {
                 for (const layer of Object.keys(this.game.layers)) {
                     this.game.layers[layer].checkMilestones();
                 }
+                
+
+                //  Update milestone costs based on loaded level
+                for (const layer of Object.keys(this.game.layers)) {
+                    for (const key of Object.keys(this.game.layers[layer].milestones)) {
+                        const ms = this.game.layers[layer].milestones[key];
+                        const msf = this.game.layers[layer].milestoneFunctions[key].cost;
+                        ms.cost = msf(ms);
+                    }
+                }
+
                 // update the text and tooltip on each milestone
                 for (const layer of Object.keys(this.game.layers)) {
                     for (const key of Object.keys(this.game.layers[layer].milestones)) {
                         if (this.game.layers[layer].milestoneFunctions[key].update) {
-                            console.log("Updating milestone", key, this.game.layers[layer].milestoneFunctions[key])
                             this.game.layers[layer].milestoneFunctions[key].update();
                         }
                     }
                 }
+
+
+
+
+
                 this.game.updateUI();
                 
 

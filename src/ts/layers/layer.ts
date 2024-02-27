@@ -14,8 +14,10 @@ export class Milestone {
     cost: number;
     buyable: boolean;
     maxLevel: number;
+    graphEnabled: boolean;
+    hovered: boolean;
 
-    costFormula: (level: number) => number;
+    costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: number) => number;
     activate: () => any;
     constructor(name: string, text: string, unlockPoints: number, description: string, maxLevel: number, milestoneFunctions: any) {
         this.name = name;
@@ -27,14 +29,15 @@ export class Milestone {
         this.level = 0;
         this.maxLevel = maxLevel;
         this.costFormula = milestoneFunctions.cost;
-        this.cost = this.costFormula(this.level);
+        this.cost = this.costFormula(this);
         this.buyable = true;
+        this.graphEnabled = false;
+        this.hovered = false;
     }
     levelUp() {
-        console.log("Level Up", this.level, this.maxLevel, this.buyable)
         if (!this.buyable) return;
         this.level++;
-        this.cost = this.costFormula(this.level);
+        this.cost = this.costFormula(this);
         if (this.level >= this.maxLevel) {
             this.buyable = false;
         }
@@ -50,7 +53,7 @@ export class Layer {
     unlocked: boolean = false;
     cost: number;
     layerColor: string;
-    milestones: { [key: string]: {[key: string]: any}; };
+    milestones: { [key: string]: Milestone; };
     // milestonesUnlocked: { [key: string]: boolean; };
     milestoneFunctions: { [key: string]: any; };
 
@@ -114,7 +117,7 @@ export class Layer {
     checkMilestones() {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
-            const unlockPoints = parseInt(milestone.unlockPoints);
+            const unlockPoints = milestone.unlockPoints;
             // Set unlocked to true (this is saved in the save file)
             if (this.game.highestPoints >= unlockPoints) {
                 milestone.unlocked = true;
@@ -134,7 +137,8 @@ export class Layer {
     setup() {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
-            const milestoneButton = this.Button.createMilestoneButton(milestone);
+            console.log("SETUP ",  milestone)
+            const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
             console.log(milestoneButton.button);
             this.buttons[key] = milestoneButton;
         }
@@ -142,6 +146,6 @@ export class Layer {
     }
 
     update() {
-        
+
     }
 }

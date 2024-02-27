@@ -13263,4 +13263,10 @@ main .layer button .givePoints {
   position: absolute !important;
 }
 
-/*# sourceMappingURL=index.dbdd491c.css.map */
+main .formula-graph {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+}
+
+/*# sourceMappingURL=index.ebd4f778.css.map */

@@ -1,12 +1,11 @@
 import * as bootstrap from 'bootstrap';
 import { SaveManager } from './saving';
+import { FormulaGraph } from './utils';
 import { Layer } from './layers/layer';
 import { Start } from './layers/start';
 import { Dice } from './layers/dice';
 import { Coin } from './layers/coin';
 
-// bind document.getElementById to $
-const $ = document.getElementById.bind(document);
 
 export class Game {
     saveManager: SaveManager;
@@ -21,16 +20,23 @@ export class Game {
     visibleLayer: string; // Holds the name of the currently visible layer
     navBar: HTMLElement;
     tooltipsEnabled: boolean;
+    keyPressed: string;
 
+    formulaGraphEnabled: boolean = false;
+    displayingGraph: boolean;
+    formulaGraph: FormulaGraph;
 
     constructor() {
         console.log("Game Constructor")
         this.saveManager = new SaveManager(this);
+        this.formulaGraph = new FormulaGraph(this);
+        this.displayingGraph = false;
         this.textElements = this.getText();
         this.navBar = $('navBar')!;
         this.mainInterval = 1000;
         this.points = 0;
         this.highestPoints = 0;
+        this.keyPressed = '';
         this.layers = { 
             start: new Start(this),
             dice: new Dice(this),
@@ -40,14 +46,44 @@ export class Game {
 
         this.visibleLayer = "start";
         this.tooltipsEnabled = true;
-        $('save-button')!.addEventListener('click', this.save.bind(this));
-        $('load-button')!.addEventListener('click', this.load.bind(this));
-        $('tooltip-button')!.addEventListener('click', this.toggleTooltips.bind(this));
+
+        function utilityButton(game: Game, txt: string,  func: () => any) {
+            const btn = document.createElement('button');
+            btn.innerText = txt;
+            btn.classList.add('btn', 'btn-transparent', 'btn-hover');
+            btn.addEventListener('click', func.bind(game))
+            document.getElementsByClassName('utility-bar')[0]!.appendChild(btn);
+        }
+        utilityButton(this, 'Save', this.save);
+        utilityButton(this, 'Load', this.load);
+        utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
+        utilityButton(this, 'Enable Graphs', this.enableGraphs);
+
 
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         
         this.setupNav();
+
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault()
+            // Can make custom right click menu if I can be bothered.
+            // simulate left click
+            const clickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            event.target?.dispatchEvent(clickEvent);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            this.keyPressed = event.key;
+        });
+        document.addEventListener('keyup', (event) => {
+            this.keyPressed = "";
+        });   
+
     }
 
     save() {
@@ -68,6 +104,7 @@ export class Game {
         this.updateUI();
     }
 
+    // Is called every mainInterval time (1000ms default)
     update() {
         for (const layer of Object.keys(this.layers)) {
             this.layers[layer].update();
@@ -78,6 +115,7 @@ export class Game {
         this.updateUI();
     }
     
+    // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
     fixedIntervalUpdate () {
         for (const layer of Object.keys(this.layers)) {
             try {
@@ -101,6 +139,10 @@ export class Game {
     toggleTooltips() {
         this.tooltipsEnabled = !this.tooltipsEnabled;
         this.setTooltipsState();
+    }
+
+    enableGraphs() {
+        this.formulaGraphEnabled = !this.formulaGraphEnabled;
     }
 
     setTooltipsState() {
@@ -152,6 +194,7 @@ export class Game {
         
     updateUI() {
         this.textElements.points.innerText = Math.floor(this.points).toString();
+        this.textElements.pointsPerSec.innerText = this.layers.start.pointsPerSec.toFixed(2);
         this.layers.start.updatePointsText();
     }
 
@@ -166,6 +209,10 @@ export class Game {
 }
 
 let game: Game;
+
+// bind document.getElementById to $
+const $ = document.getElementById.bind(document);
+
 document.addEventListener('DOMContentLoaded', function() {
     game = new Game();
     (window as any).game = game;

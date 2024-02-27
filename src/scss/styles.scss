@@ -198,3 +198,9 @@ main {
     border: 2px solid $accent !important;
     padding: 0.4rem !important;
 }
+
+main .formula-graph {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+}

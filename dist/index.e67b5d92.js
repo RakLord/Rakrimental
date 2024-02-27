@@ -2289,12 +2289,15 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 this.game.setTooltipsState();
                 // loop over each layer and update the milestones
                 for (const layer of Object.keys(this.game.layers))this.game.layers[layer].checkMilestones();
+                //  Update milestone costs based on loaded level
+                for (const layer of Object.keys(this.game.layers))for (const key of Object.keys(this.game.layers[layer].milestones)){
+                    const ms = this.game.layers[layer].milestones[key];
+                    const msf = this.game.layers[layer].milestoneFunctions[key].cost;
+                    ms.cost = msf(ms);
+                }
                 // update the text and tooltip on each milestone
                 for (const layer of Object.keys(this.game.layers)){
-                    for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) {
-                        console.log("Updating milestone", key, this.game.layers[layer].milestoneFunctions[key]);
-                        this.game.layers[layer].milestoneFunctions[key].update();
-                    }
+                    for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) this.game.layers[layer].milestoneFunctions[key].update();
                 }
                 this.game.updateUI();
             } else {
@@ -2309,11 +2312,13 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
 
 
 class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
-    constructor(milestone){
+    constructor(game, milestone){
         this.lines = [];
+        this.game = game;
         this.milestone = milestone;
         this.button = document.createElement("button");
         this.tooltopVisable = true;
+        this.button.setAttribute("tabindex", "-1");
         // add 4 divs to the this.lines array
         this.lines.push(document.createElement("h1"));
         for(let i = 0; i < 3; i++)this.lines.push(document.createElement("div"));
@@ -2324,10 +2329,35 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         this.updateTooltip();
         for (const line of this.lines)this.button.appendChild(line);
         if (this.milestone.name === "givePoints") this.lines[0].className = "givePoints";
-        this.button.addEventListener("click", ()=>{
-            this.milestone.activate.bind(this.milestone, this.milestone.cost)();
+        this.button.addEventListener("keydown", (event)=>{
+            if (event.key === "Enter" || event.keyCode === 13) event.preventDefault();
+        });
+        this.button.addEventListener("click", (event)=>{
+            this.milestone.activate();
             this.updateTooltip();
             this.updateText();
+        });
+        this.button.addEventListener("mouseenter", (event)=>{
+            this.milestone.hovered = true;
+            // Only proceed if not already displaying a graph
+            if (!this.game.displayingGraph) {
+                if (this.game.formulaGraphEnabled && this.milestone.graphEnabled) {
+                    // Conditions met, now set displayingGraph to true to block further graph creations until mouseleave
+                    this.game.displayingGraph = true;
+                    this.game.formulaGraph.createGraph(this.milestone);
+                // Move the mouseleave listener outside the condition to ensure it's always added
+                }
+                // Listener for mouseleave to reset the state
+                this.button.addEventListener("mouseleave", (event)=>{
+                    this.milestone.hovered = false;
+                    // Ensure graph is not being displayed anymore
+                    this.game.displayingGraph = false;
+                    // Call to remove the graph
+                    this.game.formulaGraph.removeGraph();
+                }, {
+                    once: true
+                }); // Ensures this listener is cleaned up after execution
+            }
         });
         // Tooltip
         this.button.addEventListener("mouseover", (event)=>{
@@ -2365,11 +2395,80 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         this.lines[0].textContent = this.milestone.text;
     }
     // Optionally, create a static factory method to directly return the button element
-    static createMilestoneButton(milestone) {
-        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(milestone);
+    static createMilestoneButton(game, milestone) {
+        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(game, milestone);
         return btn; // Return the Button instance
     }
 }
+class $e15866bea5b2da0a$export$a52303878d5ad02c {
+    constructor(game){
+        this.xMin = 0;
+        this.xMax = 0;
+        this.yMin = 0;
+        this.yMax = 0;
+        this.step = 1;
+        this.game = game;
+        this.container = document.createElement("div");
+        this.container.id = "formulaGraph";
+        this.container.classList.add("hidden");
+        this.container.classList.add("formula-graph");
+        this.container.style.top = "50vh";
+        this.container.style.left = "0";
+        this.xMax = 0;
+        this.yMax = 0;
+        document.getElementById("main").appendChild(this.container);
+    }
+    createGraph(milestone) {
+        this.milestone = milestone;
+        this.milestoneFunc = milestone.costFormula;
+        this.xMin = 0;
+        this.xMax = this.milestone.maxLevel;
+        this.yMin = 0;
+        this.yMax = this.milestoneFunc(this.milestone, true);
+        this.step = 1;
+        console.log(this.xMax, this.yMax);
+        this.drawGraph();
+    }
+    drawGraph() {
+        console.log("Drawing graph");
+        if (!this.game.formulaGraphEnabled || !this.milestoneFunc) return;
+        this.container.classList.remove("hidden");
+        this.container.innerHTML = "";
+        const canvas = document.createElement("canvas");
+        canvas.width = this.container.offsetWidth;
+        canvas.height = this.container.offsetHeight;
+        this.container.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const canvasPad = 5; // Padding around the canvas
+        ctx.fillStyle = "#808080";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Move to the starting point with padding considered
+        ctx.moveTo(canvasPad, canvas.height - canvasPad);
+        // Adjusted plotting to account for canvasPad
+        for(let x = this.xMin; x <= this.xMax; x += this.step){
+            const y = this.milestoneFunc(this.milestone, false, x);
+            // Adjust xCoord and yCoord to include canvasPad in the calculation
+            const xCoord = canvasPad + x / this.xMax * (canvas.width - 2 * canvasPad);
+            const yCoord = canvas.height - canvasPad - y / this.yMax * (canvas.height - 2 * canvasPad);
+            ctx.lineTo(xCoord, yCoord);
+        }
+        // display some text at the top of the graph that contains the max value
+        ctx.font = "12px Roboto";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.yMax.toString(), canvas.width / 2, 40);
+        ctx.stroke();
+        ctx.closePath();
+    }
+    removeGraph() {
+        this.container.classList.add("hidden");
+        this.container.innerHTML = "";
+    }
+}
+
 
 
 // bind document.getElementById to $
@@ -2385,14 +2484,15 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.level = 0;
         this.maxLevel = maxLevel;
         this.costFormula = milestoneFunctions.cost;
-        this.cost = this.costFormula(this.level);
+        this.cost = this.costFormula(this);
         this.buyable = true;
+        this.graphEnabled = false;
+        this.hovered = false;
     }
     levelUp() {
-        console.log("Level Up", this.level, this.maxLevel, this.buyable);
         if (!this.buyable) return;
         this.level++;
-        this.cost = this.costFormula(this.level);
+        this.cost = this.costFormula(this);
         if (this.level >= this.maxLevel) this.buyable = false;
     }
 }
@@ -2443,7 +2543,7 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
     checkMilestones() {
         for (const key of Object.keys(this.milestones)){
             const milestone = this.milestones[key];
-            const unlockPoints = parseInt(milestone.unlockPoints);
+            const unlockPoints = milestone.unlockPoints;
             // Set unlocked to true (this is saved in the save file)
             if (this.game.highestPoints >= unlockPoints) milestone.unlocked = true;
         }
@@ -2460,7 +2560,8 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
     setup() {
         for (const key of Object.keys(this.milestones)){
             const milestone = this.milestones[key];
-            const milestoneButton = this.Button.createMilestoneButton(milestone);
+            console.log("SETUP ", milestone);
+            const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
             console.log(milestoneButton.button);
             this.buttons[key] = milestoneButton;
         }
@@ -2477,6 +2578,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
+        this.pointsPerSec = 0;
         this.pointsText = document.createElement("h2");
         this.pointsText.classList.add("text-1xl", "text-white", "font-bold", "text-center");
         this.pointsText.textContent = `Points: ${this.game.points}`;
@@ -2487,8 +2589,15 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.game.addPoints(this.pointsPerClick);
                     this.milestoneFunctions.givePoints.update();
                 },
-                "cost": (level)=>{
-                    return 0;
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = 1;
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
                 },
                 "update": ()=>{
                     this.milestoneFunctions.givePoints.updateText();
@@ -2499,16 +2608,22 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             },
             // Increase Points Per Click
             "increasePointsPerClick": {
-                "activate": (cost)=>{
-                    console.log("Increase Points Per Click", cost, this.game.points);
-                    if (this.game.points >= cost) {
-                        this.game.removePoints(cost);
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.increasePointsPerClick.cost && this.game.layers.start.milestones.increasePointsPerClick.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.increasePointsPerClick.cost);
                         this.game.layers.start.milestones.increasePointsPerClick.levelUp();
                         this.milestoneFunctions.increasePointsPerClick.update();
                     }
                 },
-                "cost": (level)=>{
-                    return Math.floor((level + 1) ** 1.2) * 5;
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = Math.floor(lvl * 2);
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
                 },
                 "update": ()=>{
                     this.pointsPerClick = this.pointsPerClickIncrement * this.game.layers.start.milestones.increasePointsPerClick.level;
@@ -2522,16 +2637,27 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             },
             // Upgrade Increase Points Per Click
             "upgradeIncreasePointsPerClick": {
-                "activate": (cost)=>{
-                    if (this.game.points >= cost) {
-                        this.game.removePoints(cost);
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost && this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost);
                         this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
                         this.pointsPerClickIncrement += 1;
                         this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
                     }
                 },
-                "cost": (level)=>{
-                    return Math.floor((level + 10) ** 1.8) * 2;
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const m = 100;
+                        const b = 0.07;
+                        const j = 1000000;
+                        const n = j / Math.sinh(b * m);
+                        const cost = Math.floor(n * Math.sinh(b * lvl));
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
                 },
                 "update": ()=>{
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
@@ -2546,16 +2672,23 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             },
             // Auto Points
             "autoPoints": {
-                "activate": (cost)=>{
-                    if (this.game.points >= cost) {
-                        this.game.removePoints(cost);
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.autoPoints.cost && this.game.layers.start.milestones.autoPoints.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.autoPoints.cost);
                         this.autoPointsEnabled = true;
                         this.game.layers.start.milestones.autoPoints.levelUp();
                         this.milestoneFunctions.autoPoints.update();
                     }
                 },
-                "cost": (level)=>{
-                    return 3000;
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = 7777;
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
                 },
                 "update": ()=>{
                     this.milestoneFunctions.autoPoints.updateText();
@@ -2570,9 +2703,9 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             },
             // Auto Points Divisor
             "autoPointsDivisor": {
-                "activate": (cost)=>{
-                    if (this.game.points >= cost) {
-                        this.game.removePoints(cost);
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.autoPointsDivisor.cost && this.game.layers.start.milestones.autoPointsDivisor.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.autoPointsDivisor.cost);
                         if (this.pointAutoDivisor >= 2) {
                             this.pointAutoDivisor -= 1;
                             this.game.layers.start.milestones.autoPointsDivisor.levelUp();
@@ -2580,8 +2713,15 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                         }
                     }
                 },
-                "cost": (level)=>{
-                    return Math.floor((level + 1) ** 1.2 * (Math.log(level + 1) * 1000) + 10000);
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = Math.floor((lvl + 1) ** 1.2 * (Math.log(lvl + 1) * 1000) + 10000);
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
                 },
                 "update": ()=>{
                     this.milestoneFunctions.autoPointsDivisor.updateText();
@@ -2600,6 +2740,10 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             "autoPoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints),
             "autoPointsDivisor": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPointsDivisor", "Auto Points Divisor", 10000, "Lowers the auto-points divider", 100, this.milestoneFunctions.autoPointsDivisor)
         };
+        // Enable graphing feature per milestone.
+        this.milestones.increasePointsPerClick.graphEnabled = true;
+        this.milestones.upgradeIncreasePointsPerClick.graphEnabled = true;
+        this.milestones.autoPointsDivisor.graphEnabled = true;
         this.setup();
         this.toggleVisibility();
         this.milestoneFunctions.givePoints.update();
@@ -2608,7 +2752,11 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.pointsText.textContent = `Points: ${Math.floor(this.game.points)}`;
     }
     update() {
-        if (this.autoPointsEnabled) this.game.addPoints(this.pointsPerClick / this.pointAutoDivisor);
+        if (this.autoPointsEnabled) {
+            // points per sec is caluculated taking into consideration the mainInterval (which is in ms)
+            this.pointsPerSec = this.pointsPerClick / this.pointAutoDivisor * (1000 / this.game.mainInterval);
+            this.game.addPoints(this.pointsPerClick / this.pointAutoDivisor);
+        }
     }
 }
 
@@ -2630,19 +2778,21 @@ class $fec1aad84a4e3499$export$19600bc7e7f23c95 extends (0, $33dc7b2aef0a6efa$ex
 }
 
 
-// bind document.getElementById to $
-const $98b122bb987399aa$var$$ = document.getElementById.bind(document);
 class $98b122bb987399aa$export$985739bfa5723e08 {
     constructor(){
         this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
         ;
+        this.formulaGraphEnabled = false;
         console.log("Game Constructor");
         this.saveManager = new (0, $a348cea740e504f8$export$5bfce22a6398152d)(this);
+        this.formulaGraph = new (0, $e15866bea5b2da0a$export$a52303878d5ad02c)(this);
+        this.displayingGraph = false;
         this.textElements = this.getText();
         this.navBar = $98b122bb987399aa$var$$("navBar");
         this.mainInterval = 1000;
         this.points = 0;
         this.highestPoints = 0;
+        this.keyPressed = "";
         this.layers = {
             start: new (0, $93501a718a4426dd$export$568b89e600fc77eb)(this),
             dice: new (0, $83a61abead0fd813$export$8be8c2ff45d443a3)(this),
@@ -2651,12 +2801,37 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.layers.start.unlocked = true;
         this.visibleLayer = "start";
         this.tooltipsEnabled = true;
-        $98b122bb987399aa$var$$("save-button").addEventListener("click", this.save.bind(this));
-        $98b122bb987399aa$var$$("load-button").addEventListener("click", this.load.bind(this));
-        $98b122bb987399aa$var$$("tooltip-button").addEventListener("click", this.toggleTooltips.bind(this));
+        function utilityButton(game, txt, func) {
+            const btn = document.createElement("button");
+            btn.innerText = txt;
+            btn.classList.add("btn", "btn-transparent", "btn-hover");
+            btn.addEventListener("click", func.bind(game));
+            document.getElementsByClassName("utility-bar")[0].appendChild(btn);
+        }
+        utilityButton(this, "Save", this.save);
+        utilityButton(this, "Load", this.load);
+        utilityButton(this, "Toggle Tooltips", this.toggleTooltips);
+        utilityButton(this, "Enable Graphs", this.enableGraphs);
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         this.setupNav();
+        document.addEventListener("contextmenu", (event)=>{
+            event.preventDefault();
+            // Can make custom right click menu if I can be bothered.
+            // simulate left click
+            const clickEvent = new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            event.target?.dispatchEvent(clickEvent);
+        });
+        document.addEventListener("keydown", (event)=>{
+            this.keyPressed = event.key;
+        });
+        document.addEventListener("keyup", (event)=>{
+            this.keyPressed = "";
+        });
     }
     save() {
         this.saveManager.save(this);
@@ -2672,11 +2847,13 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.points -= points;
         this.updateUI();
     }
+    // Is called every mainInterval time (1000ms default)
     update() {
         for (const layer of Object.keys(this.layers))this.layers[layer].update();
         if (this.points > this.highestPoints) this.highestPoints = this.points;
         this.updateUI();
     }
+    // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
     fixedIntervalUpdate() {
         for (const layer of Object.keys(this.layers))try {
             if (!this.layers[layer].unlocked) {
@@ -2690,6 +2867,9 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
     toggleTooltips() {
         this.tooltipsEnabled = !this.tooltipsEnabled;
         this.setTooltipsState();
+    }
+    enableGraphs() {
+        this.formulaGraphEnabled = !this.formulaGraphEnabled;
     }
     setTooltipsState() {
         for (const layer of Object.keys(this.layers))for (const key of Object.keys(this.layers[layer].buttons)){
@@ -2720,6 +2900,7 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
     }
     updateUI() {
         this.textElements.points.innerText = Math.floor(this.points).toString();
+        this.textElements.pointsPerSec.innerText = this.layers.start.pointsPerSec.toFixed(2);
         this.layers.start.updatePointsText();
     }
     getText() {
@@ -2732,10 +2913,12 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
     }
 }
 let $98b122bb987399aa$var$game;
+// bind document.getElementById to $
+const $98b122bb987399aa$var$$ = document.getElementById.bind(document);
 document.addEventListener("DOMContentLoaded", function() {
     $98b122bb987399aa$var$game = new $98b122bb987399aa$export$985739bfa5723e08();
     window.game = $98b122bb987399aa$var$game;
 });
 
 
-//# sourceMappingURL=index.d55b55d2.js.map
+//# sourceMappingURL=index.e67b5d92.js.map
