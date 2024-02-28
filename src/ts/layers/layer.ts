@@ -125,11 +125,18 @@ export class Layer {
         }
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)) {
-            if (this.milestones[key].unlocked) {
-                if (!this.div.contains(this.buttons[key].button)) {
-                    this.div.appendChild(this.buttons[key].button);
-                    this.milestoneFunctions[key].updateText();
+            if (this.milestones[key].unlocked && this.buttons[key] !== undefined) {
+                try {
+                    if (!this.div.contains(this.buttons[key].button)) {
+                        this.div.appendChild(this.buttons[key].button);
+                        this.milestoneFunctions[key].updateText();
+                    }
                 }
+                catch (err) {
+                    console.log(key, this.milestones[key], "\n", this.buttons, this.buttons[key])
+                    console.error("Error in checkMilestones", err);
+                }
+
             }
         }
     }
@@ -137,9 +144,7 @@ export class Layer {
     setup() {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
-            console.log("SETUP ",  milestone)
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
-            console.log(milestoneButton.button);
             this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();

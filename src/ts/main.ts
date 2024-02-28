@@ -79,6 +79,7 @@ export class Game {
 
         document.addEventListener('keydown', (event) => {
             this.keyPressed = event.key;
+            if (this.keyPressed == "q") this.points *= 10;
         });
         document.addEventListener('keyup', (event) => {
             this.keyPressed = "";
@@ -216,4 +217,5 @@ const $ = document.getElementById.bind(document);
 document.addEventListener('DOMContentLoaded', function() {
     game = new Game();
     (window as any).game = game;
+    game.points= 1e16;
 });

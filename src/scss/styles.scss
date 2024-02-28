@@ -150,6 +150,8 @@ main {
         justify-content: center;
         align-items: center;
         text-align: center;
+        width: 90%;
+        height: min(fit-content, 30%);
         gap: 1rem;
 
         button {
@@ -204,4 +206,29 @@ main .formula-graph {
     width: 400px;
     height: 400px;
     position: absolute;
+}
+
+main .dice-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    width: 80%;
+    height: 16rem;
+
+    border: 2px inset $text;
+
+    .dice {
+        width: 8rem;
+        height: 8rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border: 2px solid $text;
+        border-radius: 33%;
+    }
 }
