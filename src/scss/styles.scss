@@ -161,6 +161,7 @@ main {
             flex-direction: column !important;
             width: 30ch !important;
             color: $text !important;
+            justify-content: center !important;
 
             &:hover {
                 background-color: $secondary !important;

@@ -1,10 +1,10 @@
 import * as bootstrap from 'bootstrap';
 import { SaveManager } from './saving';
-import { FormulaGraph } from './utils';
 import { Layer } from './layers/layer';
 import { Start } from './layers/start';
 import { Dice } from './layers/dice';
 import { Coin } from './layers/coin';
+import { FormulaGraph } from './graph';
 
 
 export class Game {

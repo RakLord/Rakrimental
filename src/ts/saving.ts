@@ -34,9 +34,15 @@ export class SaveManager {
                     increasePointsPerClick: {
                         level: this.game.layers.start.milestones.increasePointsPerClick.level
                     },
+                    upgradeIncreasePointsPerClick: {
+                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level
+                    },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level,
                         buyable: this.game.layers.start.milestones.autoPoints.buyable,
+                    },
+                    autoPointsDivisor: {
+                        level: this.game.layers.start.milestones.autoPointsDivisor.level
                     }
                 }
             },
@@ -88,9 +94,14 @@ export class SaveManager {
                 this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
 
                 this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
-
-                this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                // set pointsPerClick to increasePointsPerClick level if it is higher than 1, otherwise set it to 1
+                //  This may be broken???
                 this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
+
+                this.game.layers.start.pointsPerClick = gameState.layers.start.milestones.increasePointsPerClick.level > 1 ? gameState.layers.start.milestones.increasePointsPerClick.level : 1;
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level;
+                this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
 
                 // Dice Layer
