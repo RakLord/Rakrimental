@@ -1,35 +1,163 @@
 import { Layer } from "./layer";
 import { Game } from "../main";
 import { Milestone } from "./layer";
+import { set } from "lodash";
 
 export class SingleDice {
     game: Game;
     parentDiv: HTMLElement;
+    container: HTMLElement;
     div: HTMLElement;
     diceLayer: Dice;
+    diceValue: number;
+    diceMaxValue: number;
+    dicePips: HTMLElement[];
+    diceText: HTMLElement;
     constructor(game: Game, diceLayer: Dice) {
         this.game = game;
         this.diceLayer = diceLayer;
-        // THIS BULLSHIT IS THE NEXT THING TO FIX, IT'S NOT WORKING
-        // Passing in the diceLayer as "this" works, but game.layers.dice.diceArrayContainer is borked......
-        this.parentDiv = this.diceLayer.diceArrayContainer;
-        // this.div = document.createElement('div');
-        // this.div.classList.add('dice');
 
-        // this.div.style.transition = 'all 0.5s';
-        // this.div.style.cursor = 'pointer';
-        // this.div.addEventListener('click', this.click.bind(this));
-        // this.parentDiv.appendChild(this.div);
+        this.diceValue = 1;
+        this.diceMaxValue = 25;
+
+        this.parentDiv = this.diceLayer.diceArrayContainer;
+        this.container = document.createElement('div');
+        this.diceText = document.createElement('div');
+        this.diceText.classList.add('dice-text');
+        this.div = document.createElement('div');
+        this.div.classList.add('dice');
+
+        this.div.addEventListener('click', this.click.bind(this));
+        this.container.appendChild(this.diceText);
+        this.container.appendChild(this.div);
+        this.parentDiv.appendChild(this.container);
+        
+
+        this.diceText.textContent = this.diceValue.toString();
+
+
+        this.dicePips = [];
+        for (let i = 0; i < 25; i++) {
+            const pip = document.createElement('div');
+            pip.classList.add('dot', 'not-dot');
+            this.dicePips.push(pip);
+            this.div.appendChild(pip);
+            // pip.textContent = i.toString();
+        }
+        
+
+        this.diceFace(this.diceValue);
     }
 
-    // click() {
-    //     this.div.style.transform = `translate(-50%, -50%) scale(1.5)`;
-    //     setTimeout(() => {
-    //         this.div.style.transform = `translate(-50%, -50%) scale(1)`;
-    //     }, 500);
-    // }
+    hidePips(pipsToHide: number[]) { 
+        for (let i = 0; i < pipsToHide.length; i++) {
+            this.dicePips[pipsToHide[i]].classList.remove('not-dot');
+        }
+    }
+
+    diceFace(faceValue: number) {
+        this.diceText.textContent = this.diceValue.toString();
+        this.dicePips.forEach(pip => {
+            pip.classList.add('not-dot');
+        });
+
+
+        console.log(this.dicePips)
+        switch(faceValue) {
+            case 1:
+                this.hidePips([12])
+                break;
+            case 2:
+                this.hidePips([6, 18])
+                break;
+            case 3:
+                this.hidePips([6, 8, 17]);
+                break;
+            case 4:
+                this.hidePips([6, 8, 16, 18]);
+                break;
+            case 5:
+                this.hidePips([6, 8, 16, 18, 12]);
+                break;
+            case 6:
+                this.hidePips([6, 7, 8, 16, 17, 18]);
+                break;
+            case 7:
+                this.hidePips([6, 7, 8, 16, 17, 18, 12]);
+                break;
+            case 8:
+                this.hidePips([6, 7, 8, 11, 16, 13, 18, 17]);
+                break;
+            case 9:
+                this.hidePips([6, 7, 8, 11, 16, 13, 18, 17, 12]);
+                break;
+            case 10:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 7, 17])
+                break; 
+            case 11:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 7, 12, 17]);
+                break;
+            case 12:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 7, 17, 11, 13]);
+                break;
+            case 13:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 7, 17, 11, 13, 12]);
+                break;
+            case 14:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 10, 2, 14, 22, 11, 13]);
+                break;
+            case 15:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 10, 2, 14, 22, 6, 12, 18]);
+                break;
+            case 16:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 10, 2, 14, 22, 11, 13, 7, 17]);
+                break;
+            case 17:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 10, 2, 14, 22, 6, 12, 18, 0, 24]);
+                break;
+            case 18:
+                this.hidePips([0, 1, 2, 3, 4, 6, 7, 8, 20, 21, 22, 23, 24, 16, 17, 18, 10, 14]);
+                break;
+            case 19:
+                this.hidePips([1, 5, 3, 9, 15, 21, 19, 23, 10, 2, 14, 22, 0, 24, 20, 4, 8, 16, 12, 8]);
+                break;
+            case 20:
+                this.hidePips([0, 1, 2, 3, 4, 5, 7, 9, 20, 21, 22, 23, 24, 15, 17, 19, 10, 14, 11, 13]);
+                break;
+            case 21:
+                this.hidePips([0, 1, 2, 3, 4, 5, 9, 20, 21, 22, 23, 24, 15, 19, 10, 14, 6, 8, 16, 18, 12]);
+                break;
+            case 22:
+                this.hidePips([0, 1, 2, 3, 4, 5, 7, 9, 20, 21, 22, 23, 24, 15, 17, 19, 10, 14, 6, 8, 16, 18]);
+                break;
+            case 23:
+                this.hidePips([0, 1, 2, 3, 4, 5, 7, 9, 20, 21, 22, 23, 24, 15, 17, 19, 10, 14, 6, 8, 16, 18, 12]);
+                break;
+            case 24:
+                this.hidePips([0, 1, 2, 3, 4, 5, 7, 9, 20, 21, 22, 23, 24, 15, 17, 19, 10, 14, 6, 8, 16, 18, 11, 13]);
+                break;
+            case 25:
+                this.hidePips([0, 1, 2, 3, 4, 5, 7, 9, 20, 21, 22, 23, 24, 15, 17, 19, 10, 14, 6, 8, 16, 18, 11, 13, 12]);
+                break;
+        }
+    }
+
+    click() {
+
+        this.div.style.transform = 'rotate(360deg)';
+        // timeout remove rotation
+        setTimeout(() => {
+            this.div.style.transform = 'rotate(0deg)';
+        }, 500);
+        this.diceValue = Math.floor(Math.random() * this.diceMaxValue) + 1;
+        this.diceFace(this.diceValue);
+
+        // roll the dice
+        
+    }
 
 }
+
 export class Dice extends Layer { 
     diceArrayContainer: HTMLElement;
     diceCount: number;

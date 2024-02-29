@@ -215,20 +215,50 @@ main .dice-container {
     align-items: center;
     gap: 1rem;
 
-    width: 80%;
-    height: 16rem;
+    width: 80%; 
+    height: auto;
+    
+    padding-bottom: 1rem;
+    
 
     border: 2px inset $text;
 
+    .dice-text {
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-bottom: 2px solid $text;
+    }
+
     .dice {
-        width: 8rem;
-        height: 8rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        width: 10vw; 
+        aspect-ratio: 1 / 1;
+        max-width: 8rem; 
+        max-height: 8rem; 
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        gap: 4%;
+        padding: 0.4rem;
+        justify-items: center;
         align-items: center;
         text-align: center;
         border: 2px solid $text;
-        border-radius: 33%;
+        border-radius: 18%;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.4s;
+
+        .dot {
+            display: block;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 1);
+        }
+
+        .not-dot {
+            background-color: rgba(0, 0, 0, 0);
+        }
     }
 }

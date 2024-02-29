@@ -42,6 +42,10 @@ export class Game {
             dice: new Dice(this),
             coin: new Coin(this)
         };
+
+        
+
+
         this.layers.start.unlocked = true;
 
         this.visibleLayer = "start";
@@ -79,7 +83,26 @@ export class Game {
 
         document.addEventListener('keydown', (event) => {
             this.keyPressed = event.key;
-            if (this.keyPressed == "q") this.points *= 10;
+            switch (this.keyPressed) {
+                case 'q':
+                    this.points *= 10;
+                    break
+                
+                case '1':
+                    this.switchLayer('start');
+                    break;
+                case '2':
+                    this.switchLayer('dice');
+                    break;
+                case '3':
+                    this.switchLayer('coin');
+                    break;
+                case 'g':
+                    this.formulaGraphEnabled = !this.formulaGraphEnabled;
+                    break;
+
+            }
+
         });
         document.addEventListener('keyup', (event) => {
             this.keyPressed = "";
