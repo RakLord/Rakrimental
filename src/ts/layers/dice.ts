@@ -206,7 +206,7 @@ export class Dice extends Layer {
         };
 
         this.milestones = {
-            "addDice": new Milestone("addDice", "+1 Dice", 0, "Adds a new dice!", 5, this.milestoneFunctions.addDice),
+            "addDice": new Milestone("addDice", "+1 Dice", 0, "Adds a new dice!", 5, this.milestoneFunctions.addDice, this.div),
         }
 
         this.init();

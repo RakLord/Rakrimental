@@ -16,10 +16,11 @@ export class Milestone {
     maxLevel: number;
     graphEnabled: boolean;
     hovered: boolean;
+    buttonContainer: HTMLElement;
 
     costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: number) => number;
     activate: () => any;
-    constructor(name: string, text: string, unlockPoints: number, description: string, maxLevel: number, milestoneFunctions: any) {
+    constructor(name: string, text: string, unlockPoints: number, description: string, maxLevel: number, milestoneFunctions: any, buttonContainer: HTMLElement) {
         this.name = name;
         this.text = text;
         this.unlockPoints = unlockPoints;
@@ -33,6 +34,7 @@ export class Milestone {
         this.buyable = true;
         this.graphEnabled = false;
         this.hovered = false;
+        this.buttonContainer = buttonContainer;
     }
     levelUp() {
         if (!this.buyable) return;
@@ -128,15 +130,21 @@ export class Layer {
             if (this.milestones[key].unlocked && this.buttons[key] !== undefined) {
                 try {
                     if (!this.div.contains(this.buttons[key].button)) {
-                        this.div.appendChild(this.buttons[key].button);
-                        this.milestoneFunctions[key].updateText();
+                        if (this.milestones[key].buttonContainer !== undefined) {
+                            this.milestones[key].buttonContainer.appendChild(this.buttons[key].button);
+                            this.milestoneFunctions[key].updateText();
+                        }
+                        else {
+                            this.div.appendChild(this.buttons[key].button);
+                            this.milestoneFunctions[key].updateText();
+                        }
+
                     }
                 }
                 catch (err) {
                     console.log(key, this.milestones[key], "\n", this.buttons, this.buttons[key])
                     console.error("Error in checkMilestones", err);
                 }
-
             }
         }
     }

@@ -43,11 +43,23 @@ export class SaveManager {
                     },
                     autoPointsDivisor: {
                         level: this.game.layers.start.milestones.autoPointsDivisor.level
+                    },
+                    criticalPoints: {
+                        level: this.game.layers.start.milestones.criticalPoints.level
+                    },
+                    criticalBonus: {
+                        level: this.game.layers.start.milestones.criticalBonus.level
+                    },
+                    overCritical: {
+                        level: this.game.layers.start.milestones.overCritical.level
+                    
                     }
                 }
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
+                diceCount: this.game.layers.dice.diceCount,
+                diceCountCap: this.game.layers.dice.diceCountCap,
                 milestones: {
 
                 },
@@ -104,8 +116,17 @@ export class SaveManager {
                 
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
 
+                this.game.layers.start.milestones.autoPointsDivisor.level = gameState.layers.start.milestones.autoPointsDivisor.level;
+
+                this.game.layers.start.milestones.criticalPoints.level = gameState.layers.start.milestones.criticalPoints.level;
+                this.game.layers.start.milestones.criticalBonus.level = gameState.layers.start.milestones.criticalBonus.level;
+                this.game.layers.start.milestones.overCritical.level = gameState.layers.start.milestones.overCritical.level;
+                
+
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
+                this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
 
                 // Coin Layer
                 this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;

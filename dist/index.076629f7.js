@@ -2237,14 +2237,31 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                     increasePointsPerClick: {
                         level: this.game.layers.start.milestones.increasePointsPerClick.level
                     },
+                    upgradeIncreasePointsPerClick: {
+                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level
+                    },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level,
                         buyable: this.game.layers.start.milestones.autoPoints.buyable
+                    },
+                    autoPointsDivisor: {
+                        level: this.game.layers.start.milestones.autoPointsDivisor.level
+                    },
+                    criticalPoints: {
+                        level: this.game.layers.start.milestones.criticalPoints.level
+                    },
+                    criticalBonus: {
+                        level: this.game.layers.start.milestones.criticalBonus.level
+                    },
+                    overCritical: {
+                        level: this.game.layers.start.milestones.overCritical.level
                     }
                 }
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
+                diceCount: this.game.layers.dice.diceCount,
+                diceCountCap: this.game.layers.dice.diceCountCap,
                 milestones: {}
             },
             coin: {
@@ -2276,11 +2293,21 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
                 this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
                 this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
-                this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                // set pointsPerClick to increasePointsPerClick level if it is higher than 1, otherwise set it to 1
+                //  This may be broken???
                 this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
+                this.game.layers.start.pointsPerClick = gameState.layers.start.milestones.increasePointsPerClick.level > 1 ? gameState.layers.start.milestones.increasePointsPerClick.level : 1;
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level;
+                this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
+                this.game.layers.start.milestones.autoPointsDivisor.level = gameState.layers.start.milestones.autoPointsDivisor.level;
+                this.game.layers.start.milestones.criticalPoints.level = gameState.layers.start.milestones.criticalPoints.level;
+                this.game.layers.start.milestones.criticalBonus.level = gameState.layers.start.milestones.criticalBonus.level;
+                this.game.layers.start.milestones.overCritical.level = gameState.layers.start.milestones.overCritical.level;
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
+                this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
                 // Coin Layer
                 this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
                 this.game.setupNav();
@@ -2400,81 +2427,12 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         return btn; // Return the Button instance
     }
 }
-class $e15866bea5b2da0a$export$a52303878d5ad02c {
-    constructor(game){
-        this.xMin = 0;
-        this.xMax = 0;
-        this.yMin = 0;
-        this.yMax = 0;
-        this.step = 1;
-        this.game = game;
-        this.container = document.createElement("div");
-        this.container.id = "formulaGraph";
-        this.container.classList.add("hidden");
-        this.container.classList.add("formula-graph");
-        this.container.style.top = "50vh";
-        this.container.style.left = "0";
-        this.xMax = 0;
-        this.yMax = 0;
-        document.getElementById("main").appendChild(this.container);
-    }
-    createGraph(milestone) {
-        this.milestone = milestone;
-        this.milestoneFunc = milestone.costFormula;
-        this.xMin = 0;
-        this.xMax = this.milestone.maxLevel;
-        this.yMin = 0;
-        this.yMax = this.milestoneFunc(this.milestone, true);
-        this.step = 1;
-        console.log(this.xMax, this.yMax);
-        this.drawGraph();
-    }
-    drawGraph() {
-        console.log("Drawing graph");
-        if (!this.game.formulaGraphEnabled || !this.milestoneFunc) return;
-        this.container.classList.remove("hidden");
-        this.container.innerHTML = "";
-        const canvas = document.createElement("canvas");
-        canvas.width = this.container.offsetWidth;
-        canvas.height = this.container.offsetHeight;
-        this.container.appendChild(canvas);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        const canvasPad = 5; // Padding around the canvas
-        ctx.fillStyle = "#808080";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        // Move to the starting point with padding considered
-        ctx.moveTo(canvasPad, canvas.height - canvasPad);
-        // Adjusted plotting to account for canvasPad
-        for(let x = this.xMin; x <= this.xMax; x += this.step){
-            const y = this.milestoneFunc(this.milestone, false, x);
-            // Adjust xCoord and yCoord to include canvasPad in the calculation
-            const xCoord = canvasPad + x / this.xMax * (canvas.width - 2 * canvasPad);
-            const yCoord = canvas.height - canvasPad - y / this.yMax * (canvas.height - 2 * canvasPad);
-            ctx.lineTo(xCoord, yCoord);
-        }
-        // display some text at the top of the graph that contains the max value
-        ctx.font = "12px Roboto";
-        ctx.fillStyle = "black";
-        ctx.fillText(this.yMax.toString(), canvas.width / 2, 40);
-        ctx.stroke();
-        ctx.closePath();
-    }
-    removeGraph() {
-        this.container.classList.add("hidden");
-        this.container.innerHTML = "";
-    }
-}
-
 
 
 // bind document.getElementById to $
 const $33dc7b2aef0a6efa$var$$ = document.getElementById.bind(document);
 class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
-    constructor(name, text, unlockPoints, description, maxLevel, milestoneFunctions){
+    constructor(name, text, unlockPoints, description, maxLevel, milestoneFunctions, buttonContainer){
         this.name = name;
         this.text = text;
         this.unlockPoints = unlockPoints;
@@ -2488,6 +2446,7 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.buyable = true;
         this.graphEnabled = false;
         this.hovered = false;
+        this.buttonContainer = buttonContainer;
     }
     levelUp() {
         if (!this.buyable) return;
@@ -2549,20 +2508,26 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         }
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)){
-            if (this.milestones[key].unlocked) {
+            if (this.milestones[key].unlocked && this.buttons[key] !== undefined) try {
                 if (!this.div.contains(this.buttons[key].button)) {
-                    this.div.appendChild(this.buttons[key].button);
-                    this.milestoneFunctions[key].updateText();
+                    if (this.milestones[key].buttonContainer !== undefined) {
+                        this.milestones[key].buttonContainer.appendChild(this.buttons[key].button);
+                        this.milestoneFunctions[key].updateText();
+                    } else {
+                        this.div.appendChild(this.buttons[key].button);
+                        this.milestoneFunctions[key].updateText();
+                    }
                 }
+            } catch (err) {
+                console.log(key, this.milestones[key], "\n", this.buttons, this.buttons[key]);
+                console.error("Error in checkMilestones", err);
             }
         }
     }
     setup() {
         for (const key of Object.keys(this.milestones)){
             const milestone = this.milestones[key];
-            console.log("SETUP ", milestone);
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
-            console.log(milestoneButton.button);
             this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();
@@ -2571,22 +2536,47 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
 }
 
 
+function $93501a718a4426dd$var$mapRange(x, inMin, inMax, outMin, outMax) {
+    return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
 class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
     constructor(game){
         super(game, "start", 0, "green");
+        this.upgradeColumns = [];
+        this.pointsText = document.createElement("h2");
+        this.pointsText.classList.add("text-1xl", "text-white", "font-bold", "text-center");
+        this.pointsText.textContent = `Points: ${this.game.points}`;
+        this.div.appendChild(this.pointsText);
+        this.upgradeColumnsDiv = document.createElement("div");
+        this.upgradeColumnsDiv.classList.add("start-upgrade-columns");
+        this.div.appendChild(this.upgradeColumnsDiv);
+        // Loop over 3 upgrade columns and add the upgrade-column class and append them to the upgradecolumnsdiv
+        for(let i = 0; i < 3; i++){
+            this.upgradeColumns.push(document.createElement("div"));
+            this.upgradeColumns[i].classList.add("upgrade-column");
+            this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
+        }
         this.pointsPerClickIncrement = 1;
         this.autoPointsEnabled = false;
         this.pointAutoDivisor = 100;
         this.pointsPerClick = 1;
         this.pointsPerSec = 0;
-        this.pointsText = document.createElement("h2");
-        this.pointsText.classList.add("text-1xl", "text-white", "font-bold", "text-center");
-        this.pointsText.textContent = `Points: ${this.game.points}`;
-        this.div.appendChild(this.pointsText);
         this.milestoneFunctions = {
             "givePoints": {
                 "activate": ()=>{
-                    this.game.addPoints(this.pointsPerClick);
+                    if (this.game.layers.start.milestones.criticalPoints.level > 0) {
+                        const rawCritChance = this.game.layers.start.milestones.criticalPoints.level // 1-200
+                        ;
+                        const critChance = $93501a718a4426dd$var$mapRange(rawCritChance, 1, 200, 1, 100); // 1-100
+                        let critBonus = this.game.layers.start.milestones.criticalBonus.level; // 0-1000
+                        const overCrit = this.game.layers.start.milestones.overCritical.level; // 0-2500
+                        if (rawCritChance > 100) {
+                            if (overCrit > 0) critBonus *= 1 + overCrit / 100;
+                        }
+                        const crit = Math.random() * 100;
+                        if (crit > critChance) this.game.addPoints(this.pointsPerClick * critBonus);
+                        else this.game.addPoints(this.pointsPerClick);
+                    } else this.game.addPoints(this.pointsPerClick);
                     this.milestoneFunctions.givePoints.update();
                 },
                 "cost": (milestone, returnMax = false, forceLvl)=>{
@@ -2617,7 +2607,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                 },
                 "cost": (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(lvl * 2);
+                        const cost = Math.floor(lvl * Math.sqrt(lvl) * Math.log(lvl + 1) * 400 + Math.log(lvl + 1) * 100);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -2651,7 +2641,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                         const b = 0.07;
                         const j = 1000000;
                         const n = j / Math.sinh(b * m);
-                        const cost = Math.floor(n * Math.sinh(b * lvl));
+                        const cost = Math.floor(n * Math.sinh(b * lvl) * (Math.log(lvl + 1) * 10));
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -2715,7 +2705,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                 },
                 "cost": (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor((lvl + 1) ** 1.2 * (Math.log(lvl + 1) * 1000) + 10000);
+                        const cost = Math.floor((lvl + 1) ** 1.3 * (Math.log(lvl + 1) * 1000) + 20000);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -2731,21 +2721,113 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
                     this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${this.pointAutoDivisor}`;
                 }
+            },
+            // Critical Points (Crit Chance)
+            "criticalPoints": {
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.criticalPoints.cost && this.game.layers.start.milestones.criticalPoints.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.criticalPoints.cost);
+                        this.game.layers.start.milestones.criticalPoints.levelUp();
+                        this.milestoneFunctions.criticalPoints.update();
+                    }
+                },
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = Math.floor(30000 * 1.059 ** lvl * (Math.log(lvl + 1) * 10));
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                "update": ()=>{
+                    this.milestoneFunctions.criticalPoints.updateText();
+                },
+                "updateText": ()=>{
+                    this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.milestones.criticalPoints.cost}`;
+                    this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
+                    this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
+                }
+            },
+            // Crit Bonus (Crit reward bonus %)
+            "criticalBonus": {
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.criticalBonus.cost && this.game.layers.start.milestones.criticalBonus.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.criticalBonus.cost);
+                        this.game.layers.start.milestones.criticalBonus.levelUp();
+                        this.milestoneFunctions.criticalBonus.update();
+                    }
+                },
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = Math.floor(30000 * 1.064 ** (lvl + 1) * (Math.log(lvl + 1) * 100));
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                "update": ()=>{
+                    this.milestoneFunctions.criticalBonus.updateText();
+                },
+                "updateText": ()=>{
+                    this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.milestones.criticalBonus.cost}`;
+                    this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
+                    this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}%`;
+                }
+            },
+            // Over Crit (Turn crits over 100% into BIGGGGER crits)
+            "overCritical": {
+                "activate": ()=>{
+                    if (this.game.points >= this.game.layers.start.milestones.overCritical.cost && this.game.layers.start.milestones.overCritical.buyable) {
+                        this.game.removePoints(this.game.layers.start.milestones.overCritical.cost);
+                        this.game.layers.start.milestones.overCritical.levelUp();
+                        this.milestoneFunctions.overCritical.update();
+                    }
+                },
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = Math.floor(30000 * 1.064 ** (lvl + 1) * (Math.log(lvl + 1) * 100));
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                "update": ()=>{
+                    this.milestoneFunctions.overCritical.updateText();
+                },
+                "updateText": ()=>{
+                    this.buttons.overCritical.lines[1].textContent = `Cost: ${this.milestones.overCritical.cost}`;
+                    this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
+                    this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
+                }
             }
         };
         this.milestones = {
-            "givePoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("givePoints", "Gib Points", 0, "Give points when clicked", -1, this.milestoneFunctions.givePoints),
-            "increasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("increasePointsPerClick", "+PPC", 10, "Increase points per click", 10000, this.milestoneFunctions.increasePointsPerClick),
-            "upgradeIncreasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("upgradeIncreasePointsPerClick", "++PPC", 100, "Increase the amount that the +PPC upgrade gives", 100, this.milestoneFunctions.upgradeIncreasePointsPerClick),
-            "autoPoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints),
-            "autoPointsDivisor": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPointsDivisor", "Auto Points Divisor", 10000, "Lowers the auto-points divider", 100, this.milestoneFunctions.autoPointsDivisor)
+            "givePoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("givePoints", "Gib Points", 0, "Give points when clicked", -1, this.milestoneFunctions.givePoints, this.div),
+            "increasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("increasePointsPerClick", "+PPC", 10, "Increase points per click", 10000, this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
+            "upgradeIncreasePointsPerClick": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("upgradeIncreasePointsPerClick", "++PPC", 100, "Increase the amount that the +PPC upgrade gives", 100, this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
+            "autoPoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
+            "autoPointsDivisor": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPointsDivisor", "Auto Points Divisor", 10000, "Lowers the auto-points divider", 100, this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
+            "criticalPoints": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalPoints", "Critical Points", 30000, "Increases critical point chance", 200, this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
+            "criticalBonus": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalBonus", "Critical Bonus", 50000, "Increases critical point bonus", 1000, this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
+            "overCritical": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("overCritical", "Over Critical", 250000, "Converts bonus crit chance into better crits!", 2500, this.milestoneFunctions.overCritical, this.upgradeColumns[2])
         };
         // Enable graphing feature per milestone.
         this.milestones.increasePointsPerClick.graphEnabled = true;
         this.milestones.upgradeIncreasePointsPerClick.graphEnabled = true;
         this.milestones.autoPointsDivisor.graphEnabled = true;
+        this.milestones.criticalPoints.graphEnabled = true;
+        this.milestones.criticalBonus.graphEnabled = true;
+        this.milestones.overCritical.graphEnabled = true;
         this.setup();
         this.toggleVisibility();
+        //  Moves the give points button to after the points text but before the upgrades
+        if (this.div.firstChild) this.div.insertBefore(this.buttons.givePoints.button, this.div.children[1]);
         this.milestoneFunctions.givePoints.update();
     }
     updatePointsText() {
@@ -2762,11 +2844,524 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
 
 
 
+class $83a61abead0fd813$export$5442621d844215cb {
+    constructor(game, diceLayer){
+        this.game = game;
+        this.diceLayer = diceLayer;
+        this.diceValue = 1;
+        this.diceMaxValue = 25;
+        this.parentDiv = this.diceLayer.diceArrayContainer;
+        this.container = document.createElement("div");
+        this.diceText = document.createElement("div");
+        this.diceText.classList.add("dice-text");
+        this.div = document.createElement("div");
+        this.div.classList.add("dice");
+        this.div.addEventListener("click", this.click.bind(this));
+        this.container.appendChild(this.diceText);
+        this.container.appendChild(this.div);
+        this.parentDiv.appendChild(this.container);
+        this.diceText.textContent = this.diceValue.toString();
+        this.dicePips = [];
+        for(let i = 0; i < 25; i++){
+            const pip = document.createElement("div");
+            pip.classList.add("dot", "not-dot");
+            this.dicePips.push(pip);
+            this.div.appendChild(pip);
+        // pip.textContent = i.toString();
+        }
+        this.diceFace(this.diceValue);
+    }
+    hidePips(pipsToHide) {
+        for(let i = 0; i < pipsToHide.length; i++)this.dicePips[pipsToHide[i]].classList.remove("not-dot");
+    }
+    diceFace(faceValue) {
+        this.diceText.textContent = this.diceValue.toString();
+        this.dicePips.forEach((pip)=>{
+            pip.classList.add("not-dot");
+        });
+        console.log(this.dicePips);
+        switch(faceValue){
+            case 1:
+                this.hidePips([
+                    12
+                ]);
+                break;
+            case 2:
+                this.hidePips([
+                    6,
+                    18
+                ]);
+                break;
+            case 3:
+                this.hidePips([
+                    6,
+                    8,
+                    17
+                ]);
+                break;
+            case 4:
+                this.hidePips([
+                    6,
+                    8,
+                    16,
+                    18
+                ]);
+                break;
+            case 5:
+                this.hidePips([
+                    6,
+                    8,
+                    16,
+                    18,
+                    12
+                ]);
+                break;
+            case 6:
+                this.hidePips([
+                    6,
+                    7,
+                    8,
+                    16,
+                    17,
+                    18
+                ]);
+                break;
+            case 7:
+                this.hidePips([
+                    6,
+                    7,
+                    8,
+                    16,
+                    17,
+                    18,
+                    12
+                ]);
+                break;
+            case 8:
+                this.hidePips([
+                    6,
+                    7,
+                    8,
+                    11,
+                    16,
+                    13,
+                    18,
+                    17
+                ]);
+                break;
+            case 9:
+                this.hidePips([
+                    6,
+                    7,
+                    8,
+                    11,
+                    16,
+                    13,
+                    18,
+                    17,
+                    12
+                ]);
+                break;
+            case 10:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    7,
+                    17
+                ]);
+                break;
+            case 11:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    7,
+                    12,
+                    17
+                ]);
+                break;
+            case 12:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    7,
+                    17,
+                    11,
+                    13
+                ]);
+                break;
+            case 13:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    7,
+                    17,
+                    11,
+                    13,
+                    12
+                ]);
+                break;
+            case 14:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    10,
+                    2,
+                    14,
+                    22,
+                    11,
+                    13
+                ]);
+                break;
+            case 15:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    10,
+                    2,
+                    14,
+                    22,
+                    6,
+                    12,
+                    18
+                ]);
+                break;
+            case 16:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    10,
+                    2,
+                    14,
+                    22,
+                    11,
+                    13,
+                    7,
+                    17
+                ]);
+                break;
+            case 17:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    10,
+                    2,
+                    14,
+                    22,
+                    6,
+                    12,
+                    18,
+                    0,
+                    24
+                ]);
+                break;
+            case 18:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    6,
+                    7,
+                    8,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    16,
+                    17,
+                    18,
+                    10,
+                    14
+                ]);
+                break;
+            case 19:
+                this.hidePips([
+                    1,
+                    5,
+                    3,
+                    9,
+                    15,
+                    21,
+                    19,
+                    23,
+                    10,
+                    2,
+                    14,
+                    22,
+                    0,
+                    24,
+                    20,
+                    4,
+                    8,
+                    16,
+                    12,
+                    8
+                ]);
+                break;
+            case 20:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    7,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    17,
+                    19,
+                    10,
+                    14,
+                    11,
+                    13
+                ]);
+                break;
+            case 21:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    19,
+                    10,
+                    14,
+                    6,
+                    8,
+                    16,
+                    18,
+                    12
+                ]);
+                break;
+            case 22:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    7,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    17,
+                    19,
+                    10,
+                    14,
+                    6,
+                    8,
+                    16,
+                    18
+                ]);
+                break;
+            case 23:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    7,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    17,
+                    19,
+                    10,
+                    14,
+                    6,
+                    8,
+                    16,
+                    18,
+                    12
+                ]);
+                break;
+            case 24:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    7,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    17,
+                    19,
+                    10,
+                    14,
+                    6,
+                    8,
+                    16,
+                    18,
+                    11,
+                    13
+                ]);
+                break;
+            case 25:
+                this.hidePips([
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    7,
+                    9,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    15,
+                    17,
+                    19,
+                    10,
+                    14,
+                    6,
+                    8,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12
+                ]);
+                break;
+        }
+    }
+    click() {
+        this.div.style.transform = "rotate(360deg)";
+        // timeout remove rotation
+        setTimeout(()=>{
+            this.div.style.transform = "rotate(0deg)";
+        }, 500);
+        this.diceValue = Math.floor(Math.random() * this.diceMaxValue) + 1;
+        this.diceFace(this.diceValue);
+    // roll the dice
+    }
+}
 class $83a61abead0fd813$export$8be8c2ff45d443a3 extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
     constructor(game){
-        super(game, "dice", 100000, "white");
+        super(game, "dice", 10000000, "white");
         this.layerColor = "blue";
+        this.diceArrayContainer = document.createElement("div");
+        this.diceArrayContainer.classList.add("dice-container");
+        this.div.appendChild(this.diceArrayContainer);
+        this.diceCount = 1;
+        this.diceCountCap = 3;
+        this.diceArray = [];
+        this.milestoneFunctions = {
+            "addDice": {
+                "activate": ()=>{
+                    this.milestoneFunctions.addDice.update();
+                },
+                "cost": (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = 1;
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                "update": ()=>{},
+                "updateText": ()=>{}
+            }
+        };
+        this.milestones = {
+            "addDice": new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("addDice", "+1 Dice", 0, "Adds a new dice!", 5, this.milestoneFunctions.addDice, this.div)
+        };
+        this.init();
+        this.setup();
     }
+    init() {
+        this.diceArray.push(new $83a61abead0fd813$export$5442621d844215cb(this.game, this));
+    }
+    updatePointsText() {
+        this.pointsText.textContent = `Points: ${Math.floor(this.game.points)}`;
+    }
+    update() {}
 }
 
 
@@ -2778,21 +3373,108 @@ class $fec1aad84a4e3499$export$19600bc7e7f23c95 extends (0, $33dc7b2aef0a6efa$ex
 }
 
 
+class $f9544c9499cf351f$export$a52303878d5ad02c {
+    constructor(game){
+        this.xMin = 0;
+        this.xMax = 0;
+        this.yMin = 0;
+        this.yMax = 0;
+        this.step = 1;
+        this.game = game;
+        this.container = document.createElement("div");
+        this.container.id = "formulaGraph";
+        this.container.classList.add("hidden");
+        this.container.classList.add("formula-graph");
+        this.container.style.top = "50vh";
+        this.container.style.left = "0";
+        this.xMax = 0;
+        this.yMax = 0;
+        document.getElementById("main").appendChild(this.container);
+    }
+    createGraph(milestone) {
+        this.milestone = milestone;
+        this.milestoneFunc = milestone.costFormula;
+        this.xMin = 0;
+        this.xMax = this.milestone.maxLevel;
+        this.yMin = this.milestoneFunc(this.milestone, false, 1);
+        this.yMax = this.milestoneFunc(this.milestone, true);
+        this.step = this.xMax / 32;
+        console.log(this.xMin, this.xMax, this.yMin, this.yMax, this.step);
+        console.log(this.xMax, this.yMax);
+        this.drawGraph();
+    }
+    drawGraph() {
+        console.log("Drawing graph");
+        if (!this.game.formulaGraphEnabled || !this.milestoneFunc || !this.milestone) return;
+        this.container.classList.remove("hidden");
+        this.container.innerHTML = "";
+        const canvas = document.createElement("canvas");
+        canvas.width = this.container.offsetWidth;
+        canvas.height = this.container.offsetHeight;
+        this.container.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        // set the container position to just above the mouse
+        this.container.style.left = `${this.game.mouseX}px`;
+        this.container.style.top = `${this.game.mouseY - this.container.offsetHeight}px`;
+        const canvasPad = 5; // Padding around the canvas
+        ctx.fillStyle = "#808080";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.moveTo(canvasPad, canvas.height - canvasPad);
+        ctx.beginPath();
+        // Move to the starting point with padding considered
+        // xMax = maxLevel
+        // yMax = maxCost
+        for(let x = this.xMin; x <= this.xMax; x += this.step){
+            const y = this.milestoneFunc(this.milestone, false, x);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
+            const xCoord = canvasPad + x / this.xMax * (canvas.width - 2 * canvasPad);
+            const yCoord = canvas.height - canvasPad - y / this.yMax * (canvas.height - 2 * canvasPad);
+            ctx.lineTo(xCoord, yCoord);
+        }
+        // ctx.beginPath();
+        // ctx.ellipse(canvasPad + (x / this.xMax) * (canvas.width - 2 * canvasPad), (canvas.height - canvasPad) - (y / this.yMax) * (canvas.height - 2 * canvasPad), 5, 5, 0, 0, 2 * Math.PI);
+        // ctx.fillStyle = 'green';
+        // ctx.fill();
+        // ctx.closePath();
+        // display some text at the top of the graph that contains the max value
+        ctx.font = "12px Roboto";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.yMax.toString(), canvas.width / 2, 40);
+        ctx.stroke();
+        ctx.closePath();
+    }
+    removeGraph() {
+        this.container.classList.add("hidden");
+        this.container.innerHTML = "";
+    }
+}
+
+
 class $98b122bb987399aa$export$985739bfa5723e08 {
     constructor(){
         this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
         ;
+        this.mouseX = 0;
+        this.mouseY = 0;
         this.formulaGraphEnabled = false;
         console.log("Game Constructor");
         this.saveManager = new (0, $a348cea740e504f8$export$5bfce22a6398152d)(this);
-        this.formulaGraph = new (0, $e15866bea5b2da0a$export$a52303878d5ad02c)(this);
+        this.formulaGraph = new (0, $f9544c9499cf351f$export$a52303878d5ad02c)(this);
         this.displayingGraph = false;
         this.textElements = this.getText();
         this.navBar = $98b122bb987399aa$var$$("navBar");
+        this.utilityBar = $98b122bb987399aa$var$$("utilityBar");
         this.mainInterval = 1000;
         this.points = 0;
         this.highestPoints = 0;
         this.keyPressed = "";
+        this.autoSaveEnabled = true;
+        this.mouseX = 0;
+        this.mouseY = 0;
         this.layers = {
             start: new (0, $93501a718a4426dd$export$568b89e600fc77eb)(this),
             dice: new (0, $83a61abead0fd813$export$8be8c2ff45d443a3)(this),
@@ -2801,17 +3483,11 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.layers.start.unlocked = true;
         this.visibleLayer = "start";
         this.tooltipsEnabled = true;
-        function utilityButton(game, txt, func) {
-            const btn = document.createElement("button");
-            btn.innerText = txt;
-            btn.classList.add("btn", "btn-transparent", "btn-hover");
-            btn.addEventListener("click", func.bind(game));
-            document.getElementsByClassName("utility-bar")[0].appendChild(btn);
-        }
-        utilityButton(this, "Save", this.save);
-        utilityButton(this, "Load", this.load);
-        utilityButton(this, "Toggle Tooltips", this.toggleTooltips);
-        utilityButton(this, "Enable Graphs", this.enableGraphs);
+        this.utilityButton(this, "Save", this.save);
+        this.utilityButton(this, "Load", this.load);
+        this.utilityButton(this, "AutoSave", this.toggleAutoSave);
+        this.utilityButton(this, "Toggle Tooltips", this.toggleTooltips);
+        this.utilityButton(this, "Enable Graphs", this.enableGraphs);
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         this.setupNav();
@@ -2828,16 +3504,50 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         });
         document.addEventListener("keydown", (event)=>{
             this.keyPressed = event.key;
+            switch(this.keyPressed){
+                case "q":
+                    this.points *= 10;
+                    break;
+                case "1":
+                    this.switchLayer("start");
+                    break;
+                case "2":
+                    this.switchLayer("dice");
+                    break;
+                case "3":
+                    this.switchLayer("coin");
+                    break;
+                case "g":
+                    this.formulaGraphEnabled = !this.formulaGraphEnabled;
+                    break;
+                case "m":
+                    $98b122bb987399aa$var$game.points = 1e16;
+                    break;
+            }
         });
         document.addEventListener("keyup", (event)=>{
             this.keyPressed = "";
         });
+        document.addEventListener("mousemove", (event)=>{
+            this.mouseX = event.clientX;
+            this.mouseY = event.clientY;
+        });
+    }
+    utilityButton(game, txt, func) {
+        const btn = document.createElement("button");
+        btn.innerText = txt;
+        btn.classList.add("btn", "btn-transparent", "btn-hover");
+        btn.addEventListener("click", func.bind(game));
+        this.utilityBar.appendChild(btn);
     }
     save() {
         this.saveManager.save(this);
     }
     load() {
         this.saveManager.load(this);
+    }
+    toggleAutoSave() {
+        this.autoSaveEnabled = !this.autoSaveEnabled;
     }
     addPoints(points) {
         this.points += points;
@@ -2862,6 +3572,15 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
             } else this.layers[layer].checkMilestones();
         } catch (err) {
             console.error("Error in fixedIntervalUpdate", err);
+        }
+        if (this.autoSaveEnabled) {
+            console.log("AutoSaving");
+            this.save();
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.add("auto-save-on");
+        } else {
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.remove("auto-save-on");
         }
     }
     toggleTooltips() {
@@ -2921,4 +3640,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//# sourceMappingURL=index.e67b5d92.js.map
+//# sourceMappingURL=index.076629f7.js.map

@@ -19,8 +19,13 @@ export class Game {
     layers: { [key: string]: Layer; };
     visibleLayer: string; // Holds the name of the currently visible layer
     navBar: HTMLElement;
+    utilityBar: HTMLElement;
     tooltipsEnabled: boolean;
     keyPressed: string;
+    autoSaveEnabled: boolean;
+
+    mouseX: number = 0;
+    mouseY: number = 0;
 
     formulaGraphEnabled: boolean = false;
     displayingGraph: boolean;
@@ -33,17 +38,19 @@ export class Game {
         this.displayingGraph = false;
         this.textElements = this.getText();
         this.navBar = $('navBar')!;
+        this.utilityBar = $('utilityBar')!;
         this.mainInterval = 1000;
         this.points = 0;
         this.highestPoints = 0;
         this.keyPressed = '';
+        this.autoSaveEnabled = true;
+        this.mouseX = 0;
+        this.mouseY = 0;
         this.layers = { 
             start: new Start(this),
             dice: new Dice(this),
             coin: new Coin(this)
         };
-
-        
 
 
         this.layers.start.unlocked = true;
@@ -51,17 +58,12 @@ export class Game {
         this.visibleLayer = "start";
         this.tooltipsEnabled = true;
 
-        function utilityButton(game: Game, txt: string,  func: () => any) {
-            const btn = document.createElement('button');
-            btn.innerText = txt;
-            btn.classList.add('btn', 'btn-transparent', 'btn-hover');
-            btn.addEventListener('click', func.bind(game))
-            document.getElementsByClassName('utility-bar')[0]!.appendChild(btn);
-        }
-        utilityButton(this, 'Save', this.save);
-        utilityButton(this, 'Load', this.load);
-        utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
-        utilityButton(this, 'Enable Graphs', this.enableGraphs);
+
+        this.utilityButton(this, 'Save', this.save);
+        this.utilityButton(this, 'Load', this.load);
+        this.utilityButton(this, 'AutoSave', this.toggleAutoSave);
+        this.utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
+        this.utilityButton(this, 'Enable Graphs', this.enableGraphs);
 
 
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
@@ -100,6 +102,9 @@ export class Game {
                 case 'g':
                     this.formulaGraphEnabled = !this.formulaGraphEnabled;
                     break;
+                case 'm':
+                    game.points= 1e16;
+                    break;
 
             }
 
@@ -107,7 +112,19 @@ export class Game {
         document.addEventListener('keyup', (event) => {
             this.keyPressed = "";
         });   
+        document.addEventListener('mousemove', (event) => {
+            this.mouseX = event.clientX;
+            this.mouseY = event.clientY;
+        });
 
+    }
+
+    utilityButton(game: Game, txt: string,  func: () => any) {
+        const btn = document.createElement('button');
+        btn.innerText = txt;
+        btn.classList.add('btn', 'btn-transparent', 'btn-hover');
+        btn.addEventListener('click', func.bind(game))
+        this.utilityBar.appendChild(btn);
     }
 
     save() {
@@ -116,6 +133,10 @@ export class Game {
 
     load() {
         this.saveManager.load(this);
+    }
+
+    toggleAutoSave() {
+        this.autoSaveEnabled = !this.autoSaveEnabled;
     }
 
     addPoints(points: number) {
@@ -157,6 +178,16 @@ export class Game {
                 console.error("Error in fixedIntervalUpdate", err);
             }
             
+        }
+
+        if (this.autoSaveEnabled) {
+            console.log("AutoSaving")
+            this.save();
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.add('auto-save-on');
+        } else {
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.remove('auto-save-on');
         }
     }
 
@@ -240,5 +271,4 @@ const $ = document.getElementById.bind(document);
 document.addEventListener('DOMContentLoaded', function() {
     game = new Game();
     (window as any).game = game;
-    game.points= 1e16;
 });

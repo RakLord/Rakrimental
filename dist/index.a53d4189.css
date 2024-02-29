@@ -13136,7 +13136,15 @@ body .utility-bar button {
 }
 
 body .utility-bar button:hover {
-  color: #45e463;
+  color: #ffd13ce6;
+}
+
+body .utility-bar .auto-save-on {
+  color: #f7f7f7;
+}
+
+body .utility-bar .auto-save-on:hover {
+  color: #1aff00e6;
 }
 
 body .utility-bar * {
@@ -13211,19 +13219,24 @@ main .splitter {
 
 main .layer {
   text-align: center;
+  height: min(fit-content, 30%);
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1rem;
+  width: 90%;
   display: flex;
 }
 
 main .layer button {
   border: 2px solid #24ac3d;
+  width: 100%;
+  min-width: 16ch;
+  max-width: 265px;
   color: #f7f7f7 !important;
   border-radius: 0 !important;
   flex-direction: column !important;
-  width: 30ch !important;
+  justify-content: center !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
@@ -13248,6 +13261,23 @@ main .layer button .givePoints {
   padding: .8rem !important;
 }
 
+main .layer .start-upgrade-columns {
+  grid-template-columns: repeat(3, 33%);
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  display: grid;
+}
+
+main .layer .start-upgrade-columns .upgrade-column {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  display: flex;
+}
+
 .not-buyable {
   cursor: not-allowed !important;
   border: 2px solid #b81919 !important;
@@ -13264,9 +13294,59 @@ main .layer button .givePoints {
 }
 
 main .formula-graph {
-  width: 400px;
-  height: 400px;
+  aspect-ratio: 1;
+  width: 10vw;
   position: absolute;
 }
 
-/*# sourceMappingURL=index.ebd4f778.css.map */
+main .dice-container {
+  border: 2px inset #f7f7f7;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 80%;
+  height: auto;
+  padding-bottom: 1rem;
+  display: flex;
+}
+
+main .dice-container .dice-text {
+  border-bottom: 2px solid #f7f7f7;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+main .dice-container .dice {
+  aspect-ratio: 1;
+  text-align: center;
+  cursor: pointer;
+  background-color: #fff;
+  border: 2px solid #f7f7f7;
+  border-radius: 18%;
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  place-items: center;
+  gap: 4%;
+  width: 10vw;
+  max-width: 8rem;
+  max-height: 8rem;
+  padding: .4rem;
+  transition: all .4s;
+  display: grid;
+}
+
+main .dice-container .dice .dot {
+  background-color: #000;
+  border-radius: 50%;
+  width: 90%;
+  height: 90%;
+  display: block;
+}
+
+main .dice-container .dice .not-dot {
+  background-color: #0000;
+}
+
+/*# sourceMappingURL=index.a53d4189.css.map */

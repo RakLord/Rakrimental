@@ -52,6 +52,10 @@ export class FormulaGraph {
         this.container.appendChild(canvas);
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        // set the container position to just above the mouse
+        this.container.style.left = `${this.game.mouseX}px`;
+        this.container.style.top = `${this.game.mouseY - this.container.offsetHeight}px`;
     
         const canvasPad = 5; // Padding around the canvas
         ctx.fillStyle = '#808080';
