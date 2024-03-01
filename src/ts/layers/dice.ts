@@ -217,10 +217,6 @@ export class Dice extends Layer {
         this.diceArray.push(new SingleDice(this.game, this));
     }
 
-    updatePointsText() {
-        this.pointsText.textContent = `Points: ${Math.floor(this.game.points)}`;
-    }
-
     update() {
 
     } 

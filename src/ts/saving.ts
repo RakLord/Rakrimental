@@ -17,16 +17,14 @@ export class SaveManager {
         console.log(this.game)
         const stateToSave: { [key: string]: any } = {};
 
-        stateToSave["points"] = this.game.points;
         stateToSave["visibleLayer"] = this.game.visibleLayer;
         stateToSave["mainInterval"] = this.game.mainInterval;
         stateToSave["fixedInterval"] = this.game.fixedInterval;
-        stateToSave["highestPoints"] = this.game.highestPoints;
         stateToSave["tooltipsEnabled"] = this.game.tooltipsEnabled;
-        
         stateToSave["layers"] = {
             start: {
                 unlocked: this.game.layers.start.unlocked,
+                currency: this.game.layers.start.currency,
                 milestones: {
                     givePoints: {
                         level: this.game.layers.start.milestones.givePoints.level,
@@ -64,6 +62,7 @@ export class SaveManager {
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
+                currency: this.game.layers.dice.currency,
                 diceCount: this.game.layers.dice.diceCount,
                 diceCountCap: this.game.layers.dice.diceCountCap,
                 milestones: {
@@ -99,15 +98,14 @@ export class SaveManager {
 
             if (gameState) {
 
-                this.game.points = gameState.points;
                 this.game.visibleLayer = gameState.visibleLayer;
                 this.game.mainInterval = gameState.mainInterval;
                 this.game.fixedInterval = gameState.fixedInterval;
-                this.game.highestPoints = gameState.highestPoints;
                 this.game.tooltipsEnabled = gameState.tooltipsEnabled;
                 
                 // Start Layer
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
+                this.game.layers.start.currency = gameState.layers.start.currency;
 
                 this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
                 this.game.layers.start.milestones.givePoints.timesClicked = gameState.layers.start.milestones.givePoints.timesClicked;
@@ -137,6 +135,7 @@ export class SaveManager {
                 
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.game.layers.dice.currency = gameState.layers.dice.currency;
                 this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
                 this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
 

@@ -7,7 +7,7 @@ const $ = document.getElementById.bind(document);
 export class Milestone {
     name: string;
     text: string;
-    unlockPoints: number;
+    unlockCost: number;
     unlocked: boolean;
     description: string;
     level: number;
@@ -21,10 +21,10 @@ export class Milestone {
 
     costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: number) => number;
     activate: () => any;
-    constructor(name: string, text: string, unlockPoints: number, description: string, maxLevel: number, milestoneFunctions: any, buttonContainer: HTMLElement) {
+    constructor(name: string, text: string, unlockCost: number, description: string, maxLevel: number, milestoneFunctions: any, buttonContainer: HTMLElement) {
         this.name = name;
         this.text = text;
-        this.unlockPoints = unlockPoints;
+        this.unlockCost = unlockCost;
         this.unlocked = false;
         this.description = description;
         this.activate = milestoneFunctions.activate;
@@ -53,6 +53,9 @@ export class Milestone {
 export class Layer {
     [x: string]: any;
     game: Game;
+    currency: number;
+    highestCurrency: number;
+    currencyName: string;
     Button: typeof Button;
     name: string;
     unlocked: boolean = false;
@@ -72,6 +75,10 @@ export class Layer {
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
+        this.currency = 0;
+        this.highestCurrency = 0;
+        this.currencyName = 'Points';
+
 
         this.milestones = {};
         this.milestoneFunctions = {};
@@ -86,16 +93,6 @@ export class Layer {
         this.buttons = {};
     }
 
-    tryUnlock(currentPoints: number): boolean {
-        if (this.unlocked) return true;
-        if (currentPoints >= this.unlockPoints) {
-            this.unlocked = true;
-            console.log("Unlocked Layer", this.name);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     toggleVisibility(forceHide?: boolean) {
         if (forceHide) {
@@ -123,9 +120,9 @@ export class Layer {
     checkMilestones() {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
-            const unlockPoints = milestone.unlockPoints;
+            const unlockCost = milestone.unlockCost;
             // Set unlocked to true (this is saved in the save file)
-            if (this.game.highestPoints >= unlockPoints) {
+            if (this.highestCurrency >= unlockCost) {
                 milestone.unlocked = true;
             }
         }
@@ -163,6 +160,7 @@ export class Layer {
         this.checkMilestones();
     }
 
+    // Do not modify, its done per layer and i cba to change it :D
     update() {
 
     }

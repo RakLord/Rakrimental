@@ -215,6 +215,17 @@ main {
     }
 }
 
+.start-points-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.start-last-points-give-text {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
 .not-buyable {
     border: 2px solid $danger !important;
     cursor: not-allowed !important;

@@ -5,12 +5,11 @@ import { Start } from './layers/start';
 import { Dice } from './layers/dice';
 import { Coin } from './layers/coin';
 import { FormulaGraph } from './graph';
+import Decimal from 'break_infinity.js';
 
 
 export class Game {
     saveManager: SaveManager;
-    points: number;  // Base currency
-    highestPoints: number; // Highest points ever reached
     textElements: { [key: string]: HTMLElement; }; // Hold text displays (may refactor soon)
     mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
     gameTimer: number; // Holds the setInterval function for the mainInterval
@@ -38,12 +37,9 @@ export class Game {
         this.saveManager = new SaveManager(this);
         this.formulaGraph = new FormulaGraph(this);
         this.displayingGraph = false;
-        this.textElements = this.getText();
         this.navBar = $('navBar')!;
         this.utilityBar = $('utilityBar')!;
         this.mainInterval = 1000;
-        this.points = 0;
-        this.highestPoints = 0;
         this.keyPressed = '';
         this.autoSaveEnabled = true;
         this.autosaveInterval = 30000;
@@ -55,6 +51,17 @@ export class Game {
             coin: new Coin(this)
         };
 
+
+        this.textElements = {
+            "start": document.createElement('div'),
+            "dice": document.createElement('div'),
+        }
+
+        for (const key of Object.keys(this.textElements)) {
+            this.textElements[key].classList.add('d-flex', 'gap-2');
+            this.textElements[key].setAttribute('id', key);
+            $('header-data')!.appendChild(this.textElements[key]);
+        }
 
         this.layers.start.unlocked = true;
 
@@ -91,7 +98,7 @@ export class Game {
             this.keyPressed = event.key;
             switch (this.keyPressed) {
                 case 'q':
-                    this.points *= 10;
+                    this.layers.start.currency *= 10;
                     break
                 
                 case '1':
@@ -107,7 +114,7 @@ export class Game {
                     this.formulaGraphEnabled = !this.formulaGraphEnabled;
                     break;
                 case 'm':
-                    game.points= 1e16;
+                    this.layers.start.currency = 1e16;
                     break;
 
             }
@@ -133,7 +140,7 @@ export class Game {
 
     autoSave() {
         if (this.autoSaveEnabled) {
-            if (this.points == 0) return;
+            if (this.layers.start.currency == 0) return;
             console.log("AutoSaving")
             this.save();
             const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
@@ -156,46 +163,30 @@ export class Game {
         this.autoSaveEnabled = !this.autoSaveEnabled;
     }
 
-    addPoints(points: number) {
-        this.points += points;
-        this.updateUI();
-    }
-
-    removePoints(points: number) {
-        this.points -= points;
-        this.updateUI();
-    }
 
     // Is called every mainInterval time (1000ms default)
     update() {
         for (const layer of Object.keys(this.layers)) {
             this.layers[layer].update();
         }
-        if (this.points > this.highestPoints) {
-            this.highestPoints = this.points;
-        }
         this.updateUI();
     }
     
     // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
     fixedIntervalUpdate () {
+
         for (const layer of Object.keys(this.layers)) {
-            try {
-                if (!this.layers[layer].unlocked) {
-                    const unlocked = this.layers[layer].tryUnlock(this.points);
-                    if (unlocked) {
-                        this.setupNav();
-                    }
-                } else {
-                    this.layers[layer].checkMilestones();
-                }
-                
+            if (this.layers[layer].currency > this.layers[layer].highestCurrency) {
+                this.layers[layer].highestCurrency = this.layers[layer].currency;
+                this.layers[layer].checkMilestones();
             }
-            catch (err) {
-                console.error("Error in fixedIntervalUpdate", err);
-            }
-            
         }
+        if (this.layers.start.highestCurrency > 10) {
+            this.layers.dice.unlocked = true;
+        }
+
+
+        this.setupNav();
     }
 
     toggleTooltips() {
@@ -255,19 +246,8 @@ export class Game {
     }
         
     updateUI() {
-        this.textElements.points.innerText = Math.floor(this.points).toString();
-        this.textElements.pointsPerSec.innerText = this.layers.start.pointsPerSec.toFixed(2);
-        this.layers.start.updatePointsText();
+        this.textElements.start.innerText = Math.floor(this.layers.start.currency).toString() + " P";
     }
-
-    getText(): { [key: string]: HTMLElement; } {
-        let textElements: { [key: string]: HTMLElement; };
-        textElements = {
-            points: $('header-text-points')!,
-            pointsPerSec: $('header-text-points-per-sec')!    
-        };
-        return textElements;
-    };
 }
 
 let game: Game;
