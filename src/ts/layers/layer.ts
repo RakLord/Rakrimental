@@ -17,6 +17,7 @@ export class Milestone {
     graphEnabled: boolean;
     hovered: boolean;
     buttonContainer: HTMLElement;
+    timesClicked: number;
 
     costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: number) => number;
     activate: () => any;
@@ -35,7 +36,9 @@ export class Milestone {
         this.graphEnabled = false;
         this.hovered = false;
         this.buttonContainer = buttonContainer;
+        this.timesClicked = 0;
     }
+
     levelUp() {
         if (!this.buyable) return;
         this.level++;
@@ -84,7 +87,8 @@ export class Layer {
     }
 
     tryUnlock(currentPoints: number): boolean {
-        if (currentPoints >= this.cost) {
+        if (this.unlocked) return true;
+        if (currentPoints >= this.unlockPoints) {
             this.unlocked = true;
             console.log("Unlocked Layer", this.name);
             return true;
@@ -153,6 +157,7 @@ export class Layer {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
+            milestoneButton.button.addEventListener('click', () => {milestone.timesClicked++;});
             this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();

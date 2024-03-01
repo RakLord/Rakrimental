@@ -16,6 +16,8 @@ export class Game {
     gameTimer: number; // Holds the setInterval function for the mainInterval
     fixedInterval: number = 3000;  // Used for more process intense operations that need to be done less frequently
     fixedTimer: number; // Holds the setInterval function for the fixedInterval
+    autosaveInterval: number; // Used for autosaving
+    autosaveTimer: number; // Holds the setInterval function for the autosaveInterval
     layers: { [key: string]: Layer; };
     visibleLayer: string; // Holds the name of the currently visible layer
     navBar: HTMLElement;
@@ -44,6 +46,7 @@ export class Game {
         this.highestPoints = 0;
         this.keyPressed = '';
         this.autoSaveEnabled = true;
+        this.autosaveInterval = 30000;
         this.mouseX = 0;
         this.mouseY = 0;
         this.layers = { 
@@ -68,7 +71,8 @@ export class Game {
 
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
-        
+        this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
+
         this.setupNav();
 
         document.addEventListener('contextmenu', (event) => {
@@ -127,6 +131,19 @@ export class Game {
         this.utilityBar.appendChild(btn);
     }
 
+    autoSave() {
+        if (this.autoSaveEnabled) {
+            if (this.points == 0) return;
+            console.log("AutoSaving")
+            this.save();
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.add('auto-save-on');
+        } else {
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.remove('auto-save-on');
+        }
+    }
+
     save() {
         this.saveManager.save(this);
     }
@@ -178,16 +195,6 @@ export class Game {
                 console.error("Error in fixedIntervalUpdate", err);
             }
             
-        }
-
-        if (this.autoSaveEnabled) {
-            console.log("AutoSaving")
-            this.save();
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.add('auto-save-on');
-        } else {
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.remove('auto-save-on');
         }
     }
 

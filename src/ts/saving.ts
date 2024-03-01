@@ -29,30 +29,36 @@ export class SaveManager {
                 unlocked: this.game.layers.start.unlocked,
                 milestones: {
                     givePoints: {
-                        level: this.game.layers.start.milestones.givePoints.level
+                        level: this.game.layers.start.milestones.givePoints.level,
+                        timesClicked: this.game.layers.start.milestones.givePoints.timesClicked,
                     },
                     increasePointsPerClick: {
-                        level: this.game.layers.start.milestones.increasePointsPerClick.level
+                        level: this.game.layers.start.milestones.increasePointsPerClick.level,
+                        timesClicked: this.game.layers.start.milestones.increasePointsPerClick.timesClicked,
                     },
                     upgradeIncreasePointsPerClick: {
-                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level
+                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level,
+                        timesClicked: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked,
                     },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level,
                         buyable: this.game.layers.start.milestones.autoPoints.buyable,
                     },
                     autoPointsDivisor: {
-                        level: this.game.layers.start.milestones.autoPointsDivisor.level
+                        level: this.game.layers.start.milestones.autoPointsDivisor.level,
+                        timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked,
                     },
                     criticalPoints: {
-                        level: this.game.layers.start.milestones.criticalPoints.level
+                        level: this.game.layers.start.milestones.criticalPoints.level,
+                        timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked,
                     },
                     criticalBonus: {
-                        level: this.game.layers.start.milestones.criticalBonus.level
+                        level: this.game.layers.start.milestones.criticalBonus.level,
+                        timesClicked: this.game.layers.start.milestones.criticalBonus.timesClicked,
                     },
                     overCritical: {
-                        level: this.game.layers.start.milestones.overCritical.level
-                    
+                        level: this.game.layers.start.milestones.overCritical.level,
+                        timesClicked: this.game.layers.start.milestones.overCritical.timesClicked,                    
                     }
                 }
             },
@@ -104,25 +110,31 @@ export class SaveManager {
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
 
                 this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
+                this.game.layers.start.milestones.givePoints.timesClicked = gameState.layers.start.milestones.givePoints.timesClicked;
 
                 this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
-                // set pointsPerClick to increasePointsPerClick level if it is higher than 1, otherwise set it to 1
-                //  This may be broken???
-                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
-
+                this.game.layers.start.milestones.increasePointsPerClick.timesClicked = gameState.layers.start.milestones.increasePointsPerClick.timesClicked;
                 this.game.layers.start.pointsPerClick = gameState.layers.start.milestones.increasePointsPerClick.level > 1 ? gameState.layers.start.milestones.increasePointsPerClick.level : 1;
+
                 this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level;
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked;
+
                 this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
-                
+                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
 
                 this.game.layers.start.milestones.autoPointsDivisor.level = gameState.layers.start.milestones.autoPointsDivisor.level;
+                this.game.layers.start.milestones.autoPointsDivisor.timesClicked = gameState.layers.start.milestones.autoPointsDivisor.timesClicked;
 
                 this.game.layers.start.milestones.criticalPoints.level = gameState.layers.start.milestones.criticalPoints.level;
-                this.game.layers.start.milestones.criticalBonus.level = gameState.layers.start.milestones.criticalBonus.level;
-                this.game.layers.start.milestones.overCritical.level = gameState.layers.start.milestones.overCritical.level;
-                
+                this.game.layers.start.milestones.criticalPoints.timesClicked = gameState.layers.start.milestones.criticalPoints.timesClicked;
 
+                this.game.layers.start.milestones.criticalBonus.level = gameState.layers.start.milestones.criticalBonus.level;
+                this.game.layers.start.milestones.criticalBonus.timesClicked = gameState.layers.start.milestones.criticalBonus.timesClicked;
+
+                this.game.layers.start.milestones.overCritical.level = gameState.layers.start.milestones.overCritical.level;
+                this.game.layers.start.milestones.overCritical.timesClicked = gameState.layers.start.milestones.overCritical.timesClicked;
+                
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
                 this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
@@ -161,10 +173,8 @@ export class SaveManager {
                     }
                 }
 
-
-
-
-
+                console.log(game.layers.start.pointsPerClick)
+                // this.game.layers.start.buttons.givePoints.button
                 this.game.updateUI();
                 
 

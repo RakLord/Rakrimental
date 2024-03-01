@@ -44,6 +44,7 @@ export class Start extends Layer {
         this.milestoneFunctions = {
             "givePoints": {
                 "activate": () => {
+                    console.log("Give Points")
                     if (this.game.layers.start.milestones.criticalPoints.level > 0) {
                         const rawCritChance = this.game.layers.start.milestones.criticalPoints.level // 1-200
                         const critChance = mapRange(rawCritChance, 1, 200, 1, 100);                  // 1-100
@@ -57,7 +58,7 @@ export class Start extends Layer {
                         }
                         const crit = Math.random() * 100;
                         if (crit > critChance) {
-                            this.game.addPoints(this.pointsPerClick * critBonus);
+                            this.game.addPoints(this.pointsPerClick + (this.pointsPerClick * critBonus));
                         } else {
                             this.game.addPoints(this.pointsPerClick);
                         }
@@ -97,7 +98,7 @@ export class Start extends Layer {
                 },
                 "cost": (milestone: Milestone, returnMax: boolean=false, forceLvl?: number): number => {
                     function calcCost(lvl: number): number {
-                        const cost = Math.floor((lvl * Math.sqrt(lvl) * Math.log(lvl+1) * 400) + Math.log(lvl+1) * 100);
+                        const cost = Math.floor((lvl * Math.sqrt(lvl) * Math.log(lvl+1) * 100) + Math.log(lvl+1) * 100);
                         return cost;
                     }
 
@@ -107,7 +108,9 @@ export class Start extends Layer {
                     return calcCost(levelToUse);
                 },
                 "update": () => {
-                    this.pointsPerClick = this.pointsPerClickIncrement * this.game.layers.start.milestones.increasePointsPerClick.level;
+                    if (this.game.layers.start.milestones.increasePointsPerClick.level > 0) {
+                        this.pointsPerClick = this.pointsPerClickIncrement * (this.game.layers.start.milestones.increasePointsPerClick.level+1);
+                    }
                     this.milestoneFunctions.increasePointsPerClick.updateText();
                 },
                 "updateText": () => {
@@ -123,7 +126,6 @@ export class Start extends Layer {
                     if (this.game.points >= this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost && this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable) {
                         this.game.removePoints(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost);
                         this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
-                        this.pointsPerClickIncrement += 1;
                         this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
                     }
                 },
@@ -143,6 +145,7 @@ export class Start extends Layer {
                     return calcCost(levelToUse);
                 },
                 "update": () => {
+                    this.pointsPerClickIncrement = 1 + this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level;
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
                     this.milestoneFunctions.increasePointsPerClick.update();
                 },
@@ -150,7 +153,7 @@ export class Start extends Layer {
                     console.log("Updating Upgrade Increase Points Per Click")
                     this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
                     this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
-                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `+${this.pointsPerClickIncrement}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.pointsPerClickIncrement}`;
                 }
             },
 

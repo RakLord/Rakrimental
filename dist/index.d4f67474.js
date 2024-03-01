@@ -2232,29 +2232,36 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 unlocked: this.game.layers.start.unlocked,
                 milestones: {
                     givePoints: {
-                        level: this.game.layers.start.milestones.givePoints.level
+                        level: this.game.layers.start.milestones.givePoints.level,
+                        timesClicked: this.game.layers.start.milestones.givePoints.timesClicked
                     },
                     increasePointsPerClick: {
-                        level: this.game.layers.start.milestones.increasePointsPerClick.level
+                        level: this.game.layers.start.milestones.increasePointsPerClick.level,
+                        timesClicked: this.game.layers.start.milestones.increasePointsPerClick.timesClicked
                     },
                     upgradeIncreasePointsPerClick: {
-                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level
+                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level,
+                        timesClicked: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked
                     },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level,
                         buyable: this.game.layers.start.milestones.autoPoints.buyable
                     },
                     autoPointsDivisor: {
-                        level: this.game.layers.start.milestones.autoPointsDivisor.level
+                        level: this.game.layers.start.milestones.autoPointsDivisor.level,
+                        timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked
                     },
                     criticalPoints: {
-                        level: this.game.layers.start.milestones.criticalPoints.level
+                        level: this.game.layers.start.milestones.criticalPoints.level,
+                        timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked
                     },
                     criticalBonus: {
-                        level: this.game.layers.start.milestones.criticalBonus.level
+                        level: this.game.layers.start.milestones.criticalBonus.level,
+                        timesClicked: this.game.layers.start.milestones.criticalBonus.timesClicked
                     },
                     overCritical: {
-                        level: this.game.layers.start.milestones.overCritical.level
+                        level: this.game.layers.start.milestones.overCritical.level,
+                        timesClicked: this.game.layers.start.milestones.overCritical.timesClicked
                     }
                 }
             },
@@ -2292,18 +2299,23 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 // Start Layer
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
                 this.game.layers.start.milestones.givePoints.level = gameState.layers.start.milestones.givePoints.level;
+                this.game.layers.start.milestones.givePoints.timesClicked = gameState.layers.start.milestones.givePoints.timesClicked;
                 this.game.layers.start.milestones.increasePointsPerClick.level = gameState.layers.start.milestones.increasePointsPerClick.level;
-                // set pointsPerClick to increasePointsPerClick level if it is higher than 1, otherwise set it to 1
-                //  This may be broken???
-                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
+                this.game.layers.start.milestones.increasePointsPerClick.timesClicked = gameState.layers.start.milestones.increasePointsPerClick.timesClicked;
                 this.game.layers.start.pointsPerClick = gameState.layers.start.milestones.increasePointsPerClick.level > 1 ? gameState.layers.start.milestones.increasePointsPerClick.level : 1;
                 this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level;
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked = gameState.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked;
                 this.game.layers.start.milestones.autoPoints.level = gameState.layers.start.milestones.autoPoints.level;
+                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPointsDivisor.level = gameState.layers.start.milestones.autoPointsDivisor.level;
+                this.game.layers.start.milestones.autoPointsDivisor.timesClicked = gameState.layers.start.milestones.autoPointsDivisor.timesClicked;
                 this.game.layers.start.milestones.criticalPoints.level = gameState.layers.start.milestones.criticalPoints.level;
+                this.game.layers.start.milestones.criticalPoints.timesClicked = gameState.layers.start.milestones.criticalPoints.timesClicked;
                 this.game.layers.start.milestones.criticalBonus.level = gameState.layers.start.milestones.criticalBonus.level;
+                this.game.layers.start.milestones.criticalBonus.timesClicked = gameState.layers.start.milestones.criticalBonus.timesClicked;
                 this.game.layers.start.milestones.overCritical.level = gameState.layers.start.milestones.overCritical.level;
+                this.game.layers.start.milestones.overCritical.timesClicked = gameState.layers.start.milestones.overCritical.timesClicked;
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
                 this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
@@ -2326,6 +2338,8 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 for (const layer of Object.keys(this.game.layers)){
                     for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) this.game.layers[layer].milestoneFunctions[key].update();
                 }
+                console.log(game.layers.start.pointsPerClick);
+                // this.game.layers.start.buttons.givePoints.button
                 this.game.updateUI();
             } else {
                 console.log("No saved game state to load");
@@ -2447,6 +2461,7 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.graphEnabled = false;
         this.hovered = false;
         this.buttonContainer = buttonContainer;
+        this.timesClicked = 0;
     }
     levelUp() {
         if (!this.buyable) return;
@@ -2475,7 +2490,8 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         this.buttons = {};
     }
     tryUnlock(currentPoints) {
-        if (currentPoints >= this.cost) {
+        if (this.unlocked) return true;
+        if (currentPoints >= this.unlockPoints) {
             this.unlocked = true;
             console.log("Unlocked Layer", this.name);
             return true;
@@ -2528,6 +2544,9 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         for (const key of Object.keys(this.milestones)){
             const milestone = this.milestones[key];
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
+            milestoneButton.button.addEventListener("click", ()=>{
+                milestone.timesClicked++;
+            });
             this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();
@@ -2564,6 +2583,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.milestoneFunctions = {
             "givePoints": {
                 "activate": ()=>{
+                    console.log("Give Points");
                     if (this.game.layers.start.milestones.criticalPoints.level > 0) {
                         const rawCritChance = this.game.layers.start.milestones.criticalPoints.level // 1-200
                         ;
@@ -2574,7 +2594,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                             if (overCrit > 0) critBonus *= 1 + overCrit / 100;
                         }
                         const crit = Math.random() * 100;
-                        if (crit > critChance) this.game.addPoints(this.pointsPerClick * critBonus);
+                        if (crit > critChance) this.game.addPoints(this.pointsPerClick + this.pointsPerClick * critBonus);
                         else this.game.addPoints(this.pointsPerClick);
                     } else this.game.addPoints(this.pointsPerClick);
                     this.milestoneFunctions.givePoints.update();
@@ -2607,7 +2627,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                 },
                 "cost": (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(lvl * Math.sqrt(lvl) * Math.log(lvl + 1) * 400 + Math.log(lvl + 1) * 100);
+                        const cost = Math.floor(lvl * Math.sqrt(lvl) * Math.log(lvl + 1) * 100 + Math.log(lvl + 1) * 100);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -2616,7 +2636,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     return calcCost(levelToUse);
                 },
                 "update": ()=>{
-                    this.pointsPerClick = this.pointsPerClickIncrement * this.game.layers.start.milestones.increasePointsPerClick.level;
+                    if (this.game.layers.start.milestones.increasePointsPerClick.level > 0) this.pointsPerClick = this.pointsPerClickIncrement * (this.game.layers.start.milestones.increasePointsPerClick.level + 1);
                     this.milestoneFunctions.increasePointsPerClick.updateText();
                 },
                 "updateText": ()=>{
@@ -2631,7 +2651,6 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     if (this.game.points >= this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost && this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable) {
                         this.game.removePoints(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost);
                         this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
-                        this.pointsPerClickIncrement += 1;
                         this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
                     }
                 },
@@ -2650,6 +2669,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     return calcCost(levelToUse);
                 },
                 "update": ()=>{
+                    this.pointsPerClickIncrement = 1 + this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level;
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
                     this.milestoneFunctions.increasePointsPerClick.update();
                 },
@@ -2657,7 +2677,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     console.log("Updating Upgrade Increase Points Per Click");
                     this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
                     this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
-                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `+${this.pointsPerClickIncrement}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.pointsPerClickIncrement}`;
                 }
             },
             // Auto Points
@@ -3473,6 +3493,7 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.highestPoints = 0;
         this.keyPressed = "";
         this.autoSaveEnabled = true;
+        this.autosaveInterval = 30000;
         this.mouseX = 0;
         this.mouseY = 0;
         this.layers = {
@@ -3490,6 +3511,7 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.utilityButton(this, "Enable Graphs", this.enableGraphs);
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
+        this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
         this.setupNav();
         document.addEventListener("contextmenu", (event)=>{
             event.preventDefault();
@@ -3540,6 +3562,18 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         btn.addEventListener("click", func.bind(game));
         this.utilityBar.appendChild(btn);
     }
+    autoSave() {
+        if (this.autoSaveEnabled) {
+            if (this.points == 0) return;
+            console.log("AutoSaving");
+            this.save();
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.add("auto-save-on");
+        } else {
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.remove("auto-save-on");
+        }
+    }
     save() {
         this.saveManager.save(this);
     }
@@ -3572,15 +3606,6 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
             } else this.layers[layer].checkMilestones();
         } catch (err) {
             console.error("Error in fixedIntervalUpdate", err);
-        }
-        if (this.autoSaveEnabled) {
-            console.log("AutoSaving");
-            this.save();
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.add("auto-save-on");
-        } else {
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.remove("auto-save-on");
         }
     }
     toggleTooltips() {
@@ -3640,4 +3665,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//# sourceMappingURL=index.076629f7.js.map
+//# sourceMappingURL=index.d4f67474.js.map
