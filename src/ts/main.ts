@@ -98,7 +98,7 @@ export class Game {
             this.keyPressed = event.key;
             switch (this.keyPressed) {
                 case 'q':
-                    this.layers.start.currency *= 10;
+                    this.layers.start.currency = this.layers.start.currency.times(10);
                     break
                 
                 case '1':
@@ -114,7 +114,7 @@ export class Game {
                     this.formulaGraphEnabled = !this.formulaGraphEnabled;
                     break;
                 case 'm':
-                    this.layers.start.currency = 1e16;
+                    this.layers.start.currency = new Decimal(1e16);
                     break;
 
             }
@@ -140,7 +140,7 @@ export class Game {
 
     autoSave() {
         if (this.autoSaveEnabled) {
-            if (this.layers.start.currency == 0) return;
+            if (this.layers.start.currency.eq(0)) return;
             console.log("AutoSaving")
             this.save();
             const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
@@ -181,7 +181,7 @@ export class Game {
                 this.layers[layer].checkMilestones();
             }
         }
-        if (this.layers.start.highestCurrency > 10) {
+        if (this.layers.start.highestCurrency.gt(10)) {
             this.layers.dice.unlocked = true;
         }
 
@@ -217,9 +217,7 @@ export class Game {
                 layerButton.setAttribute('id', layer);
                 layerButton.innerText = this.layers[layer].name.toUpperCase();
                 layerButton.addEventListener('click', () => this.switchLayer(layer));
-                this.navBar.appendChild(layerButton);
-                console.log("Added button for", layer)
-            }
+                this.navBar.appendChild(layerButton);            }
         }
         for (const button of this.navBar.children) {
             if (button.id === this.visibleLayer) {
@@ -246,7 +244,7 @@ export class Game {
     }
         
     updateUI() {
-        this.textElements.start.innerText = Math.floor(this.layers.start.currency).toString() + " P";
+        this.textElements.start.innerText = this.layers.start.currency.toString() + " P";
     }
 }
 

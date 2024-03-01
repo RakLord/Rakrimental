@@ -1,5 +1,6 @@
 import { Game } from "../main";
 import { Button } from "../utils";
+import Decimal from 'break_infinity.js';
 
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
@@ -7,28 +8,28 @@ const $ = document.getElementById.bind(document);
 export class Milestone {
     name: string;
     text: string;
-    unlockCost: number;
+    unlockCost: Decimal;
     unlocked: boolean;
     description: string;
-    level: number;
-    cost: number;
+    level: Decimal;
+    cost: Decimal;
     buyable: boolean;
-    maxLevel: number;
+    maxLevel: Decimal;
     graphEnabled: boolean;
     hovered: boolean;
     buttonContainer: HTMLElement;
-    timesClicked: number;
+    timesClicked: Decimal;
 
-    costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: number) => number;
+    costFormula: (milestone: Milestone, returnMax?: boolean, forceLvl?: Decimal) => Decimal;
     activate: () => any;
-    constructor(name: string, text: string, unlockCost: number, description: string, maxLevel: number, milestoneFunctions: any, buttonContainer: HTMLElement) {
+    constructor(name: string, text: string, unlockCost: Decimal, description: string, maxLevel: Decimal, milestoneFunctions: any, buttonContainer: HTMLElement) {
         this.name = name;
         this.text = text;
         this.unlockCost = unlockCost;
         this.unlocked = false;
         this.description = description;
         this.activate = milestoneFunctions.activate;
-        this.level = 0;
+        this.level = new Decimal(0);
         this.maxLevel = maxLevel;
         this.costFormula = milestoneFunctions.cost;
         this.cost = this.costFormula(this);
@@ -36,14 +37,14 @@ export class Milestone {
         this.graphEnabled = false;
         this.hovered = false;
         this.buttonContainer = buttonContainer;
-        this.timesClicked = 0;
+        this.timesClicked = new Decimal(0);
     }
 
     levelUp() {
         if (!this.buyable) return;
-        this.level++;
+        this.level = this.level.add(1);
         this.cost = this.costFormula(this);
-        if (this.level >= this.maxLevel) {
+        if (this.level.gte(this.maxLevel)) {
             this.buyable = false;
         }
     }
@@ -53,13 +54,13 @@ export class Milestone {
 export class Layer {
     [x: string]: any;
     game: Game;
-    currency: number;
-    highestCurrency: number;
+    currency: Decimal;
+    highestCurrency: Decimal;
     currencyName: string;
     Button: typeof Button;
     name: string;
     unlocked: boolean = false;
-    cost: number;
+    cost: Decimal;
     layerColor: string;
     milestones: { [key: string]: Milestone; };
     // milestonesUnlocked: { [key: string]: boolean; };
@@ -69,14 +70,14 @@ export class Layer {
     div: HTMLElement;
     visible: boolean = false;
     buttons: { [key: string]: Button; };
-    constructor(game: Game,name: string, cost: number, layerColor: string) {
+    constructor(game: Game,name: string, cost: Decimal, layerColor: string) {
         this.Button = Button;
         this.game = game;
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
-        this.currency = 0;
-        this.highestCurrency = 0;
+        this.currency = new Decimal(0);
+        this.highestCurrency = new Decimal(0);
         this.currencyName = 'Points';
 
 
@@ -154,7 +155,7 @@ export class Layer {
         for (const key of Object.keys(this.milestones)) {
             const milestone = this.milestones[key];
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
-            milestoneButton.button.addEventListener('click', () => {milestone.timesClicked++;});
+            milestoneButton.button.addEventListener('click', () => {milestone.timesClicked = milestone.timesClicked.add(1);});
             this.buttons[key] = milestoneButton;
         }
         this.checkMilestones();

@@ -587,6 +587,8 @@ var _start = require("./layers/start");
 var _dice = require("./layers/dice");
 var _coin = require("./layers/coin");
 var _graph = require("./graph");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
 class Game {
     constructor(){
         this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
@@ -647,7 +649,7 @@ class Game {
             this.keyPressed = event.key;
             switch(this.keyPressed){
                 case "q":
-                    this.layers.start.currency *= 10;
+                    this.layers.start.currency = this.layers.start.currency.times(10);
                     break;
                 case "1":
                     this.switchLayer("start");
@@ -662,7 +664,7 @@ class Game {
                     this.formulaGraphEnabled = !this.formulaGraphEnabled;
                     break;
                 case "m":
-                    this.layers.start.currency = 1e16;
+                    this.layers.start.currency = new (0, _breakInfinityJsDefault.default)(1e16);
                     break;
             }
         });
@@ -683,7 +685,7 @@ class Game {
     }
     autoSave() {
         if (this.autoSaveEnabled) {
-            if (this.layers.start.currency == 0) return;
+            if (this.layers.start.currency.eq(0)) return;
             console.log("AutoSaving");
             this.save();
             const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
@@ -713,7 +715,7 @@ class Game {
             this.layers[layer].highestCurrency = this.layers[layer].currency;
             this.layers[layer].checkMilestones();
         }
-        if (this.layers.start.highestCurrency > 10) this.layers.dice.unlocked = true;
+        if (this.layers.start.highestCurrency.gt(10)) this.layers.dice.unlocked = true;
         this.setupNav();
     }
     toggleTooltips() {
@@ -738,7 +740,6 @@ class Game {
             layerButton.innerText = this.layers[layer].name.toUpperCase();
             layerButton.addEventListener("click", ()=>this.switchLayer(layer));
             this.navBar.appendChild(layerButton);
-            console.log("Added button for", layer);
         }
         for (const button of this.navBar.children)if (button.id === this.visibleLayer) button.classList.add("selected");
         else button.classList.remove("selected");
@@ -751,7 +752,7 @@ class Game {
         else button.classList.remove("selected");
     }
     updateUI() {
-        this.textElements.start.innerText = Math.floor(this.layers.start.currency).toString() + " P";
+        this.textElements.start.innerText = this.layers.start.currency.toString() + " P";
     }
 }
 let game;
@@ -762,7 +763,7 @@ document.addEventListener("DOMContentLoaded", function() {
     window.game = game;
 });
 
-},{"./saving":"LpBZE","./layers/start":"8H89C","./layers/dice":"isy6N","./layers/coin":"aXwEX","./graph":"D4z9g","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"LpBZE":[function(require,module,exports) {
+},{"./saving":"LpBZE","./layers/start":"8H89C","./layers/dice":"isy6N","./layers/coin":"aXwEX","./graph":"D4z9g","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","break_infinity.js":"bXpmd"}],"LpBZE":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "SaveManager", ()=>SaveManager);
@@ -3150,15 +3151,17 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Start", ()=>Start);
 var _layer = require("./layer");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
 function mapRange(x, inMin, inMax, outMin, outMax) {
-    return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    return x.minus(inMin).times(outMax.minus(outMin)).div(inMax.minus(inMin)).plus(outMin);
 }
 class Start extends (0, _layer.Layer) {
     constructor(game){
-        super(game, "start", 0, "green");
+        super(game, "start", new (0, _breakInfinityJsDefault.default)(0), "green");
         this.upgradeColumns = [];
         this.currencyName = "Points";
-        this.currency = 0;
+        this.currency = new (0, _breakInfinityJsDefault.default)(0);
         this.pointsText = document.createElement("h2");
         this.pointsText.classList.add("start-points-text");
         this.pointsText.textContent = `Points: ${this.currency}`;
@@ -3177,17 +3180,17 @@ class Start extends (0, _layer.Layer) {
             this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
         }
         this.autoPointsEnabled = false;
-        this.pointAutoDivisor = 100;
-        this.lastPointsGive = 0;
+        this.pointAutoDivisor = new (0, _breakInfinityJsDefault.default)(100);
+        this.lastPointsGive = new (0, _breakInfinityJsDefault.default)(0);
         this.milestoneFunctions = {
-            "givePoints": {
-                "activate": ()=>{
+            givePoints: {
+                activate: ()=>{
                     this.game.layers.start.addCurrencyStack();
                     this.milestoneFunctions.givePoints.update();
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = 1;
+                        const cost = new (0, _breakInfinityJsDefault.default)(1);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3195,25 +3198,29 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.givePoints.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
                 }
             },
             // Increase Points Per Click
-            "increasePointsPerClick": {
-                "activate": ()=>{
-                    if (this.currency >= this.game.layers.start.milestones.increasePointsPerClick.cost && this.game.layers.start.milestones.increasePointsPerClick.buyable) {
+            increasePointsPerClick: {
+                activate: ()=>{
+                    console.log("Activating Increase Points Per Click");
+                    if (this.currency.gte(this.game.layers.start.milestones.increasePointsPerClick.cost) && this.game.layers.start.milestones.increasePointsPerClick.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.increasePointsPerClick.cost);
                         this.game.layers.start.milestones.increasePointsPerClick.levelUp();
                         this.milestoneFunctions.increasePointsPerClick.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(lvl * Math.sqrt(lvl) * Math.log(lvl + 1) * 100 + Math.log(lvl + 1) * 100);
+                        const lvlPlusOne = lvl.add(1);
+                        let cost = new (0, _breakInfinityJsDefault.default)(lvl.times(lvl.sqrt()));
+                        cost = cost.times(new (0, _breakInfinityJsDefault.default)(lvlPlusOne).log(10)).times(10);
+                        cost = cost.add(lvlPlusOne.ln()).times(10).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3221,31 +3228,32 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.increasePointsPerClick.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.increasePointsPerClick.cost}`;
                     this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
-                    this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level + 1}`;
+                    this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level.add(1)}`;
                 }
             },
             // Upgrade Increase Points Per Click
-            "upgradeIncreasePointsPerClick": {
-                "activate": ()=>{
+            upgradeIncreasePointsPerClick: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost && this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost);
                         this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
                         this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const m = 100;
-                        const b = 0.07;
-                        const j = 100000;
-                        const n = j / Math.sinh(b * m);
-                        const cost = Math.floor((n * Math.sinh(b * lvl) * (Math.log(lvl + 1) * 10)) ** 1.3) + 150;
+                        const m = new (0, _breakInfinityJsDefault.default)(100);
+                        const b = new (0, _breakInfinityJsDefault.default)(0.07);
+                        const j = new (0, _breakInfinityJsDefault.default)(100000);
+                        const n = j.div(b.times(m).sinh());
+                        const lvlPlusOne = lvl.add(1);
+                        const cost = n.times(b.times(lvl).sinh()).times(new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(10)).pow(1.3).plus(150).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3253,28 +3261,28 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     console.log("Updating Upgrade Increase Points Per Click");
                     this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
                     this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
-                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level + 1}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level.add(1)}`;
                 }
             },
             // Ultimate Points Per Click
-            "ultimatePointsPerClick": {
-                "activate": ()=>{
+            ultimatePointsPerClick: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.ultimatePointsPerClick.cost && this.game.layers.start.milestones.ultimatePointsPerClick.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.ultimatePointsPerClick.cost);
                         this.game.layers.start.milestones.ultimatePointsPerClick.levelUp();
                         this.milestoneFunctions.ultimatePointsPerClick.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = 7777;
+                        const cost = new (0, _breakInfinityJsDefault.default)(7777);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3282,19 +3290,19 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.ultimatePointsPerClick.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     console.log("Updating Upgrade Increase Points Per Click");
                     this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.ultimatePointsPerClick.cost}`;
                     this.buttons.ultimatePointsPerClick.lines[2].textContent = `Level: ${this.milestones.ultimatePointsPerClick.level}/${this.milestones.ultimatePointsPerClick.maxLevel}`;
-                    this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level + 1}`;
+                    this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level.add(1)}`;
                 }
             },
             // Auto Points
-            "autoPoints": {
-                "activate": ()=>{
+            autoPoints: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.autoPoints.cost && this.game.layers.start.milestones.autoPoints.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.autoPoints.cost);
                         this.autoPointsEnabled = true;
@@ -3302,9 +3310,9 @@ class Start extends (0, _layer.Layer) {
                         this.milestoneFunctions.autoPoints.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = 7777;
+                        const cost = new (0, _breakInfinityJsDefault.default)(7777);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3312,10 +3320,10 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.autoPoints.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
                     else {
                         this.buttons.autoPoints.lines[1].textContent = "Enabled";
@@ -3324,20 +3332,24 @@ class Start extends (0, _layer.Layer) {
                 }
             },
             // Auto Points Divisor
-            "autoPointsDivisor": {
-                "activate": ()=>{
+            autoPointsDivisor: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.autoPointsDivisor.cost && this.game.layers.start.milestones.autoPointsDivisor.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.autoPointsDivisor.cost);
-                        if (this.pointAutoDivisor >= 2) {
-                            this.pointAutoDivisor -= 1;
+                        if (this.pointAutoDivisor.gte(2)) {
+                            this.pointAutoDivisor = this.pointAutoDivisor.sub(1);
                             this.game.layers.start.milestones.autoPointsDivisor.levelUp();
                             this.milestoneFunctions.autoPointsDivisor.update();
                         }
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor((lvl + 1) ** 1.3 * (Math.log(lvl + 1) * 1000) + 20000);
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.3));
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(1000);
+                        const c = new (0, _breakInfinityJsDefault.default)(20000);
+                        const cost = a.times(b).plus(c).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3345,27 +3357,30 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.autoPointsDivisor.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.milestones.autoPointsDivisor.cost}`;
                     this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
                     this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${this.pointAutoDivisor}`;
                 }
             },
             // Critical Points (Crit Chance)
-            "criticalPoints": {
-                "activate": ()=>{
+            criticalPoints: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.criticalPoints.cost && this.game.layers.start.milestones.criticalPoints.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.criticalPoints.cost);
                         this.game.layers.start.milestones.criticalPoints.levelUp();
                         this.milestoneFunctions.criticalPoints.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(30000 * 1.059 ** lvl * (Math.log(lvl + 1) * 10));
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvl.pow(1.059).times(30000)).floor();
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(10);
+                        const cost = a.times(b).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3373,27 +3388,30 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.criticalPoints.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.milestones.criticalPoints.cost}`;
                     this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
                     this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
                 }
             },
             // Crit Bonus (Crit reward bonus %)
-            "criticalBonus": {
-                "activate": ()=>{
+            criticalBonus: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.criticalBonus.cost && this.game.layers.start.milestones.criticalBonus.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.criticalBonus.cost);
                         this.game.layers.start.milestones.criticalBonus.levelUp();
                         this.milestoneFunctions.criticalBonus.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(30000 * 1.064 ** (lvl + 1) * (Math.log(lvl + 1) * 100));
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.064).times(30000));
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(100);
+                        const cost = a.times(b).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3401,27 +3419,30 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.criticalBonus.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.milestones.criticalBonus.cost}`;
                     this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
                     this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}%`;
                 }
             },
             // Over Crit (Turn crits over 100% into BIGGGGER crits)
-            "overCritical": {
-                "activate": ()=>{
+            overCritical: {
+                activate: ()=>{
                     if (this.currency >= this.game.layers.start.milestones.overCritical.cost && this.game.layers.start.milestones.overCritical.buyable) {
                         this.removeCurrency(this.game.layers.start.milestones.overCritical.cost);
                         this.game.layers.start.milestones.overCritical.levelUp();
                         this.milestoneFunctions.overCritical.update();
                     }
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = Math.floor(30000 * 1.064 ** (lvl + 1) * (Math.log(lvl + 1) * 100));
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.064).times(30000));
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(100);
+                        const cost = a.times(b).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3429,10 +3450,10 @@ class Start extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{
+                update: ()=>{
                     this.milestoneFunctions.overCritical.updateText();
                 },
-                "updateText": ()=>{
+                updateText: ()=>{
                     this.buttons.overCritical.lines[1].textContent = `Cost: ${this.milestones.overCritical.cost}`;
                     this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
                     this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
@@ -3440,15 +3461,15 @@ class Start extends (0, _layer.Layer) {
             }
         };
         this.milestones = {
-            "givePoints": new (0, _layer.Milestone)("givePoints", "Gib Points", 0, "Give points when clicked", -1, this.milestoneFunctions.givePoints, this.div),
-            "increasePointsPerClick": new (0, _layer.Milestone)("increasePointsPerClick", "+PPC", 10, "Increase points per click", 10000, this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
-            "upgradeIncreasePointsPerClick": new (0, _layer.Milestone)("upgradeIncreasePointsPerClick", "++PPC", 100, "Increase the amount that the +PPC upgrade gives", 100, this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
-            "ultimatePointsPerClick": new (0, _layer.Milestone)("ultimatePointsPerClick", "Ultimate PPC", 30000, "Makes +PPC and ++PPC bettererist", 10, this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
-            "autoPoints": new (0, _layer.Milestone)("autoPoints", "Automates Points", 1000, "Give points automatically", 1, this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
-            "autoPointsDivisor": new (0, _layer.Milestone)("autoPointsDivisor", "Auto Points Divisor", 10000, "Lowers the auto-points divider", 99, this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
-            "criticalPoints": new (0, _layer.Milestone)("criticalPoints", "Critical Points", 30000, "Increases critical point chance", 200, this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
-            "criticalBonus": new (0, _layer.Milestone)("criticalBonus", "Critical Bonus", 50000, "Increases critical point bonus", 1000, this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
-            "overCritical": new (0, _layer.Milestone)("overCritical", "Over Critical", 250000, "Converts bonus crit chance into better crits!", 2500, this.milestoneFunctions.overCritical, this.upgradeColumns[2])
+            givePoints: new (0, _layer.Milestone)("givePoints", "Gib Points", new (0, _breakInfinityJsDefault.default)(0), "Give points when clicked", new (0, _breakInfinityJsDefault.default)(-1), this.milestoneFunctions.givePoints, this.div),
+            increasePointsPerClick: new (0, _layer.Milestone)("increasePointsPerClick", "+PPC", new (0, _breakInfinityJsDefault.default)(10), "Increase points per click", new (0, _breakInfinityJsDefault.default)(10000), this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
+            upgradeIncreasePointsPerClick: new (0, _layer.Milestone)("upgradeIncreasePointsPerClick", "++PPC", new (0, _breakInfinityJsDefault.default)(100), "Increase the amount that the +PPC upgrade gives", new (0, _breakInfinityJsDefault.default)(100), this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
+            ultimatePointsPerClick: new (0, _layer.Milestone)("ultimatePointsPerClick", "Ultimate PPC", new (0, _breakInfinityJsDefault.default)(30000), "Makes +PPC and ++PPC bettererist", new (0, _breakInfinityJsDefault.default)(10), this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
+            autoPoints: new (0, _layer.Milestone)("autoPoints", "Automates Points", new (0, _breakInfinityJsDefault.default)(1000), "Give points automatically", new (0, _breakInfinityJsDefault.default)(1), this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
+            autoPointsDivisor: new (0, _layer.Milestone)("autoPointsDivisor", "Auto Points Divisor", new (0, _breakInfinityJsDefault.default)(10000), "Lowers the auto-points divider", new (0, _breakInfinityJsDefault.default)(99), this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
+            criticalPoints: new (0, _layer.Milestone)("criticalPoints", "Critical Points", new (0, _breakInfinityJsDefault.default)(30000), "Increases critical point chance", new (0, _breakInfinityJsDefault.default)(200), this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
+            criticalBonus: new (0, _layer.Milestone)("criticalBonus", "Critical Bonus", new (0, _breakInfinityJsDefault.default)(50000), "Increases critical point bonus", new (0, _breakInfinityJsDefault.default)(1000), this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
+            overCritical: new (0, _layer.Milestone)("overCritical", "Over Critical", new (0, _breakInfinityJsDefault.default)(250000), "Converts bonus crit chance into better crits!", new (0, _breakInfinityJsDefault.default)(2500), this.milestoneFunctions.overCritical, this.upgradeColumns[2])
         };
         // Enable graphing feature per milestone.
         this.milestones.increasePointsPerClick.graphEnabled = true;
@@ -3465,22 +3486,22 @@ class Start extends (0, _layer.Layer) {
         this.milestoneFunctions.givePoints.update();
     }
     addCurrencyStack(rtn) {
-        let value = 1;
-        if (this.milestones.increasePointsPerClick.level > 0) value *= this.milestones.increasePointsPerClick.level + 1;
-        if (this.milestones.upgradeIncreasePointsPerClick.level > 0) value *= this.milestones.upgradeIncreasePointsPerClick.level + 1;
-        if (this.milestones.ultimatePointsPerClick.level > 0) value *= this.milestones.ultimatePointsPerClick.level + 1;
-        if (this.milestones.criticalPoints.level > 0) {
+        let value = new (0, _breakInfinityJsDefault.default)(1);
+        if (this.milestones.increasePointsPerClick.level.gt(0)) value = value.times(this.milestones.increasePointsPerClick.level.add(1));
+        if (this.milestones.upgradeIncreasePointsPerClick.level.gt(0)) value = value.times(this.milestones.upgradeIncreasePointsPerClick.level.add(1));
+        if (this.milestones.ultimatePointsPerClick.level.gt(0)) value = value.times(this.milestones.ultimatePointsPerClick.level.add(1));
+        if (this.milestones.criticalPoints.level.gt(0)) {
             const rawCritChance = this.milestones.criticalPoints.level;
-            const critChance = mapRange(rawCritChance, 1, 200, 1, 100);
-            let critBonus = this.milestones.criticalBonus.level + 1;
+            const critChance = mapRange(rawCritChance, new (0, _breakInfinityJsDefault.default)(1), new (0, _breakInfinityJsDefault.default)(200), new (0, _breakInfinityJsDefault.default)(1), new (0, _breakInfinityJsDefault.default)(100));
+            let critBonus = this.milestones.criticalBonus.level.add(1);
             const overCrit = this.game.layers.start.milestones.overCritical.level;
-            if (rawCritChance > 100) {
-                if (overCrit > 0) critBonus *= overCrit;
+            if (rawCritChance.gt(100)) {
+                if (overCrit.gt(0)) critBonus = critBonus.times(overCrit);
             }
-            const crit = Math.random() * 100;
-            if (crit < critChance) {
+            const crit = new (0, _breakInfinityJsDefault.default)(Math.random() * 100);
+            if (critChance.gte(crit)) {
                 console.log("CRIT, bonus*: ", critBonus);
-                value += value * critBonus;
+                value = value.add(value.times(critBonus));
             }
         }
         if (rtn) return value;
@@ -3489,28 +3510,30 @@ class Start extends (0, _layer.Layer) {
         this.addCurrency(value);
     }
     addCurrency(amount) {
-        this.currency += amount;
+        this.currency = this.currency.add(amount);
         this.updatePointsText();
     }
     removeCurrency(amount) {
-        this.currency -= amount;
+        this.currency = this.currency.add(amount);
         this.updatePointsText();
     }
     updatePointsText() {
-        this.pointsText.textContent = `Points: ${Math.floor(this.currency)}`;
+        this.pointsText.textContent = `Points: ${this.currency.toString()}`;
         this.lastPointsGiveText.textContent = `+ ${this.lastPointsGive}`;
     }
     update() {
-        if (this.autoPointsEnabled) this.addCurrency(this.addCurrencyStack(true) / this.pointAutoDivisor);
+        if (this.autoPointsEnabled) this.addCurrency(this.addCurrencyStack(true).div(this.pointAutoDivisor));
     }
 }
 
-},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bX7Wa":[function(require,module,exports) {
+},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","break_infinity.js":"bXpmd"}],"bX7Wa":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Milestone", ()=>Milestone);
 parcelHelpers.export(exports, "Layer", ()=>Layer);
 var _utils = require("../utils");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
 class Milestone {
@@ -3521,7 +3544,7 @@ class Milestone {
         this.unlocked = false;
         this.description = description;
         this.activate = milestoneFunctions.activate;
-        this.level = 0;
+        this.level = new (0, _breakInfinityJsDefault.default)(0);
         this.maxLevel = maxLevel;
         this.costFormula = milestoneFunctions.cost;
         this.cost = this.costFormula(this);
@@ -3529,13 +3552,13 @@ class Milestone {
         this.graphEnabled = false;
         this.hovered = false;
         this.buttonContainer = buttonContainer;
-        this.timesClicked = 0;
+        this.timesClicked = new (0, _breakInfinityJsDefault.default)(0);
     }
     levelUp() {
         if (!this.buyable) return;
-        this.level++;
+        this.level = this.level.add(1);
         this.cost = this.costFormula(this);
-        if (this.level >= this.maxLevel) this.buyable = false;
+        if (this.level.gte(this.maxLevel)) this.buyable = false;
     }
 }
 class Layer {
@@ -3548,8 +3571,8 @@ class Layer {
         this.name = name;
         this.cost = cost;
         this.layerColor = layerColor;
-        this.currency = 0;
-        this.highestCurrency = 0;
+        this.currency = new (0, _breakInfinityJsDefault.default)(0);
+        this.highestCurrency = new (0, _breakInfinityJsDefault.default)(0);
         this.currencyName = "Points";
         this.milestones = {};
         this.milestoneFunctions = {};
@@ -3608,7 +3631,7 @@ class Layer {
             const milestone = this.milestones[key];
             const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
             milestoneButton.button.addEventListener("click", ()=>{
-                milestone.timesClicked++;
+                milestone.timesClicked = milestone.timesClicked.add(1);
             });
             this.buttons[key] = milestoneButton;
         }
@@ -3618,7 +3641,7 @@ class Layer {
     update() {}
 }
 
-},{"../utils":"gmdam","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gmdam":[function(require,module,exports) {
+},{"../utils":"gmdam","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","break_infinity.js":"bXpmd"}],"gmdam":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Button", ()=>Button);
@@ -3712,12 +3735,538 @@ class Button {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"isy6N":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXpmd":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _padEnd = require("pad-end");
+var _padEndDefault = parcelHelpers.interopDefault(_padEnd);
+var n = 9e15, e = function() {
+    for(var t = [], n = -323; n <= 308; n++)t.push(Number("1e" + n));
+    return function(n) {
+        return t[n + 323];
+    };
+}(), r = function(t) {
+    return t instanceof a ? t : new a(t);
+}, i = function(t, n) {
+    return (new a).fromMantissaExponent(t, n);
+}, o = function(t, n) {
+    return (new a).fromMantissaExponent_noNormalize(t, n);
+};
+function u(t, n, e, r) {
+    var i = n.mul(e.pow(r));
+    return a.floor(t.div(i).mul(e.sub(1)).add(1).log10() / e.log10());
+}
+function s(t, n, e, r) {
+    return n.mul(e.pow(r)).mul(a.sub(1, e.pow(t))).div(a.sub(1, e));
+}
+var a = function() {
+    function a(t) {
+        this.mantissa = NaN, this.exponent = NaN, void 0 === t ? (this.m = 0, this.e = 0) : t instanceof a ? this.fromDecimal(t) : "number" == typeof t ? this.fromNumber(t) : this.fromString(t);
+    }
+    return Object.defineProperty(a.prototype, "m", {
+        get: function() {
+            return this.mantissa;
+        },
+        set: function(t) {
+            this.mantissa = t;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), Object.defineProperty(a.prototype, "e", {
+        get: function() {
+            return this.exponent;
+        },
+        set: function(t) {
+            this.exponent = t;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), Object.defineProperty(a.prototype, "s", {
+        get: function() {
+            return this.sign();
+        },
+        set: function(t) {
+            if (0 === t) return this.e = 0, void (this.m = 0);
+            this.sgn() !== t && (this.m = -this.m);
+        },
+        enumerable: !1,
+        configurable: !0
+    }), a.fromMantissaExponent = function(t, n) {
+        return (new a).fromMantissaExponent(t, n);
+    }, a.fromMantissaExponent_noNormalize = function(t, n) {
+        return (new a).fromMantissaExponent_noNormalize(t, n);
+    }, a.fromDecimal = function(t) {
+        return (new a).fromDecimal(t);
+    }, a.fromNumber = function(t) {
+        return (new a).fromNumber(t);
+    }, a.fromString = function(t) {
+        return (new a).fromString(t);
+    }, a.fromValue = function(t) {
+        return (new a).fromValue(t);
+    }, a.fromValue_noAlloc = function(t) {
+        return t instanceof a ? t : new a(t);
+    }, a.abs = function(t) {
+        return r(t).abs();
+    }, a.neg = function(t) {
+        return r(t).neg();
+    }, a.negate = function(t) {
+        return r(t).neg();
+    }, a.negated = function(t) {
+        return r(t).neg();
+    }, a.sign = function(t) {
+        return r(t).sign();
+    }, a.sgn = function(t) {
+        return r(t).sign();
+    }, a.round = function(t) {
+        return r(t).round();
+    }, a.floor = function(t) {
+        return r(t).floor();
+    }, a.ceil = function(t) {
+        return r(t).ceil();
+    }, a.trunc = function(t) {
+        return r(t).trunc();
+    }, a.add = function(t, n) {
+        return r(t).add(n);
+    }, a.plus = function(t, n) {
+        return r(t).add(n);
+    }, a.sub = function(t, n) {
+        return r(t).sub(n);
+    }, a.subtract = function(t, n) {
+        return r(t).sub(n);
+    }, a.minus = function(t, n) {
+        return r(t).sub(n);
+    }, a.mul = function(t, n) {
+        return r(t).mul(n);
+    }, a.multiply = function(t, n) {
+        return r(t).mul(n);
+    }, a.times = function(t, n) {
+        return r(t).mul(n);
+    }, a.div = function(t, n) {
+        return r(t).div(n);
+    }, a.divide = function(t, n) {
+        return r(t).div(n);
+    }, a.recip = function(t) {
+        return r(t).recip();
+    }, a.reciprocal = function(t) {
+        return r(t).recip();
+    }, a.reciprocate = function(t) {
+        return r(t).reciprocate();
+    }, a.cmp = function(t, n) {
+        return r(t).cmp(n);
+    }, a.compare = function(t, n) {
+        return r(t).cmp(n);
+    }, a.eq = function(t, n) {
+        return r(t).eq(n);
+    }, a.equals = function(t, n) {
+        return r(t).eq(n);
+    }, a.neq = function(t, n) {
+        return r(t).neq(n);
+    }, a.notEquals = function(t, n) {
+        return r(t).notEquals(n);
+    }, a.lt = function(t, n) {
+        return r(t).lt(n);
+    }, a.lte = function(t, n) {
+        return r(t).lte(n);
+    }, a.gt = function(t, n) {
+        return r(t).gt(n);
+    }, a.gte = function(t, n) {
+        return r(t).gte(n);
+    }, a.max = function(t, n) {
+        return r(t).max(n);
+    }, a.min = function(t, n) {
+        return r(t).min(n);
+    }, a.clamp = function(t, n, e) {
+        return r(t).clamp(n, e);
+    }, a.clampMin = function(t, n) {
+        return r(t).clampMin(n);
+    }, a.clampMax = function(t, n) {
+        return r(t).clampMax(n);
+    }, a.cmp_tolerance = function(t, n, e) {
+        return r(t).cmp_tolerance(n, e);
+    }, a.compare_tolerance = function(t, n, e) {
+        return r(t).cmp_tolerance(n, e);
+    }, a.eq_tolerance = function(t, n, e) {
+        return r(t).eq_tolerance(n, e);
+    }, a.equals_tolerance = function(t, n, e) {
+        return r(t).eq_tolerance(n, e);
+    }, a.neq_tolerance = function(t, n, e) {
+        return r(t).neq_tolerance(n, e);
+    }, a.notEquals_tolerance = function(t, n, e) {
+        return r(t).notEquals_tolerance(n, e);
+    }, a.lt_tolerance = function(t, n, e) {
+        return r(t).lt_tolerance(n, e);
+    }, a.lte_tolerance = function(t, n, e) {
+        return r(t).lte_tolerance(n, e);
+    }, a.gt_tolerance = function(t, n, e) {
+        return r(t).gt_tolerance(n, e);
+    }, a.gte_tolerance = function(t, n, e) {
+        return r(t).gte_tolerance(n, e);
+    }, a.log10 = function(t) {
+        return r(t).log10();
+    }, a.absLog10 = function(t) {
+        return r(t).absLog10();
+    }, a.pLog10 = function(t) {
+        return r(t).pLog10();
+    }, a.log = function(t, n) {
+        return r(t).log(n);
+    }, a.log2 = function(t) {
+        return r(t).log2();
+    }, a.ln = function(t) {
+        return r(t).ln();
+    }, a.logarithm = function(t, n) {
+        return r(t).logarithm(n);
+    }, a.pow10 = function(t) {
+        return Number.isInteger(t) ? o(1, t) : i(Math.pow(10, t % 1), Math.trunc(t));
+    }, a.pow = function(t, n) {
+        return "number" == typeof t && 10 === t && "number" == typeof n && Number.isInteger(n) ? o(1, n) : r(t).pow(n);
+    }, a.exp = function(t) {
+        return r(t).exp();
+    }, a.sqr = function(t) {
+        return r(t).sqr();
+    }, a.sqrt = function(t) {
+        return r(t).sqrt();
+    }, a.cube = function(t) {
+        return r(t).cube();
+    }, a.cbrt = function(t) {
+        return r(t).cbrt();
+    }, a.dp = function(t) {
+        return r(t).dp();
+    }, a.decimalPlaces = function(t) {
+        return r(t).dp();
+    }, a.affordGeometricSeries = function(t, n, e, i) {
+        return u(r(t), r(n), r(e), i);
+    }, a.sumGeometricSeries = function(t, n, e, i) {
+        return s(t, r(n), r(e), i);
+    }, a.affordArithmeticSeries = function(t, n, e, i) {
+        return function(t, n, e, r) {
+            var i = n.add(r.mul(e)).sub(e.div(2)), o = i.pow(2);
+            return i.neg().add(o.add(e.mul(t).mul(2)).sqrt()).div(e).floor();
+        }(r(t), r(n), r(e), r(i));
+    }, a.sumArithmeticSeries = function(t, n, e, i) {
+        return function(t, n, e, r) {
+            var i = n.add(r.mul(e));
+            return t.div(2).mul(i.mul(2).plus(t.sub(1).mul(e)));
+        }(r(t), r(n), r(e), r(i));
+    }, a.efficiencyOfPurchase = function(t, n, e) {
+        return function(t, n, e) {
+            return t.div(n).add(t.div(e));
+        }(r(t), r(n), r(e));
+    }, a.randomDecimalForTesting = function(t) {
+        if (20 * Math.random() < 1) return o(0, 0);
+        var n = 10 * Math.random();
+        10 * Math.random() < 1 && (n = Math.round(n)), n *= Math.sign(2 * Math.random() - 1);
+        var e = Math.floor(Math.random() * t * 2) - t;
+        return i(n, e);
+    }, a.prototype.normalize = function() {
+        if (this.m >= 1 && this.m < 10) return this;
+        if (0 === this.m) return this.m = 0, this.e = 0, this;
+        var t = Math.floor(Math.log10(Math.abs(this.m)));
+        return this.m = -324 === t ? 10 * this.m / 1e-323 : this.m / e(t), this.e += t, this;
+    }, a.prototype.fromMantissaExponent = function(t, n) {
+        return isFinite(t) && isFinite(n) ? (this.m = t, this.e = n, this.normalize(), this) : (t = Number.NaN, n = Number.NaN, this);
+    }, a.prototype.fromMantissaExponent_noNormalize = function(t, n) {
+        return this.m = t, this.e = n, this;
+    }, a.prototype.fromDecimal = function(t) {
+        return this.m = t.m, this.e = t.e, this;
+    }, a.prototype.fromNumber = function(t) {
+        return isNaN(t) ? (this.m = Number.NaN, this.e = Number.NaN) : t === Number.POSITIVE_INFINITY ? (this.m = 1, this.e = n) : t === Number.NEGATIVE_INFINITY ? (this.m = -1, this.e = n) : 0 === t ? (this.m = 0, this.e = 0) : (this.e = Math.floor(Math.log10(Math.abs(t))), this.m = -324 === this.e ? 10 * t / 1e-323 : t / e(this.e), this.normalize()), this;
+    }, a.prototype.fromString = function(t) {
+        if (-1 !== t.indexOf("e")) {
+            var n = t.split("e");
+            this.m = parseFloat(n[0]), this.e = parseFloat(n[1]), this.normalize();
+        } else if ("NaN" === t) this.m = Number.NaN, this.e = Number.NaN;
+        else if (this.fromNumber(parseFloat(t)), isNaN(this.m)) throw Error("[DecimalError] Invalid argument: " + t);
+        return this;
+    }, a.prototype.fromValue = function(t) {
+        return t instanceof a ? this.fromDecimal(t) : "number" == typeof t ? this.fromNumber(t) : "string" == typeof t ? this.fromString(t) : (this.m = 0, this.e = 0, this);
+    }, a.prototype.toNumber = function() {
+        if (!isFinite(this.e)) return Number.NaN;
+        if (this.e > 308) return this.m > 0 ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+        if (this.e < -324) return 0;
+        if (-324 === this.e) return this.m > 0 ? 5e-324 : -0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005;
+        var t = this.m * e(this.e);
+        if (!isFinite(t) || this.e < 0) return t;
+        var n = Math.round(t);
+        return Math.abs(n - t) < 1e-10 ? n : t;
+    }, a.prototype.mantissaWithDecimalPlaces = function(t) {
+        if (isNaN(this.m) || isNaN(this.e)) return Number.NaN;
+        if (0 === this.m) return 0;
+        var n = t + 1, e = Math.ceil(Math.log10(Math.abs(this.m))), r = Math.round(this.m * Math.pow(10, n - e)) * Math.pow(10, e - n);
+        return parseFloat(r.toFixed(Math.max(n - e, 0)));
+    }, a.prototype.toString = function() {
+        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -n || 0 === this.m ? "0" : this.e < 21 && this.e > -7 ? this.toNumber().toString() : this.m + "e" + (this.e >= 0 ? "+" : "") + this.e;
+    }, a.prototype.toExponential = function(e) {
+        if (isNaN(this.m) || isNaN(this.e)) return "NaN";
+        if (this.e >= n) return this.m > 0 ? "Infinity" : "-Infinity";
+        if (this.e <= -n || 0 === this.m) return "0" + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") + "e+0";
+        if (this.e > -324 && this.e < 308) return this.toNumber().toExponential(e);
+        isFinite(e) || (e = 17);
+        var r = e + 1, i = Math.max(1, Math.ceil(Math.log10(Math.abs(this.m))));
+        return (Math.round(this.m * Math.pow(10, r - i)) * Math.pow(10, i - r)).toFixed(Math.max(r - i, 0)) + "e" + (this.e >= 0 ? "+" : "") + this.e;
+    }, a.prototype.toFixed = function(e) {
+        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -n || 0 === this.m ? "0" + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") : this.e >= 17 ? this.m.toString().replace(".", "").padEnd(this.e + 1, "0") + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") : this.toNumber().toFixed(e);
+    }, a.prototype.toPrecision = function(t) {
+        return this.e <= -7 ? this.toExponential(t - 1) : t > this.e ? this.toFixed(t - this.e - 1) : this.toExponential(t - 1);
+    }, a.prototype.valueOf = function() {
+        return this.toString();
+    }, a.prototype.toJSON = function() {
+        return this.toString();
+    }, a.prototype.toStringWithDecimalPlaces = function(t) {
+        return this.toExponential(t);
+    }, a.prototype.abs = function() {
+        return o(Math.abs(this.m), this.e);
+    }, a.prototype.neg = function() {
+        return o(-this.m, this.e);
+    }, a.prototype.negate = function() {
+        return this.neg();
+    }, a.prototype.negated = function() {
+        return this.neg();
+    }, a.prototype.sign = function() {
+        return Math.sign(this.m);
+    }, a.prototype.sgn = function() {
+        return this.sign();
+    }, a.prototype.round = function() {
+        return this.e < -1 ? new a(0) : this.e < 17 ? new a(Math.round(this.toNumber())) : this;
+    }, a.prototype.floor = function() {
+        return this.e < -1 ? Math.sign(this.m) >= 0 ? new a(0) : new a(-1) : this.e < 17 ? new a(Math.floor(this.toNumber())) : this;
+    }, a.prototype.ceil = function() {
+        return this.e < -1 ? Math.sign(this.m) > 0 ? new a(1) : new a(0) : this.e < 17 ? new a(Math.ceil(this.toNumber())) : this;
+    }, a.prototype.trunc = function() {
+        return this.e < 0 ? new a(0) : this.e < 17 ? new a(Math.trunc(this.toNumber())) : this;
+    }, a.prototype.add = function(t) {
+        var n, o, u = r(t);
+        if (0 === this.m) return u;
+        if (0 === u.m) return this;
+        if (this.e >= u.e ? (n = this, o = u) : (n = u, o = this), n.e - o.e > 17) return n;
+        var s = Math.round(1e14 * n.m + 1e14 * o.m * e(o.e - n.e));
+        return i(s, n.e - 14);
+    }, a.prototype.plus = function(t) {
+        return this.add(t);
+    }, a.prototype.sub = function(t) {
+        return this.add(r(t).neg());
+    }, a.prototype.subtract = function(t) {
+        return this.sub(t);
+    }, a.prototype.minus = function(t) {
+        return this.sub(t);
+    }, a.prototype.mul = function(t) {
+        if ("number" == typeof t) return t < 1e307 && t > -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 ? i(this.m * t, this.e) : i(1e-307 * this.m * t, this.e + 307);
+        var n = "string" == typeof t ? new a(t) : t;
+        return i(this.m * n.m, this.e + n.e);
+    }, a.prototype.multiply = function(t) {
+        return this.mul(t);
+    }, a.prototype.times = function(t) {
+        return this.mul(t);
+    }, a.prototype.div = function(t) {
+        return this.mul(r(t).recip());
+    }, a.prototype.divide = function(t) {
+        return this.div(t);
+    }, a.prototype.divideBy = function(t) {
+        return this.div(t);
+    }, a.prototype.dividedBy = function(t) {
+        return this.div(t);
+    }, a.prototype.recip = function() {
+        return i(1 / this.m, -this.e);
+    }, a.prototype.reciprocal = function() {
+        return this.recip();
+    }, a.prototype.reciprocate = function() {
+        return this.recip();
+    }, a.prototype.cmp = function(t) {
+        var n = r(t);
+        if (0 === this.m) {
+            if (0 === n.m) return 0;
+            if (n.m < 0) return 1;
+            if (n.m > 0) return -1;
+        }
+        if (0 === n.m) {
+            if (this.m < 0) return -1;
+            if (this.m > 0) return 1;
+        }
+        if (this.m > 0) return n.m < 0 || this.e > n.e ? 1 : this.e < n.e ? -1 : this.m > n.m ? 1 : this.m < n.m ? -1 : 0;
+        if (this.m < 0) return n.m > 0 || this.e > n.e ? -1 : this.e < n.e || this.m > n.m ? 1 : this.m < n.m ? -1 : 0;
+        throw Error("Unreachable code");
+    }, a.prototype.compare = function(t) {
+        return this.cmp(t);
+    }, a.prototype.eq = function(t) {
+        var n = r(t);
+        return this.e === n.e && this.m === n.m;
+    }, a.prototype.equals = function(t) {
+        return this.eq(t);
+    }, a.prototype.neq = function(t) {
+        return !this.eq(t);
+    }, a.prototype.notEquals = function(t) {
+        return this.neq(t);
+    }, a.prototype.lt = function(t) {
+        var n = r(t);
+        return 0 === this.m ? n.m > 0 : 0 === n.m ? this.m <= 0 : this.e === n.e ? this.m < n.m : this.m > 0 ? n.m > 0 && this.e < n.e : n.m > 0 || this.e > n.e;
+    }, a.prototype.lte = function(t) {
+        return !this.gt(t);
+    }, a.prototype.gt = function(t) {
+        var n = r(t);
+        return 0 === this.m ? n.m < 0 : 0 === n.m ? this.m > 0 : this.e === n.e ? this.m > n.m : this.m > 0 ? n.m < 0 || this.e > n.e : n.m < 0 && this.e < n.e;
+    }, a.prototype.gte = function(t) {
+        return !this.lt(t);
+    }, a.prototype.max = function(t) {
+        var n = r(t);
+        return this.lt(n) ? n : this;
+    }, a.prototype.min = function(t) {
+        var n = r(t);
+        return this.gt(n) ? n : this;
+    }, a.prototype.clamp = function(t, n) {
+        return this.max(t).min(n);
+    }, a.prototype.clampMin = function(t) {
+        return this.max(t);
+    }, a.prototype.clampMax = function(t) {
+        return this.min(t);
+    }, a.prototype.cmp_tolerance = function(t, n) {
+        var e = r(t);
+        return this.eq_tolerance(e, n) ? 0 : this.cmp(e);
+    }, a.prototype.compare_tolerance = function(t, n) {
+        return this.cmp_tolerance(t, n);
+    }, a.prototype.eq_tolerance = function(t, n) {
+        var e = r(t);
+        return a.lte(this.sub(e).abs(), a.max(this.abs(), e.abs()).mul(n));
+    }, a.prototype.equals_tolerance = function(t, n) {
+        return this.eq_tolerance(t, n);
+    }, a.prototype.neq_tolerance = function(t, n) {
+        return !this.eq_tolerance(t, n);
+    }, a.prototype.notEquals_tolerance = function(t, n) {
+        return this.neq_tolerance(t, n);
+    }, a.prototype.lt_tolerance = function(t, n) {
+        var e = r(t);
+        return !this.eq_tolerance(e, n) && this.lt(e);
+    }, a.prototype.lte_tolerance = function(t, n) {
+        var e = r(t);
+        return this.eq_tolerance(e, n) || this.lt(e);
+    }, a.prototype.gt_tolerance = function(t, n) {
+        var e = r(t);
+        return !this.eq_tolerance(e, n) && this.gt(e);
+    }, a.prototype.gte_tolerance = function(t, n) {
+        var e = r(t);
+        return this.eq_tolerance(e, n) || this.gt(e);
+    }, a.prototype.log10 = function() {
+        return this.e + Math.log10(this.m);
+    }, a.prototype.absLog10 = function() {
+        return this.e + Math.log10(Math.abs(this.m));
+    }, a.prototype.pLog10 = function() {
+        return this.m <= 0 || this.e < 0 ? 0 : this.log10();
+    }, a.prototype.log = function(t) {
+        return Math.LN10 / Math.log(t) * this.log10();
+    }, a.prototype.log2 = function() {
+        return 3.321928094887362 * this.log10();
+    }, a.prototype.ln = function() {
+        return 2.302585092994045 * this.log10();
+    }, a.prototype.logarithm = function(t) {
+        return this.log(t);
+    }, a.prototype.pow = function(t) {
+        var n, e = t instanceof a ? t.toNumber() : t, r = this.e * e;
+        if (Number.isSafeInteger(r) && (n = Math.pow(this.m, e), isFinite(n) && 0 !== n)) return i(n, r);
+        var o = Math.trunc(r), u = r - o;
+        if (n = Math.pow(10, e * Math.log10(this.m) + u), isFinite(n) && 0 !== n) return i(n, o);
+        var s = a.pow10(e * this.absLog10());
+        return -1 === this.sign() ? 1 === Math.abs(e % 2) ? s.neg() : 0 === Math.abs(e % 2) ? s : new a(Number.NaN) : s;
+    }, a.prototype.pow_base = function(t) {
+        return r(t).pow(this);
+    }, a.prototype.factorial = function() {
+        var t = this.toNumber() + 1;
+        return a.pow(t / Math.E * Math.sqrt(t * Math.sinh(1 / t) + 1 / (810 * Math.pow(t, 6))), t).mul(Math.sqrt(2 * Math.PI / t));
+    }, a.prototype.exp = function() {
+        var t = this.toNumber();
+        return -706 < t && t < 709 ? a.fromNumber(Math.exp(t)) : a.pow(Math.E, t);
+    }, a.prototype.sqr = function() {
+        return i(Math.pow(this.m, 2), 2 * this.e);
+    }, a.prototype.sqrt = function() {
+        return this.m < 0 ? new a(Number.NaN) : this.e % 2 != 0 ? i(3.16227766016838 * Math.sqrt(this.m), Math.floor(this.e / 2)) : i(Math.sqrt(this.m), Math.floor(this.e / 2));
+    }, a.prototype.cube = function() {
+        return i(Math.pow(this.m, 3), 3 * this.e);
+    }, a.prototype.cbrt = function() {
+        var t = 1, n = this.m;
+        n < 0 && (t = -1, n = -n);
+        var e = t * Math.pow(n, 1 / 3), r = this.e % 3;
+        return i(1 === r || -1 === r ? 2.154434690031883 * e : 0 !== r ? 4.641588833612778 * e : e, Math.floor(this.e / 3));
+    }, a.prototype.sinh = function() {
+        return this.exp().sub(this.negate().exp()).div(2);
+    }, a.prototype.cosh = function() {
+        return this.exp().add(this.negate().exp()).div(2);
+    }, a.prototype.tanh = function() {
+        return this.sinh().div(this.cosh());
+    }, a.prototype.asinh = function() {
+        return a.ln(this.add(this.sqr().add(1).sqrt()));
+    }, a.prototype.acosh = function() {
+        return a.ln(this.add(this.sqr().sub(1).sqrt()));
+    }, a.prototype.atanh = function() {
+        return this.abs().gte(1) ? Number.NaN : a.ln(this.add(1).div(new a(1).sub(this))) / 2;
+    }, a.prototype.ascensionPenalty = function(t) {
+        return 0 === t ? this : this.pow(Math.pow(10, -t));
+    }, a.prototype.egg = function() {
+        return this.add(9);
+    }, a.prototype.lessThanOrEqualTo = function(t) {
+        return this.cmp(t) < 1;
+    }, a.prototype.lessThan = function(t) {
+        return this.cmp(t) < 0;
+    }, a.prototype.greaterThanOrEqualTo = function(t) {
+        return this.cmp(t) > -1;
+    }, a.prototype.greaterThan = function(t) {
+        return this.cmp(t) > 0;
+    }, a.prototype.decimalPlaces = function() {
+        return this.dp();
+    }, a.prototype.dp = function() {
+        if (!isFinite(this.mantissa)) return NaN;
+        if (this.exponent >= 17) return 0;
+        for(var t = this.mantissa, n = -this.exponent, e = 1; Math.abs(Math.round(t * e) / e - t) > 1e-10;)e *= 10, n++;
+        return n > 0 ? n : 0;
+    }, Object.defineProperty(a, "MAX_VALUE", {
+        get: function() {
+            return h;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), Object.defineProperty(a, "MIN_VALUE", {
+        get: function() {
+            return c;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), Object.defineProperty(a, "NUMBER_MAX_VALUE", {
+        get: function() {
+            return p;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), Object.defineProperty(a, "NUMBER_MIN_VALUE", {
+        get: function() {
+            return f;
+        },
+        enumerable: !1,
+        configurable: !0
+    }), a;
+}(), h = o(1, n), c = o(1, -n), p = r(Number.MAX_VALUE), f = r(Number.MIN_VALUE);
+exports.default = a;
+
+},{"pad-end":"bJggk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bJggk":[function(require,module,exports) {
+"use strict";
+module.exports = function(string, maxLength, fillString) {
+    if (string == null || maxLength == null) return string;
+    var result = String(string);
+    var targetLen = typeof maxLength === "number" ? maxLength : parseInt(maxLength, 10);
+    if (isNaN(targetLen) || !isFinite(targetLen)) return result;
+    var length = result.length;
+    if (length >= targetLen) return result;
+    var filled = fillString == null ? "" : String(fillString);
+    if (filled === "") filled = " ";
+    var fillLen = targetLen - length;
+    while(filled.length < fillLen)filled += filled;
+    var truncated = filled.length > fillLen ? filled.substr(0, fillLen) : filled;
+    return result + truncated;
+};
+
+},{}],"isy6N":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "SingleDice", ()=>SingleDice);
 parcelHelpers.export(exports, "Dice", ()=>Dice);
 var _layer = require("./layer");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
 class SingleDice {
     constructor(game, diceLayer){
         this.game = game;
@@ -4196,7 +4745,7 @@ class SingleDice {
 }
 class Dice extends (0, _layer.Layer) {
     constructor(game){
-        super(game, "dice", 10000000, "white");
+        super(game, "dice", new (0, _breakInfinityJsDefault.default)(10000000), "white");
         this.layerColor = "blue";
         this.diceArrayContainer = document.createElement("div");
         this.diceArrayContainer.classList.add("dice-container");
@@ -4205,13 +4754,13 @@ class Dice extends (0, _layer.Layer) {
         this.diceCountCap = 3;
         this.diceArray = [];
         this.milestoneFunctions = {
-            "addDice": {
-                "activate": ()=>{
+            addDice: {
+                activate: ()=>{
                     this.milestoneFunctions.addDice.update();
                 },
-                "cost": (milestone, returnMax = false, forceLvl)=>{
+                cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = 1;
+                        const cost = new (0, _breakInfinityJsDefault.default)(1);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -4219,12 +4768,12 @@ class Dice extends (0, _layer.Layer) {
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                "update": ()=>{},
-                "updateText": ()=>{}
+                update: ()=>{},
+                updateText: ()=>{}
             }
         };
         this.milestones = {
-            "addDice": new (0, _layer.Milestone)("addDice", "+1 Dice", 0, "Adds a new dice!", 5, this.milestoneFunctions.addDice, this.div)
+            addDice: new (0, _layer.Milestone)("addDice", "+1 Dice", new (0, _breakInfinityJsDefault.default)(0), "Adds a new dice!", new (0, _breakInfinityJsDefault.default)(5), this.milestoneFunctions.addDice, this.div)
         };
         this.init();
         this.setup();
@@ -4235,7 +4784,7 @@ class Dice extends (0, _layer.Layer) {
     update() {}
 }
 
-},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aXwEX":[function(require,module,exports) {
+},{"./layer":"bX7Wa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","break_infinity.js":"bXpmd"}],"aXwEX":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Coin", ()=>Coin);
