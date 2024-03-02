@@ -2776,6 +2776,10 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                         level: this.game.layers.start.milestones.autoPointsDivisor.level.toString(),
                         timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked.toString()
                     },
+                    betterAutoPoints: {
+                        level: this.game.layers.start.milestones.betterAutoPoints.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.betterAutoPoints.timesClicked.toString()
+                    },
                     criticalPoints: {
                         level: this.game.layers.start.milestones.criticalPoints.level.toString(),
                         timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked.toString()
@@ -2840,6 +2844,8 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPointsDivisor.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPointsDivisor.level);
                 this.game.layers.start.milestones.autoPointsDivisor.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPointsDivisor.timesClicked);
+                this.game.layers.start.milestones.betterAutoPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.betterAutoPoints.level);
+                this.game.layers.start.milestones.betterAutoPoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.betterAutoPoints.timesClicked);
                 this.game.layers.start.milestones.criticalPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalPoints.level);
                 this.game.layers.start.milestones.criticalPoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalPoints.timesClicked);
                 this.game.layers.start.milestones.criticalBonus.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalBonus.level);
@@ -4287,4 +4293,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//# sourceMappingURL=index.9b6e771c.js.map
+//# sourceMappingURL=index.ced336cf.js.map

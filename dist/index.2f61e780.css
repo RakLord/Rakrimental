@@ -13234,9 +13234,11 @@ main .layer button {
   min-width: 16ch;
   max-width: 265px;
   color: #f7f7f7 !important;
+  text-align: center !important;
   border-radius: 0 !important;
   flex-direction: column !important;
   justify-content: center !important;
+  align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
@@ -13367,4 +13369,4 @@ main .dice-container .dice .not-dot {
   background-color: #0000;
 }
 
-/*# sourceMappingURL=index.e134835c.css.map */
+/*# sourceMappingURL=index.2f61e780.css.map */

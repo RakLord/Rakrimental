@@ -52,6 +52,10 @@ export class SaveManager {
                         level: this.game.layers.start.milestones.autoPointsDivisor.level.toString(),
                         timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked.toString(),
                     },
+                    betterAutoPoints: {
+                        level: this.game.layers.start.milestones.betterAutoPoints.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.betterAutoPoints.timesClicked.toString(),
+                    },
                     criticalPoints: {
                         level: this.game.layers.start.milestones.criticalPoints.level.toString(),
                         timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked.toString(),
@@ -135,6 +139,10 @@ export class SaveManager {
 
                 this.game.layers.start.milestones.autoPointsDivisor.level = new Decimal(gameState.layers.start.milestones.autoPointsDivisor.level);
                 this.game.layers.start.milestones.autoPointsDivisor.timesClicked = new Decimal(gameState.layers.start.milestones.autoPointsDivisor.timesClicked);
+
+                this.game.layers.start.milestones.betterAutoPoints.level = new Decimal(gameState.layers.start.milestones.betterAutoPoints.level);
+                this.game.layers.start.milestones.betterAutoPoints.timesClicked = new Decimal(gameState.layers.start.milestones.betterAutoPoints.timesClicked);
+                
                 this.game.layers.start.milestones.criticalPoints.level = new Decimal(gameState.layers.start.milestones.criticalPoints.level);
                 this.game.layers.start.milestones.criticalPoints.timesClicked = new Decimal(gameState.layers.start.milestones.criticalPoints.timesClicked);
 
