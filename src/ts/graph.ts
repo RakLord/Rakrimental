@@ -1,5 +1,5 @@
 import { Game } from './main';
-import { Milestone } from './layers/layer';
+import { Milestone } from './milestone';
 import Decimal from 'break_infinity.js';
 
 export class FormulaGraph {

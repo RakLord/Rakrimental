@@ -1,6 +1,6 @@
 import { Game } from "./main";
 import localForage from 'localforage';
-import { Milestone } from "./layers/layer";
+import { Milestone } from "./milestone";
 import Decimal from 'break_infinity.js';
 
 export class SaveManager {

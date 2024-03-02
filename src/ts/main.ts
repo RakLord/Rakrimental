@@ -1,261 +1,251 @@
 import * as bootstrap from 'bootstrap';
-import { SaveManager } from './saving';
-import { Layer } from './layers/layer';
-import { Start } from './layers/start';
-import { Dice } from './layers/dice';
-import { Coin } from './layers/coin';
-import { FormulaGraph } from './graph';
+import {SaveManager} from './saving';
+import {Layer} from './layers/layer';
+import {Start} from './layers/start';
+import {Dice} from './layers/dice';
+import {Coin} from './layers/coin';
+import {FormulaGraph} from './graph';
 import Decimal from 'break_infinity.js';
 
-
 export class Game {
-    saveManager: SaveManager;
-    textElements: { [key: string]: HTMLElement; }; // Hold text displays (may refactor soon)
-    mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
-    gameTimer: number; // Holds the setInterval function for the mainInterval
-    fixedInterval: number = 3000;  // Used for more process intense operations that need to be done less frequently
-    fixedTimer: number; // Holds the setInterval function for the fixedInterval
-    autosaveInterval: number; // Used for autosaving
-    autosaveTimer: number; // Holds the setInterval function for the autosaveInterval
-    layers: { [key: string]: Layer; };
-    visibleLayer: string; // Holds the name of the currently visible layer
-    navBar: HTMLElement;
-    utilityBar: HTMLElement;
-    tooltipsEnabled: boolean;
-    keyPressed: string;
-    autoSaveEnabled: boolean;
+	saveManager: SaveManager;
+	textElements: {[key: string]: HTMLElement}; // Hold text displays (may refactor soon)
+	mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
+	gameTimer: number; // Holds the setInterval function for the mainInterval
+	fixedInterval: number = 3000; // Used for more process intense operations that need to be done less frequently
+	fixedTimer: number; // Holds the setInterval function for the fixedInterval
+	autosaveInterval: number; // Used for autosaving
+	autosaveTimer: number; // Holds the setInterval function for the autosaveInterval
+	layers: {[key: string]: Layer};
+	visibleLayer: string; // Holds the name of the currently visible layer
+	navBar: HTMLElement;
+	utilityBar: HTMLElement;
+	tooltipsEnabled: boolean;
+	keyPressed: string;
+	autoSaveEnabled: boolean;
 
-    mouseX: number = 0;
-    mouseY: number = 0;
+	mouseX: number = 0;
+	mouseY: number = 0;
 
-    formulaGraphEnabled: boolean = false;
-    displayingGraph: boolean;
-    formulaGraph: FormulaGraph;
+	formulaGraphEnabled: boolean = false;
+	displayingGraph: boolean;
+	formulaGraph: FormulaGraph;
 
-    constructor() {
-        console.log("Game Constructor")
-        this.saveManager = new SaveManager(this);
-        this.formulaGraph = new FormulaGraph(this);
-        this.displayingGraph = false;
-        this.navBar = $('navBar')!;
-        this.utilityBar = $('utilityBar')!;
-        this.mainInterval = 1000;
-        this.keyPressed = '';
-        this.autoSaveEnabled = true;
-        this.autosaveInterval = 30000;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.layers = { 
-            start: new Start(this),
-            dice: new Dice(this),
-            coin: new Coin(this)
-        };
+	constructor() {
+		console.log('Game Constructor');
+		this.saveManager = new SaveManager(this);
+		this.formulaGraph = new FormulaGraph(this);
+		this.displayingGraph = false;
+		this.navBar = $('navBar')!;
+		this.utilityBar = $('utilityBar')!;
+		this.mainInterval = 1000;
+		this.keyPressed = '';
+		this.autoSaveEnabled = true;
+		this.autosaveInterval = 30000;
+		this.mouseX = 0;
+		this.mouseY = 0;
+		this.layers = {
+			start: new Start(this),
+			dice: new Dice(this),
+			coin: new Coin(this),
+		};
 
+		this.textElements = {
+			start: document.createElement('div'),
+			dice: document.createElement('div'),
+		};
 
-        this.textElements = {
-            "start": document.createElement('div'),
-            "dice": document.createElement('div'),
-        }
+		for (const key of Object.keys(this.textElements)) {
+			this.textElements[key].classList.add('d-flex', 'gap-2');
+			this.textElements[key].setAttribute('id', key);
+			$('header-data')!.appendChild(this.textElements[key]);
+		}
 
-        for (const key of Object.keys(this.textElements)) {
-            this.textElements[key].classList.add('d-flex', 'gap-2');
-            this.textElements[key].setAttribute('id', key);
-            $('header-data')!.appendChild(this.textElements[key]);
-        }
+		this.layers.start.unlocked = true;
 
-        this.layers.start.unlocked = true;
+		this.visibleLayer = 'start';
+		this.tooltipsEnabled = true;
 
-        this.visibleLayer = "start";
-        this.tooltipsEnabled = true;
+		this.utilityButton(this, 'Save', this.save);
+		this.utilityButton(this, 'Load', this.load);
+		this.utilityButton(this, 'AutoSave', this.toggleAutoSave);
+		this.utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
+		this.utilityButton(this, 'Enable Graphs', this.enableGraphs);
 
+		this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
+		this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
+		this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
 
-        this.utilityButton(this, 'Save', this.save);
-        this.utilityButton(this, 'Load', this.load);
-        this.utilityButton(this, 'AutoSave', this.toggleAutoSave);
-        this.utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
-        this.utilityButton(this, 'Enable Graphs', this.enableGraphs);
+		this.setupNav();
 
+		document.addEventListener('contextmenu', (event) => {
+			event.preventDefault();
+			// Can make custom right click menu if I can be bothered.
+			// simulate left click
+			const clickEvent = new MouseEvent('click', {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+			});
+			event.target?.dispatchEvent(clickEvent);
+		});
 
-        this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
-        this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
-        this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
+		document.addEventListener('keydown', (event) => {
+			this.keyPressed = event.key;
+			switch (this.keyPressed) {
+				case 'q':
+					this.layers.start.currency = this.layers.start.currency.times(10);
+					break;
 
-        this.setupNav();
+				case '1':
+					this.switchLayer('start');
+					break;
+				case '2':
+					this.switchLayer('dice');
+					break;
+				case '3':
+					this.switchLayer('coin');
+					break;
+				case 'g':
+					this.formulaGraphEnabled = !this.formulaGraphEnabled;
+					break;
+				case 'm':
+					this.layers.start.currency = new Decimal(1e16);
+					break;
+			}
+		});
+		document.addEventListener('keyup', (event) => {
+			this.keyPressed = '';
+		});
+		document.addEventListener('mousemove', (event) => {
+			this.mouseX = event.clientX;
+			this.mouseY = event.clientY;
+		});
+	}
 
-        document.addEventListener('contextmenu', (event) => {
-            event.preventDefault()
-            // Can make custom right click menu if I can be bothered.
-            // simulate left click
-            const clickEvent = new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            });
-            event.target?.dispatchEvent(clickEvent);
-        });
+	utilityButton(game: Game, txt: string, func: () => any) {
+		const btn = document.createElement('button');
+		btn.innerText = txt;
+		btn.classList.add('btn', 'btn-transparent', 'btn-hover');
+		btn.addEventListener('click', func.bind(game));
+		this.utilityBar.appendChild(btn);
+	}
 
-        document.addEventListener('keydown', (event) => {
-            this.keyPressed = event.key;
-            switch (this.keyPressed) {
-                case 'q':
-                    this.layers.start.currency = this.layers.start.currency.times(10);
-                    break
-                
-                case '1':
-                    this.switchLayer('start');
-                    break;
-                case '2':
-                    this.switchLayer('dice');
-                    break;
-                case '3':
-                    this.switchLayer('coin');
-                    break;
-                case 'g':
-                    this.formulaGraphEnabled = !this.formulaGraphEnabled;
-                    break;
-                case 'm':
-                    this.layers.start.currency = new Decimal(1e16);
-                    break;
+	autoSave() {
+		if (this.autoSaveEnabled) {
+			if (this.layers.start.currency.eq(0)) return;
+			console.log('AutoSaving');
+			this.save();
+			const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === 'AutoSave')[0];
+			autoSaveBtn.classList.add('auto-save-on');
+		} else {
+			const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === 'AutoSave')[0];
+			autoSaveBtn.classList.remove('auto-save-on');
+		}
+	}
 
-            }
+	save() {
+		this.saveManager.save(this);
+	}
 
-        });
-        document.addEventListener('keyup', (event) => {
-            this.keyPressed = "";
-        });   
-        document.addEventListener('mousemove', (event) => {
-            this.mouseX = event.clientX;
-            this.mouseY = event.clientY;
-        });
+	load() {
+		this.saveManager.load(this);
+	}
 
-    }
+	toggleAutoSave() {
+		this.autoSaveEnabled = !this.autoSaveEnabled;
+	}
 
-    utilityButton(game: Game, txt: string,  func: () => any) {
-        const btn = document.createElement('button');
-        btn.innerText = txt;
-        btn.classList.add('btn', 'btn-transparent', 'btn-hover');
-        btn.addEventListener('click', func.bind(game))
-        this.utilityBar.appendChild(btn);
-    }
+	// Is called every mainInterval time (1000ms default)
+	update() {
+		for (const layer of Object.keys(this.layers)) {
+			this.layers[layer].update();
+		}
+		this.updateUI();
+	}
 
-    autoSave() {
-        if (this.autoSaveEnabled) {
-            if (this.layers.start.currency.eq(0)) return;
-            console.log("AutoSaving")
-            this.save();
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.add('auto-save-on');
-        } else {
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.remove('auto-save-on');
-        }
-    }
+	// Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
+	fixedIntervalUpdate() {
+		for (const layer of Object.keys(this.layers)) {
+			if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) {
+				this.layers[layer].highestCurrency = this.layers[layer].currency;
+			}
+			this.layers[layer].checkMilestones();
+		}
+		if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
+			console.log('Unlocking Layer: ', this.layers.dice.name, 'Cost: ', this.layers.dice.unlockCost.toString());
+			this.layers.dice.unlocked = true;
+		}
 
-    save() {
-        this.saveManager.save(this);
-    }
+		this.setupNav();
+	}
 
-    load() {
-        this.saveManager.load(this);
-    }
+	toggleTooltips() {
+		this.tooltipsEnabled = !this.tooltipsEnabled;
+		this.setTooltipsState();
+	}
 
-    toggleAutoSave() {
-        this.autoSaveEnabled = !this.autoSaveEnabled;
-    }
+	enableGraphs() {
+		this.formulaGraphEnabled = !this.formulaGraphEnabled;
+	}
 
+	setTooltipsState() {
+		for (const layer of Object.keys(this.layers)) {
+			for (const key of Object.keys(this.layers[layer].buttons)) {
+				const btn = this.layers[layer].buttons[key];
+				btn.toggleTooltip();
+				// element.setAttribute('tooltipenabled', 'enabled');
+			}
+		}
+	}
 
-    // Is called every mainInterval time (1000ms default)
-    update() {
-        for (const layer of Object.keys(this.layers)) {
-            this.layers[layer].update();
-        }
-        this.updateUI();
-    }
-    
-    // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
-    fixedIntervalUpdate () {
+	setupNav() {
+		this.navBar.innerHTML = '';
+		for (const layer of Object.keys(this.layers)) {
+			if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
+				const layerButton = document.createElement('button');
+				layerButton.setAttribute('id', layer);
+				layerButton.innerText = this.layers[layer].name.toUpperCase();
+				layerButton.addEventListener('click', () => this.switchLayer(layer));
+				this.navBar.appendChild(layerButton);
+			}
+		}
+		for (const button of this.navBar.children) {
+			if (button.id === this.visibleLayer) {
+				button.classList.add('selected');
+			} else {
+				button.classList.remove('selected');
+			}
+		}
+	}
 
-        for (const layer of Object.keys(this.layers)) {
-            if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) {
-                this.layers[layer].highestCurrency = this.layers[layer].currency;
-            }
-            this.layers[layer].checkMilestones();
-        }
-        if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
-            console.log("Unlocking Layer: ", this.layers.dice.name, "Cost: ", this.layers.dice.unlockCost.toString());
-            this.layers.dice.unlocked = true;
-        }
+	switchLayer(layerName: string) {
+        if (this.layers[layerName].unlocked === false) return;
+		console.log('Switching to layer', layerName);
+		for (const layer of Object.keys(this.layers)) {
+			this.layers[layer].toggleVisibility(true);
+		}
+		this.layers[layerName].toggleVisibility();
+		for (const button of this.navBar.children) {
+			if (button.id === layerName) {
+                this.visibleLayer = layerName;
+				button.classList.add('selected');
+			} else {
+				button.classList.remove('selected');
+			}
+		}
+	}
 
-
-        this.setupNav();
-    }
-
-    toggleTooltips() {
-        this.tooltipsEnabled = !this.tooltipsEnabled;
-        this.setTooltipsState();
-    }
-
-    enableGraphs() {
-        this.formulaGraphEnabled = !this.formulaGraphEnabled;
-    }
-
-    setTooltipsState() {
-
-        for (const layer of Object.keys(this.layers)) {
-            for (const key of Object.keys(this.layers[layer].buttons)) {
-                const btn = this.layers[layer].buttons[key];
-                btn.toggleTooltip();
-                // element.setAttribute('tooltipenabled', 'enabled');
-            }
-        }
-    }
-
-    setupNav() {
-        this.navBar.innerHTML = '';
-        for (const layer of Object.keys(this.layers)) {
-            if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
-                const layerButton = document.createElement('button');
-                layerButton.setAttribute('id', layer);
-                layerButton.innerText = this.layers[layer].name.toUpperCase();
-                layerButton.addEventListener('click', () => this.switchLayer(layer));
-                this.navBar.appendChild(layerButton);            }
-        }
-        for (const button of this.navBar.children) {
-            if (button.id === this.visibleLayer) {
-                button.classList.add('selected');
-            } else {
-                button.classList.remove('selected');
-            }
-        }
-    }
-
-    switchLayer(layerName: string) {
-        console.log("Switching to layer", layerName)
-        for (const layer of Object.keys(this.layers)) {
-            this.layers[layer].toggleVisibility(true);
-        }
-        this.layers[layerName].toggleVisibility();
-        for (const button of this.navBar.children) {
-            if (button.id === layerName) {
-                button.classList.add('selected');
-            } else {
-                button.classList.remove('selected');
-            }
-        }
-    }
-    
-    formatValue(value: Decimal, places: number = 2): string {
-        if (value.lt(1000)) {
-            return value.toFixed(places).toString();
-        }
-        else {
-            return `${value.m.toFixed(places)}e${value.e}`;
-        
-        }
-    }
-    updateUI() {
-        this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + " P";
-    }
+	formatValue(value: Decimal, places: number = 2): string {
+		if (value.lt(1000)) {
+			return value.toFixed(places).toString();
+		} else {
+			return `${value.m.toFixed(places)}e${value.e}`;
+		}
+	}
+	updateUI() {
+		this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + ' P';
+	}
 }
 
 let game: Game;
@@ -263,7 +253,7 @@ let game: Game;
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
 
-document.addEventListener('DOMContentLoaded', function() {
-    game = new Game();
-    (window as any).game = game;
+document.addEventListener('DOMContentLoaded', function () {
+	game = new Game();
+	(window as any).game = game;
 });

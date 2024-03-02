@@ -1,6 +1,6 @@
 import {Layer} from './layer';
 import {Game} from '../main';
-import {Milestone} from './layer';
+import {Milestone} from '../milestone';
 import {set} from 'lodash';
 import Decimal from 'break_infinity.js';
 
@@ -59,7 +59,6 @@ export class SingleDice {
 			pip.classList.add('not-dot');
 		});
 
-		console.log(this.dicePips);
 		switch (faceValue) {
 			case 1:
 				this.hidePips([12]);

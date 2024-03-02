@@ -1,20 +1,10 @@
 import {Layer} from './layer';
 import {Game} from '../main';
-import {Milestone} from './layer';
+import {Milestone} from '../milestone';
 import Decimal from 'break_infinity.js';
 
-function mapRange(
-	x: Decimal,
-	inMin: Decimal,
-	inMax: Decimal,
-	outMin: Decimal,
-	outMax: Decimal,
-) {
-	return x
-		.minus(inMin)
-		.times(outMax.minus(outMin))
-		.div(inMax.minus(inMin))
-		.plus(outMin);
+function mapRange(x: Decimal, inMin: Decimal, inMax: Decimal, outMin: Decimal, outMax: Decimal) {
+	return x.minus(inMin).times(outMax.minus(outMin)).div(inMax.minus(inMin)).plus(outMin);
 }
 export class Start extends Layer {
 	autoPointsEnabled: boolean;
@@ -25,6 +15,10 @@ export class Start extends Layer {
 	upgradeColumns: HTMLElement[] = [];
 	lastPointsGive: Decimal;
 	lastAutoPointsGive: Decimal;
+
+	// Limit the amount of clicks per second to stop overly fast AC's
+	lastClickTimestamp: number;
+	minTimePerClick: number;
 
 	constructor(game: Game) {
 		super(game, 'start', new Decimal(0), 'green');
@@ -59,17 +53,20 @@ export class Start extends Layer {
 		this.lastPointsGive = new Decimal(0);
 		this.lastAutoPointsGive = new Decimal(0);
 
+		this.lastClickTimestamp = 0;
+		this.minTimePerClick = 3;
+
 		this.milestoneFunctions = {
 			givePoints: {
 				activate: () => {
-					this.game.layers.start.addCurrencyStack();
+					const currentTimestamp = Date.now();
+					if (currentTimestamp - this.lastClickTimestamp > this.minTimePerClick) {
+						this.lastClickTimestamp = currentTimestamp;
+						this.addCurrencyStack();
+					} else (console.log('Slow your auto-clicker homie ;) (rate limit 3ms/activation)'));
 					this.milestoneFunctions.givePoints.update();
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const cost = new Decimal(1);
 						return cost;
@@ -84,8 +81,7 @@ export class Start extends Layer {
 					this.milestoneFunctions.givePoints.updateText();
 				},
 				updateText: () => {
-					this.buttons.givePoints.lines[0].textContent =
-						this.milestones.givePoints.text;
+					this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
 				},
 			},
 
@@ -94,16 +90,12 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('increasePointsPerClick');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
-                        const lvlPlusOne = lvl.add(1);
+						const lvlPlusOne = lvl.add(1);
 						let cost = new Decimal(lvl.times(lvl.sqrt()));
 						cost = cost.times(new Decimal(lvlPlusOne).log(10)).times(10);
-                        cost = cost.add(lvlPlusOne.ln()).times(10).floor();
+						cost = cost.add(lvlPlusOne.ln()).times(10).floor();
 						return cost;
 					}
 
@@ -127,23 +119,14 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('upgradeIncreasePointsPerClick');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const m = new Decimal(100);
 						const b = new Decimal(0.07);
 						const j = new Decimal(100000);
 						const n = j.div(b.times(m).sinh());
 						const lvlPlusOne = lvl.add(1);
-						const cost = n
-							.times(b.times(lvl).sinh())
-							.times(new Decimal(lvlPlusOne.ln()).times(10))
-							.pow(1.3)
-							.plus(150)
-							.floor();
+						const cost = n.times(b.times(lvl).sinh()).times(new Decimal(lvlPlusOne.ln()).times(10)).pow(1.3).plus(150).floor();
 						return cost;
 					}
 
@@ -167,11 +150,7 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('ultimatePointsPerClick');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
 						const a = new Decimal(20000);
@@ -204,11 +183,7 @@ export class Start extends Layer {
 						this.autoPointsEnabled = true;
 					}
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const cost = new Decimal(15000);
 						return cost;
@@ -226,11 +201,8 @@ export class Start extends Layer {
 					if (this.milestones.autoPoints.buyable) {
 						this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPoints.cost)}`;
 					} else {
-						this.buttons.autoPoints.lines[1].textContent =
-							'Enabled';
-						this.buttons.autoPoints.button.classList.add(
-							'not-buyable',
-						);
+						this.buttons.autoPoints.lines[1].textContent = 'Enabled';
+						this.buttons.autoPoints.button.classList.add('not-buyable');
 					}
 				},
 			},
@@ -242,17 +214,11 @@ export class Start extends Layer {
 					if (this.milestones.autoPointsDivisor.level.lt(1)) {
 						this.milestones.autoPointsDivisor.level = new Decimal(1);
 					}
-					
-
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const j = 10000
+						const j = 10000;
 						const a = new Decimal(1.5);
 						const b = new Decimal(2.8);
 						const c = new Decimal(lvlPlusOne.times(a)).times(lvl.pow(b));
@@ -280,14 +246,10 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('betterAutoPoints');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const j = 10000
+						const j = 10000;
 						const a = new Decimal(1.9);
 						const b = new Decimal(2.8);
 						const c = new Decimal(lvlPlusOne.times(a)).times(lvl.pow(b));
@@ -315,16 +277,10 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('criticalPoints');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const a = new Decimal(
-							lvl.pow(1.059).times(30000),
-						).floor();
+						const a = new Decimal(lvl.pow(1.059).times(30000)).floor();
 						const b = new Decimal(lvlPlusOne.ln()).times(10);
 						const cost = a.times(b).floor();
 						return cost;
@@ -349,16 +305,10 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('criticalBonus');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const a = new Decimal(
-							lvlPlusOne.pow(1.064).times(30000),
-						);
+						const a = new Decimal(lvlPlusOne.pow(1.064).times(30000));
 						const b = new Decimal(lvlPlusOne.ln()).times(100);
 						const cost = a.times(b).floor();
 						return cost;
@@ -383,16 +333,10 @@ export class Start extends Layer {
 				activate: () => {
 					this.buyMilestone('overCritical');
 				},
-				cost: (
-					milestone: Milestone,
-					returnMax: boolean = false,
-					forceLvl?: Decimal,
-				): Decimal => {
+				cost: (milestone: Milestone, returnMax: boolean = false, forceLvl?: Decimal): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const a = new Decimal(
-							lvlPlusOne.pow(1.064).times(30000),
-						);
+						const a = new Decimal(lvlPlusOne.pow(1.064).times(30000));
 						const b = new Decimal(lvlPlusOne.ln()).times(100);
 						const cost = a.times(b).floor();
 						return cost;
@@ -531,45 +475,18 @@ export class Start extends Layer {
 		//  Moves the give points button to after the points text but before the upgrades
 		// The index will need to change if I add more text in the this.div
 		if (this.div.firstChild) {
-			this.div.insertBefore(
-				this.buttons.givePoints.button,
-				this.div.children[3],
-			);
+			this.div.insertBefore(this.buttons.givePoints.button, this.div.children[3]);
 		}
 		this.milestoneFunctions.givePoints.update();
-	}
-
-	buyMilestone(m: string) {
-		const tryUpg = (): void => {
-			if (
-				this.currency.gte(this.milestones[m].cost) &&
-				this.milestones[m].buyable
-			) {
-				this.removeCurrency(this.milestones[m].cost);
-				this.milestones[m].levelUp();
-				
-			}
-		}
-		if (this.game.keyPressed === 'Shift') {
-			for (let i = 0; i < 10; i++) {
-				tryUpg();
-			}
-		} else tryUpg();
-
-		this.milestoneFunctions[m].update();
 	}
 
 	addCurrencyStack(rtn?: boolean) {
 		let value = new Decimal(1);
 		if (this.milestones.increasePointsPerClick.level.gt(0)) {
-			value = value.times(
-				this.milestones.increasePointsPerClick.level.add(1),
-			);
+			value = value.times(this.milestones.increasePointsPerClick.level.add(1));
 		}
 		if (this.milestones.upgradeIncreasePointsPerClick.level.gt(0)) {
-			value = value.times(
-				this.milestones.upgradeIncreasePointsPerClick.level.add(1),
-			);
+			value = value.times(this.milestones.upgradeIncreasePointsPerClick.level.add(1));
 		}
 		if (this.milestones.ultimatePointsPerClick.level.gt(0)) {
 			value = value.times(this.milestones.ultimatePointsPerClick.level.add(1)).times(this.milestones.ultimatePointsPerClick.level.add(1));
@@ -578,16 +495,9 @@ export class Start extends Layer {
 		// Crit stuff
 		if (this.milestones.criticalPoints.level.gt(0)) {
 			const rawCritChance = this.milestones.criticalPoints.level;
-			const critChance = mapRange(
-				rawCritChance,
-				new Decimal(1),
-				new Decimal(200),
-				new Decimal(1),
-				new Decimal(100),
-			);
+			const critChance = mapRange(rawCritChance, new Decimal(1), new Decimal(200), new Decimal(1), new Decimal(100));
 			let critBonus = this.milestones.criticalBonus.level.add(1);
-			const overCrit =
-				this.game.layers.start.milestones.overCritical.level;
+			const overCrit = this.game.layers.start.milestones.overCritical.level;
 			if (rawCritChance.gt(100)) {
 				if (overCrit.gt(0)) {
 					critBonus = critBonus.times(overCrit);
@@ -629,7 +539,7 @@ export class Start extends Layer {
 		}
 		if (this.autoPointsEnabled) {
 			let value = this.addCurrencyStack(true)!;
-			value = value.div(new Decimal(100).sub(this.milestones.autoPointsDivisor.level))
+			value = value.div(new Decimal(100).sub(this.milestones.autoPointsDivisor.level));
 			value = value.times(new Decimal(this.milestones.betterAutoPoints.level.add(1).ln()).add(1));
 			this.lastAutoPointsGive = value;
 			this.addCurrency(value);

@@ -1,5 +1,5 @@
 import { Game } from './main';
-import { Milestone } from './layers/layer';
+import { Milestone } from './milestone';
 
 export class Button {
     button: HTMLButtonElement;
