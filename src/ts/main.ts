@@ -121,8 +121,18 @@ export class Game {
 			this.mouseX = event.clientX;
 			this.mouseY = event.clientY;
 		});
+
+		this.tryLoad();
 	}
 
+	async tryLoad() {
+		if (await this.saveManager.saveExists()) {
+			this.load();
+		} else {
+			console.log('No saved game state to load');
+			this.save(); // Save initial state if nothing to load
+		}
+	}
 	utilityButton(game: Game, txt: string, func: () => any) {
 		const btn = document.createElement('button');
 		btn.innerText = txt;
@@ -173,7 +183,6 @@ export class Game {
 			this.layers[layer].checkMilestones();
 		}
 		if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
-			console.log('Unlocking Layer: ', this.layers.dice.name, 'Cost: ', this.layers.dice.unlockCost.toString());
 			this.layers.dice.unlocked = true;
 		}
 
@@ -220,7 +229,7 @@ export class Game {
 	}
 
 	switchLayer(layerName: string) {
-        if (this.layers[layerName].unlocked === false) return;
+		if (this.layers[layerName].unlocked === false) return;
 		console.log('Switching to layer', layerName);
 		for (const layer of Object.keys(this.layers)) {
 			this.layers[layer].toggleVisibility(true);
@@ -228,7 +237,7 @@ export class Game {
 		this.layers[layerName].toggleVisibility();
 		for (const button of this.navBar.children) {
 			if (button.id === layerName) {
-                this.visibleLayer = layerName;
+				this.visibleLayer = layerName;
 				button.classList.add('selected');
 			} else {
 				button.classList.remove('selected');
@@ -245,6 +254,7 @@ export class Game {
 	}
 	updateUI() {
 		this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + ' P';
+		this.textElements.dice.innerText = this.formatValue(this.layers.dice.currency) + ' D';
 	}
 }
 

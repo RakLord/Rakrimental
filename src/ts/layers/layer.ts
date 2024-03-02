@@ -6,8 +6,6 @@ import {Milestone} from '../milestone';
 // bind document.getElementById to $
 const $ = document.getElementById.bind(document);
 
-
-
 export class Layer {
 	[x: string]: any;
 	game: Game;
@@ -32,7 +30,7 @@ export class Layer {
 		this.game = game;
 		this.name = name;
 		this.unlockCost = cost; // Cost to show the layer
-		this.cost = cost; // Cost to buy (probs depricate soon)
+		this.cost = cost; // Cost to buy (prob deprecate soon)
 		this.layerColor = layerColor;
 		this.currency = new Decimal(0);
 		this.highestCurrency = new Decimal(0);
@@ -50,7 +48,7 @@ export class Layer {
 		this.buttons = {};
 	}
 
-    buyMilestone(m: string) {
+	buyMilestone(m: string) {
 		const tryUpg = (): void => {
 			if (this.currency.gte(this.milestones[m].cost) && this.milestones[m].buyable) {
 				this.removeCurrency(this.milestones[m].cost);
@@ -59,6 +57,11 @@ export class Layer {
 		};
 		if (this.game.keyPressed === 'Shift') {
 			for (let i = 0; i < 10; i++) {
+				tryUpg();
+			}
+		} else if (this.game.keyPressed === 'z') {
+			console.log('ctrl');
+			for (let i = 0; i < 10000; i++) {
 				tryUpg();
 			}
 		} else tryUpg();
@@ -101,6 +104,11 @@ export class Layer {
 				console.log('Milestone: ', milestone, '\nUnlock Cost: ', unlockCost, '\nHighest Currency: ', this.highestCurrency, '\nLayer: ', this);
 			}
 		}
+		for (const key of Object.keys(this.milestones)) {
+			const milestone = this.milestones[key];
+			milestone.cost = this.milestoneFunctions[key].cost(milestone);
+		}
+
 		// Loop over the unlocked milestones and add them to the div if they are not already in it
 		for (const key of Object.keys(this.milestones)) {
 			if (this.milestones[key].unlocked && this.buttons[key] !== undefined) {
@@ -121,7 +129,6 @@ export class Layer {
 			}
 		}
 	}
-
 	setup() {
 		for (const key of Object.keys(this.milestones)) {
 			const milestone = this.milestones[key];

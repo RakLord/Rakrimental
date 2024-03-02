@@ -1,10 +1,967 @@
+// modules are defined as an array
+// [ module function, map of requires ]
+//
+// map of requires is short require name -> numeric require
+//
+// anything defined in a previous bundle is accessed via the
+// orig method which is the require for previous bundles
 
-function $parcel$interopDefault(a) {
-  return a && a.__esModule ? a.default : a;
+(function (modules, entry, mainEntry, parcelRequireName, globalName) {
+  /* eslint-disable no-undef */
+  var globalObject =
+    typeof globalThis !== 'undefined'
+      ? globalThis
+      : typeof self !== 'undefined'
+      ? self
+      : typeof window !== 'undefined'
+      ? window
+      : typeof global !== 'undefined'
+      ? global
+      : {};
+  /* eslint-enable no-undef */
+
+  // Save the require from previous bundle to this closure if any
+  var previousRequire =
+    typeof globalObject[parcelRequireName] === 'function' &&
+    globalObject[parcelRequireName];
+
+  var cache = previousRequire.cache || {};
+  // Do not use `require` to prevent Webpack from trying to bundle this call
+  var nodeRequire =
+    typeof module !== 'undefined' &&
+    typeof module.require === 'function' &&
+    module.require.bind(module);
+
+  function newRequire(name, jumped) {
+    if (!cache[name]) {
+      if (!modules[name]) {
+        // if we cannot find the module within our internal map or
+        // cache jump to the current global require ie. the last bundle
+        // that was added to the page.
+        var currentRequire =
+          typeof globalObject[parcelRequireName] === 'function' &&
+          globalObject[parcelRequireName];
+        if (!jumped && currentRequire) {
+          return currentRequire(name, true);
+        }
+
+        // If there are other bundles on this page the require from the
+        // previous one is saved to 'previousRequire'. Repeat this as
+        // many times as there are bundles until the module is found or
+        // we exhaust the require chain.
+        if (previousRequire) {
+          return previousRequire(name, true);
+        }
+
+        // Try the node require function if it exists.
+        if (nodeRequire && typeof name === 'string') {
+          return nodeRequire(name);
+        }
+
+        var err = new Error("Cannot find module '" + name + "'");
+        err.code = 'MODULE_NOT_FOUND';
+        throw err;
+      }
+
+      localRequire.resolve = resolve;
+      localRequire.cache = {};
+
+      var module = (cache[name] = new newRequire.Module(name));
+
+      modules[name][0].call(
+        module.exports,
+        localRequire,
+        module,
+        module.exports,
+        this
+      );
+    }
+
+    return cache[name].exports;
+
+    function localRequire(x) {
+      var res = localRequire.resolve(x);
+      return res === false ? {} : newRequire(res);
+    }
+
+    function resolve(x) {
+      var id = modules[name][1][x];
+      return id != null ? id : x;
+    }
+  }
+
+  function Module(moduleName) {
+    this.id = moduleName;
+    this.bundle = newRequire;
+    this.exports = {};
+  }
+
+  newRequire.isParcelRequire = true;
+  newRequire.Module = Module;
+  newRequire.modules = modules;
+  newRequire.cache = cache;
+  newRequire.parent = previousRequire;
+  newRequire.register = function (id, exports) {
+    modules[id] = [
+      function (require, module) {
+        module.exports = exports;
+      },
+      {},
+    ];
+  };
+
+  Object.defineProperty(newRequire, 'root', {
+    get: function () {
+      return globalObject[parcelRequireName];
+    },
+  });
+
+  globalObject[parcelRequireName] = newRequire;
+
+  for (var i = 0; i < entry.length; i++) {
+    newRequire(entry[i]);
+  }
+
+  if (mainEntry) {
+    // Expose entry point to Node, AMD or browser globals
+    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+    var mainExports = newRequire(mainEntry);
+
+    // CommonJS
+    if (typeof exports === 'object' && typeof module !== 'undefined') {
+      module.exports = mainExports;
+
+      // RequireJS
+    } else if (typeof define === 'function' && define.amd) {
+      define(function () {
+        return mainExports;
+      });
+
+      // <script>
+    } else if (globalName) {
+      this[globalName] = mainExports;
+    }
+  }
+})({"bMKAI":[function(require,module,exports) {
+var global = arguments[3];
+var HMR_HOST = null;
+var HMR_PORT = null;
+var HMR_SECURE = false;
+var HMR_ENV_HASH = "d6ea1d42532a7575";
+module.bundle.HMR_BUNDLE_ID = "0e49c2a5ca39cc5e";
+"use strict";
+/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
+import type {
+  HMRAsset,
+  HMRMessage,
+} from '@parcel/reporter-dev-server/src/HMRServer.js';
+interface ParcelRequire {
+  (string): mixed;
+  cache: {|[string]: ParcelModule|};
+  hotData: {|[string]: mixed|};
+  Module: any;
+  parent: ?ParcelRequire;
+  isParcelRequire: true;
+  modules: {|[string]: [Function, {|[string]: string|}]|};
+  HMR_BUNDLE_ID: string;
+  root: ParcelRequire;
+}
+interface ParcelModule {
+  hot: {|
+    data: mixed,
+    accept(cb: (Function) => void): void,
+    dispose(cb: (mixed) => void): void,
+    // accept(deps: Array<string> | string, cb: (Function) => void): void,
+    // decline(): void,
+    _acceptCallbacks: Array<(Function) => void>,
+    _disposeCallbacks: Array<(mixed) => void>,
+  |};
+}
+interface ExtensionContext {
+  runtime: {|
+    reload(): void,
+    getURL(url: string): string;
+    getManifest(): {manifest_version: number, ...};
+  |};
+}
+declare var module: {bundle: ParcelRequire, ...};
+declare var HMR_HOST: string;
+declare var HMR_PORT: string;
+declare var HMR_ENV_HASH: string;
+declare var HMR_SECURE: boolean;
+declare var chrome: ExtensionContext;
+declare var browser: ExtensionContext;
+declare var __parcel__import__: (string) => Promise<void>;
+declare var __parcel__importScripts__: (string) => Promise<void>;
+declare var globalThis: typeof self;
+declare var ServiceWorkerGlobalScope: Object;
+*/ var OVERLAY_ID = "__parcel__error__overlay__";
+var OldModule = module.bundle.Module;
+function Module(moduleName) {
+    OldModule.call(this, moduleName);
+    this.hot = {
+        data: module.bundle.hotData[moduleName],
+        _acceptCallbacks: [],
+        _disposeCallbacks: [],
+        accept: function(fn) {
+            this._acceptCallbacks.push(fn || function() {});
+        },
+        dispose: function(fn) {
+            this._disposeCallbacks.push(fn);
+        }
+    };
+    module.bundle.hotData[moduleName] = undefined;
+}
+module.bundle.Module = Module;
+module.bundle.hotData = {};
+var checkedAssets /*: {|[string]: boolean|} */ , assetsToDispose /*: Array<[ParcelRequire, string]> */ , assetsToAccept /*: Array<[ParcelRequire, string]> */ ;
+function getHostname() {
+    return HMR_HOST || (location.protocol.indexOf("http") === 0 ? location.hostname : "localhost");
+}
+function getPort() {
+    return HMR_PORT || location.port;
+}
+// eslint-disable-next-line no-redeclare
+var parent = module.bundle.parent;
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
+    var hostname = getHostname();
+    var port = getPort();
+    var protocol = HMR_SECURE || location.protocol == "https:" && ![
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0"
+    ].includes(hostname) ? "wss" : "ws";
+    var ws;
+    try {
+        ws = new WebSocket(protocol + "://" + hostname + (port ? ":" + port : "") + "/");
+    } catch (err) {
+        if (err.message) console.error(err.message);
+        ws = {};
+    }
+    // Web extension context
+    var extCtx = typeof browser === "undefined" ? typeof chrome === "undefined" ? null : chrome : browser;
+    // Safari doesn't support sourceURL in error stacks.
+    // eval may also be disabled via CSP, so do a quick check.
+    var supportsSourceURL = false;
+    try {
+        (0, eval)('throw new Error("test"); //# sourceURL=test.js');
+    } catch (err) {
+        supportsSourceURL = err.stack.includes("test.js");
+    }
+    // $FlowFixMe
+    ws.onmessage = async function(event /*: {data: string, ...} */ ) {
+        checkedAssets = {} /*: {|[string]: boolean|} */ ;
+        assetsToAccept = [];
+        assetsToDispose = [];
+        var data /*: HMRMessage */  = JSON.parse(event.data);
+        if (data.type === "update") {
+            // Remove error overlay if there is one
+            if (typeof document !== "undefined") removeErrorOverlay();
+            let assets = data.assets.filter((asset)=>asset.envHash === HMR_ENV_HASH);
+            // Handle HMR Update
+            let handled = assets.every((asset)=>{
+                return asset.type === "css" || asset.type === "js" && hmrAcceptCheck(module.bundle.root, asset.id, asset.depsByBundle);
+            });
+            if (handled) {
+                console.clear();
+                // Dispatch custom event so other runtimes (e.g React Refresh) are aware.
+                if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") window.dispatchEvent(new CustomEvent("parcelhmraccept"));
+                await hmrApplyUpdates(assets);
+                // Dispose all old assets.
+                let processedAssets = {} /*: {|[string]: boolean|} */ ;
+                for(let i = 0; i < assetsToDispose.length; i++){
+                    let id = assetsToDispose[i][1];
+                    if (!processedAssets[id]) {
+                        hmrDispose(assetsToDispose[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+                // Run accept callbacks. This will also re-execute other disposed assets in topological order.
+                processedAssets = {};
+                for(let i = 0; i < assetsToAccept.length; i++){
+                    let id = assetsToAccept[i][1];
+                    if (!processedAssets[id]) {
+                        hmrAccept(assetsToAccept[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+            } else fullReload();
+        }
+        if (data.type === "error") {
+            // Log parcel errors to console
+            for (let ansiDiagnostic of data.diagnostics.ansi){
+                let stack = ansiDiagnostic.codeframe ? ansiDiagnostic.codeframe : ansiDiagnostic.stack;
+                console.error("\uD83D\uDEA8 [parcel]: " + ansiDiagnostic.message + "\n" + stack + "\n\n" + ansiDiagnostic.hints.join("\n"));
+            }
+            if (typeof document !== "undefined") {
+                // Render the fancy html overlay
+                removeErrorOverlay();
+                var overlay = createErrorOverlay(data.diagnostics.html);
+                // $FlowFixMe
+                document.body.appendChild(overlay);
+            }
+        }
+    };
+    ws.onerror = function(e) {
+        if (e.message) console.error(e.message);
+    };
+    ws.onclose = function() {
+        console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
+    };
+}
+function removeErrorOverlay() {
+    var overlay = document.getElementById(OVERLAY_ID);
+    if (overlay) {
+        overlay.remove();
+        console.log("[parcel] \u2728 Error resolved");
+    }
+}
+function createErrorOverlay(diagnostics) {
+    var overlay = document.createElement("div");
+    overlay.id = OVERLAY_ID;
+    let errorHTML = '<div style="background: black; opacity: 0.85; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; font-family: Menlo, Consolas, monospace; z-index: 9999;">';
+    for (let diagnostic of diagnostics){
+        let stack = diagnostic.frames.length ? diagnostic.frames.reduce((p, frame)=>{
+            return `${p}
+<a href="/__parcel_launch_editor?file=${encodeURIComponent(frame.location)}" style="text-decoration: underline; color: #888" onclick="fetch(this.href); return false">${frame.location}</a>
+${frame.code}`;
+        }, "") : diagnostic.stack;
+        errorHTML += `
+      <div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px;">
+          \u{1F6A8} ${diagnostic.message}
+        </div>
+        <pre>${stack}</pre>
+        <div>
+          ${diagnostic.hints.map((hint)=>"<div>\uD83D\uDCA1 " + hint + "</div>").join("")}
+        </div>
+        ${diagnostic.documentation ? `<div>\u{1F4DD} <a style="color: violet" href="${diagnostic.documentation}" target="_blank">Learn more</a></div>` : ""}
+      </div>
+    `;
+    }
+    errorHTML += "</div>";
+    overlay.innerHTML = errorHTML;
+    return overlay;
+}
+function fullReload() {
+    if ("reload" in location) location.reload();
+    else if (extCtx && extCtx.runtime && extCtx.runtime.reload) extCtx.runtime.reload();
+}
+function getParents(bundle, id) /*: Array<[ParcelRequire, string]> */ {
+    var modules = bundle.modules;
+    if (!modules) return [];
+    var parents = [];
+    var k, d, dep;
+    for(k in modules)for(d in modules[k][1]){
+        dep = modules[k][1][d];
+        if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) parents.push([
+            bundle,
+            k
+        ]);
+    }
+    if (bundle.parent) parents = parents.concat(getParents(bundle.parent, id));
+    return parents;
+}
+function updateLink(link) {
+    var href = link.getAttribute("href");
+    if (!href) return;
+    var newLink = link.cloneNode();
+    newLink.onload = function() {
+        if (link.parentNode !== null) // $FlowFixMe
+        link.parentNode.removeChild(link);
+    };
+    newLink.setAttribute("href", // $FlowFixMe
+    href.split("?")[0] + "?" + Date.now());
+    // $FlowFixMe
+    link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+    if (cssTimeout) return;
+    cssTimeout = setTimeout(function() {
+        var links = document.querySelectorAll('link[rel="stylesheet"]');
+        for(var i = 0; i < links.length; i++){
+            // $FlowFixMe[incompatible-type]
+            var href /*: string */  = links[i].getAttribute("href");
+            var hostname = getHostname();
+            var servedFromHMRServer = hostname === "localhost" ? new RegExp("^(https?:\\/\\/(0.0.0.0|127.0.0.1)|localhost):" + getPort()).test(href) : href.indexOf(hostname + ":" + getPort());
+            var absolute = /^https?:\/\//i.test(href) && href.indexOf(location.origin) !== 0 && !servedFromHMRServer;
+            if (!absolute) updateLink(links[i]);
+        }
+        cssTimeout = null;
+    }, 50);
+}
+function hmrDownload(asset) {
+    if (asset.type === "js") {
+        if (typeof document !== "undefined") {
+            let script = document.createElement("script");
+            script.src = asset.url + "?t=" + Date.now();
+            if (asset.outputFormat === "esmodule") script.type = "module";
+            return new Promise((resolve, reject)=>{
+                var _document$head;
+                script.onload = ()=>resolve(script);
+                script.onerror = reject;
+                (_document$head = document.head) === null || _document$head === void 0 || _document$head.appendChild(script);
+            });
+        } else if (typeof importScripts === "function") {
+            // Worker scripts
+            if (asset.outputFormat === "esmodule") return import(asset.url + "?t=" + Date.now());
+            else return new Promise((resolve, reject)=>{
+                try {
+                    importScripts(asset.url + "?t=" + Date.now());
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+    }
+}
+async function hmrApplyUpdates(assets) {
+    global.parcelHotUpdate = Object.create(null);
+    let scriptsToRemove;
+    try {
+        // If sourceURL comments aren't supported in eval, we need to load
+        // the update from the dev server over HTTP so that stack traces
+        // are correct in errors/logs. This is much slower than eval, so
+        // we only do it if needed (currently just Safari).
+        // https://bugs.webkit.org/show_bug.cgi?id=137297
+        // This path is also taken if a CSP disallows eval.
+        if (!supportsSourceURL) {
+            let promises = assets.map((asset)=>{
+                var _hmrDownload;
+                return (_hmrDownload = hmrDownload(asset)) === null || _hmrDownload === void 0 ? void 0 : _hmrDownload.catch((err)=>{
+                    // Web extension fix
+                    if (extCtx && extCtx.runtime && extCtx.runtime.getManifest().manifest_version == 3 && typeof ServiceWorkerGlobalScope != "undefined" && global instanceof ServiceWorkerGlobalScope) {
+                        extCtx.runtime.reload();
+                        return;
+                    }
+                    throw err;
+                });
+            });
+            scriptsToRemove = await Promise.all(promises);
+        }
+        assets.forEach(function(asset) {
+            hmrApply(module.bundle.root, asset);
+        });
+    } finally{
+        delete global.parcelHotUpdate;
+        if (scriptsToRemove) scriptsToRemove.forEach((script)=>{
+            if (script) {
+                var _document$head2;
+                (_document$head2 = document.head) === null || _document$head2 === void 0 || _document$head2.removeChild(script);
+            }
+        });
+    }
+}
+function hmrApply(bundle /*: ParcelRequire */ , asset /*:  HMRAsset */ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (asset.type === "css") reloadCSS();
+    else if (asset.type === "js") {
+        let deps = asset.depsByBundle[bundle.HMR_BUNDLE_ID];
+        if (deps) {
+            if (modules[asset.id]) {
+                // Remove dependencies that are removed and will become orphaned.
+                // This is necessary so that if the asset is added back again, the cache is gone, and we prevent a full page reload.
+                let oldDeps = modules[asset.id][1];
+                for(let dep in oldDeps)if (!deps[dep] || deps[dep] !== oldDeps[dep]) {
+                    let id = oldDeps[dep];
+                    let parents = getParents(module.bundle.root, id);
+                    if (parents.length === 1) hmrDelete(module.bundle.root, id);
+                }
+            }
+            if (supportsSourceURL) // Global eval. We would use `new Function` here but browser
+            // support for source maps is better with eval.
+            (0, eval)(asset.output);
+            // $FlowFixMe
+            let fn = global.parcelHotUpdate[asset.id];
+            modules[asset.id] = [
+                fn,
+                deps
+            ];
+        } else if (bundle.parent) hmrApply(bundle.parent, asset);
+    }
+}
+function hmrDelete(bundle, id) {
+    let modules = bundle.modules;
+    if (!modules) return;
+    if (modules[id]) {
+        // Collect dependencies that will become orphaned when this module is deleted.
+        let deps = modules[id][1];
+        let orphans = [];
+        for(let dep in deps){
+            let parents = getParents(module.bundle.root, deps[dep]);
+            if (parents.length === 1) orphans.push(deps[dep]);
+        }
+        // Delete the module. This must be done before deleting dependencies in case of circular dependencies.
+        delete modules[id];
+        delete bundle.cache[id];
+        // Now delete the orphans.
+        orphans.forEach((id)=>{
+            hmrDelete(module.bundle.root, id);
+        });
+    } else if (bundle.parent) hmrDelete(bundle.parent, id);
+}
+function hmrAcceptCheck(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    if (hmrAcceptCheckOne(bundle, id, depsByBundle)) return true;
+    // Traverse parents breadth first. All possible ancestries must accept the HMR update, or we'll reload.
+    let parents = getParents(module.bundle.root, id);
+    let accepted = false;
+    while(parents.length > 0){
+        let v = parents.shift();
+        let a = hmrAcceptCheckOne(v[0], v[1], null);
+        if (a) // If this parent accepts, stop traversing upward, but still consider siblings.
+        accepted = true;
+        else {
+            // Otherwise, queue the parents in the next level upward.
+            let p = getParents(module.bundle.root, v[1]);
+            if (p.length === 0) {
+                // If there are no parents, then we've reached an entry without accepting. Reload.
+                accepted = false;
+                break;
+            }
+            parents.push(...p);
+        }
+    }
+    return accepted;
+}
+function hmrAcceptCheckOne(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (depsByBundle && !depsByBundle[bundle.HMR_BUNDLE_ID]) {
+        // If we reached the root bundle without finding where the asset should go,
+        // there's nothing to do. Mark as "accepted" so we don't reload the page.
+        if (!bundle.parent) return true;
+        return hmrAcceptCheck(bundle.parent, id, depsByBundle);
+    }
+    if (checkedAssets[id]) return true;
+    checkedAssets[id] = true;
+    var cached = bundle.cache[id];
+    assetsToDispose.push([
+        bundle,
+        id
+    ]);
+    if (!cached || cached.hot && cached.hot._acceptCallbacks.length) {
+        assetsToAccept.push([
+            bundle,
+            id
+        ]);
+        return true;
+    }
+}
+function hmrDispose(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    var cached = bundle.cache[id];
+    bundle.hotData[id] = {};
+    if (cached && cached.hot) cached.hot.data = bundle.hotData[id];
+    if (cached && cached.hot && cached.hot._disposeCallbacks.length) cached.hot._disposeCallbacks.forEach(function(cb) {
+        cb(bundle.hotData[id]);
+    });
+    delete bundle.cache[id];
+}
+function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    // Execute the module.
+    bundle(id);
+    // Run the accept callbacks in the new version of the module.
+    var cached = bundle.cache[id];
+    if (cached && cached.hot && cached.hot._acceptCallbacks.length) cached.hot._acceptCallbacks.forEach(function(cb) {
+        var assetsToAlsoAccept = cb(function() {
+            return getParents(module.bundle.root, id);
+        });
+        if (assetsToAlsoAccept && assetsToAccept.length) {
+            assetsToAlsoAccept.forEach(function(a) {
+                hmrDispose(a[0], a[1]);
+            });
+            // $FlowFixMe[method-unbinding]
+            assetsToAccept.push.apply(assetsToAccept, assetsToAlsoAccept);
+        }
+    });
 }
 
-      var $parcel$global = globalThis;
-    var $9c5688bb4ed5d6a8$exports = {};
+},{}],"4j3ZX":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Game", ()=>Game);
+var _saving = require("./saving");
+var _start = require("./layers/start");
+var _dice = require("./layers/dice");
+var _coin = require("./layers/coin");
+var _graph = require("./graph");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class Game {
+    constructor(){
+        this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
+        ;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.formulaGraphEnabled = false;
+        console.log("Game Constructor");
+        this.saveManager = new (0, _saving.SaveManager)(this);
+        this.formulaGraph = new (0, _graph.FormulaGraph)(this);
+        this.displayingGraph = false;
+        this.navBar = $("navBar");
+        this.utilityBar = $("utilityBar");
+        this.mainInterval = 1000;
+        this.keyPressed = "";
+        this.autoSaveEnabled = true;
+        this.autosaveInterval = 30000;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.layers = {
+            start: new (0, _start.Start)(this),
+            dice: new (0, _dice.Dice)(this),
+            coin: new (0, _coin.Coin)(this)
+        };
+        this.textElements = {
+            start: document.createElement("div"),
+            dice: document.createElement("div")
+        };
+        for (const key of Object.keys(this.textElements)){
+            this.textElements[key].classList.add("d-flex", "gap-2");
+            this.textElements[key].setAttribute("id", key);
+            $("header-data").appendChild(this.textElements[key]);
+        }
+        this.layers.start.unlocked = true;
+        this.visibleLayer = "start";
+        this.tooltipsEnabled = true;
+        this.utilityButton(this, "Save", this.save);
+        this.utilityButton(this, "Load", this.load);
+        this.utilityButton(this, "AutoSave", this.toggleAutoSave);
+        this.utilityButton(this, "Toggle Tooltips", this.toggleTooltips);
+        this.utilityButton(this, "Enable Graphs", this.enableGraphs);
+        this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
+        this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
+        this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
+        this.setupNav();
+        document.addEventListener("contextmenu", (event)=>{
+            event.preventDefault();
+            // Can make custom right click menu if I can be bothered.
+            // simulate left click
+            const clickEvent = new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            event.target?.dispatchEvent(clickEvent);
+        });
+        document.addEventListener("keydown", (event)=>{
+            this.keyPressed = event.key;
+            switch(this.keyPressed){
+                case "q":
+                    this.layers.start.currency = this.layers.start.currency.times(10);
+                    break;
+                case "1":
+                    this.switchLayer("start");
+                    break;
+                case "2":
+                    this.switchLayer("dice");
+                    break;
+                case "3":
+                    this.switchLayer("coin");
+                    break;
+                case "g":
+                    this.formulaGraphEnabled = !this.formulaGraphEnabled;
+                    break;
+                case "m":
+                    this.layers.start.currency = new (0, _breakInfinityJsDefault.default)(1e16);
+                    break;
+            }
+        });
+        document.addEventListener("keyup", (event)=>{
+            this.keyPressed = "";
+        });
+        document.addEventListener("mousemove", (event)=>{
+            this.mouseX = event.clientX;
+            this.mouseY = event.clientY;
+        });
+        this.tryLoad();
+    }
+    async tryLoad() {
+        if (await this.saveManager.saveExists()) this.load();
+        else {
+            console.log("No saved game state to load");
+            this.save(); // Save initial state if nothing to load
+        }
+    }
+    utilityButton(game, txt, func) {
+        const btn = document.createElement("button");
+        btn.innerText = txt;
+        btn.classList.add("btn", "btn-transparent", "btn-hover");
+        btn.addEventListener("click", func.bind(game));
+        this.utilityBar.appendChild(btn);
+    }
+    autoSave() {
+        if (this.autoSaveEnabled) {
+            if (this.layers.start.currency.eq(0)) return;
+            console.log("AutoSaving");
+            this.save();
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.add("auto-save-on");
+        } else {
+            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
+            autoSaveBtn.classList.remove("auto-save-on");
+        }
+    }
+    save() {
+        this.saveManager.save(this);
+    }
+    load() {
+        this.saveManager.load(this);
+    }
+    toggleAutoSave() {
+        this.autoSaveEnabled = !this.autoSaveEnabled;
+    }
+    // Is called every mainInterval time (1000ms default)
+    update() {
+        for (const layer of Object.keys(this.layers))this.layers[layer].update();
+        this.updateUI();
+    }
+    // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
+    fixedIntervalUpdate() {
+        for (const layer of Object.keys(this.layers)){
+            if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) this.layers[layer].highestCurrency = this.layers[layer].currency;
+            this.layers[layer].checkMilestones();
+        }
+        if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) this.layers.dice.unlocked = true;
+        this.setupNav();
+    }
+    toggleTooltips() {
+        this.tooltipsEnabled = !this.tooltipsEnabled;
+        this.setTooltipsState();
+    }
+    enableGraphs() {
+        this.formulaGraphEnabled = !this.formulaGraphEnabled;
+    }
+    setTooltipsState() {
+        for (const layer of Object.keys(this.layers))for (const key of Object.keys(this.layers[layer].buttons)){
+            const btn = this.layers[layer].buttons[key];
+            btn.toggleTooltip();
+        // element.setAttribute('tooltipenabled', 'enabled');
+        }
+    }
+    setupNav() {
+        this.navBar.innerHTML = "";
+        for (const layer of Object.keys(this.layers))if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
+            const layerButton = document.createElement("button");
+            layerButton.setAttribute("id", layer);
+            layerButton.innerText = this.layers[layer].name.toUpperCase();
+            layerButton.addEventListener("click", ()=>this.switchLayer(layer));
+            this.navBar.appendChild(layerButton);
+        }
+        for (const button of this.navBar.children)if (button.id === this.visibleLayer) button.classList.add("selected");
+        else button.classList.remove("selected");
+    }
+    switchLayer(layerName) {
+        if (this.layers[layerName].unlocked === false) return;
+        console.log("Switching to layer", layerName);
+        for (const layer of Object.keys(this.layers))this.layers[layer].toggleVisibility(true);
+        this.layers[layerName].toggleVisibility();
+        for (const button of this.navBar.children)if (button.id === layerName) {
+            this.visibleLayer = layerName;
+            button.classList.add("selected");
+        } else button.classList.remove("selected");
+    }
+    formatValue(value, places = 2) {
+        if (value.lt(1000)) return value.toFixed(places).toString();
+        else return `${value.m.toFixed(places)}e${value.e}`;
+    }
+    updateUI() {
+        this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + " P";
+        this.textElements.dice.innerText = this.formatValue(this.layers.dice.currency) + " D";
+    }
+}
+let game;
+// bind document.getElementById to $
+const $ = document.getElementById.bind(document);
+document.addEventListener("DOMContentLoaded", function() {
+    game = new Game();
+    window.game = game;
+});
+
+},{"./saving":"LpBZE","./layers/start":"8H89C","./layers/dice":"isy6N","./layers/coin":"aXwEX","./graph":"D4z9g","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"LpBZE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SaveManager", ()=>SaveManager);
+var _localforage = require("localforage");
+var _localforageDefault = parcelHelpers.interopDefault(_localforage);
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class SaveManager {
+    constructor(game){
+        this.game = game;
+        console.log("Save Manager Constructor");
+        console.log(this.game);
+    }
+    async save(game) {
+        this.game = game;
+        console.log("Saving game");
+        console.log(this.game);
+        const stateToSave = {};
+        stateToSave["visibleLayer"] = this.game.visibleLayer;
+        stateToSave["mainInterval"] = this.game.mainInterval;
+        stateToSave["fixedInterval"] = this.game.fixedInterval;
+        stateToSave["tooltipsEnabled"] = this.game.tooltipsEnabled;
+        stateToSave["layers"] = {
+            start: {
+                unlocked: this.game.layers.start.unlocked,
+                currency: this.game.layers.start.currency.toString(),
+                highestCurrency: this.game.layers.start.highestCurrency.toString(),
+                milestones: {
+                    givePoints: {
+                        level: this.game.layers.start.milestones.givePoints.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.givePoints.timesClicked.toString()
+                    },
+                    increasePointsPerClick: {
+                        level: this.game.layers.start.milestones.increasePointsPerClick.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.increasePointsPerClick.timesClicked.toString()
+                    },
+                    upgradeIncreasePointsPerClick: {
+                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked.toString()
+                    },
+                    ultimatePointsPerClick: {
+                        level: this.game.layers.start.milestones.ultimatePointsPerClick.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked.toString()
+                    },
+                    autoPoints: {
+                        level: this.game.layers.start.milestones.autoPoints.level.toString(),
+                        buyable: this.game.layers.start.milestones.autoPoints.buyable
+                    },
+                    autoPointsDivisor: {
+                        level: this.game.layers.start.milestones.autoPointsDivisor.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked.toString()
+                    },
+                    betterAutoPoints: {
+                        level: this.game.layers.start.milestones.betterAutoPoints.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.betterAutoPoints.timesClicked.toString()
+                    },
+                    criticalPoints: {
+                        level: this.game.layers.start.milestones.criticalPoints.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked.toString()
+                    },
+                    criticalBonus: {
+                        level: this.game.layers.start.milestones.criticalBonus.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.criticalBonus.timesClicked.toString()
+                    },
+                    overCritical: {
+                        level: this.game.layers.start.milestones.overCritical.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.overCritical.timesClicked.toString()
+                    }
+                }
+            },
+            dice: {
+                unlocked: this.game.layers.dice.unlocked,
+                currency: this.game.layers.dice.currency.toString(),
+                highestCurrency: this.game.layers.dice.highestCurrency.toString(),
+                diceCount: this.game.layers.dice.diceCount,
+                diceCountCap: this.game.layers.dice.diceCountCap,
+                milestones: {
+                    addDice: {
+                        level: this.game.layers.dice.milestones.addDice.level.toString()
+                    },
+                    diceTimeout: {
+                        level: this.game.layers.dice.milestones.diceTimeout.level.toString()
+                    }
+                }
+            },
+            coin: {
+                unlocked: this.game.layers.coin.unlocked,
+                milestones: {}
+            }
+        };
+        // Actually save the state
+        try {
+            console.log("Saving game state", stateToSave);
+            await (0, _localforageDefault.default).setItem("gameState", stateToSave);
+        } catch (err) {
+            console.error("Save failed", err);
+        }
+    }
+    async load(game) {
+        this.game = game;
+        try {
+            const gameState = await (0, _localforageDefault.default).getItem("gameState");
+            console.log("STATE LOAD: ", gameState);
+            if (gameState) {
+                this.game.visibleLayer = gameState.visibleLayer;
+                this.game.mainInterval = gameState.mainInterval;
+                this.game.fixedInterval = gameState.fixedInterval;
+                this.game.tooltipsEnabled = gameState.tooltipsEnabled;
+                // Start Layer
+                console.log(gameState.layers.start.currency, typeof gameState.layers.start.currency);
+                this.game.layers.start.unlocked = gameState.layers.start.unlocked;
+                this.game.layers.start.currency = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.currency);
+                this.game.layers.start.highestCurrency = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.highestCurrency);
+                this.game.layers.start.highestCurrency = this.game.layers.start.highestCurrency.add(0.1);
+                this.game.layers.start.milestones.givePoints.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.givePoints.level);
+                this.game.layers.start.milestones.givePoints.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.givePoints.timesClicked);
+                this.game.layers.start.milestones.increasePointsPerClick.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.increasePointsPerClick.level);
+                this.game.layers.start.milestones.increasePointsPerClick.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.increasePointsPerClick.timesClicked);
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level);
+                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked);
+                this.game.layers.start.milestones.ultimatePointsPerClick.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.ultimatePointsPerClick.level);
+                this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.ultimatePointsPerClick.timesClicked);
+                this.game.layers.start.milestones.autoPoints.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.autoPoints.level);
+                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
+                this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
+                this.game.layers.start.milestones.autoPointsDivisor.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.autoPointsDivisor.level);
+                this.game.layers.start.milestones.autoPointsDivisor.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.autoPointsDivisor.timesClicked);
+                this.game.layers.start.milestones.betterAutoPoints.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.betterAutoPoints.level);
+                this.game.layers.start.milestones.betterAutoPoints.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.betterAutoPoints.timesClicked);
+                this.game.layers.start.milestones.criticalPoints.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.criticalPoints.level);
+                this.game.layers.start.milestones.criticalPoints.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.criticalPoints.timesClicked);
+                this.game.layers.start.milestones.criticalBonus.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.criticalBonus.level);
+                this.game.layers.start.milestones.criticalBonus.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.criticalBonus.timesClicked);
+                this.game.layers.start.milestones.overCritical.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.overCritical.level);
+                this.game.layers.start.milestones.overCritical.timesClicked = new (0, _breakInfinityJsDefault.default)(gameState.layers.start.milestones.overCritical.timesClicked);
+                // Dice Layer
+                this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
+                this.game.layers.dice.currency = new (0, _breakInfinityJsDefault.default)(gameState.layers.dice.currency);
+                this.game.layers.dice.highestCurrency = new (0, _breakInfinityJsDefault.default)(gameState.layers.dice.highestCurrency);
+                this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
+                this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
+                this.game.layers.dice.milestones.addDice.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.dice.milestones.addDice.level);
+                this.game.layers.dice.milestones.diceTimeout.level = new (0, _breakInfinityJsDefault.default)(gameState.layers.dice.milestones.diceTimeout.level);
+                // Coin Layer
+                this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
+                this.game.setupNav();
+                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].toggleVisibility(true);
+                this.game.switchLayer(this.game.visibleLayer);
+                this.game.setTooltipsState();
+                // loop over each layer and update the milestones
+                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].checkMilestones();
+                //  Update milestone costs based on loaded level
+                for (const layer of Object.keys(this.game.layers))for (const key of Object.keys(this.game.layers[layer].milestones)){
+                    const ms = this.game.layers[layer].milestones[key];
+                    const msf = this.game.layers[layer].milestoneFunctions[key].cost;
+                    ms.cost = msf(ms);
+                }
+                // update the text and tooltip on each milestone
+                for (const layer of Object.keys(this.game.layers)){
+                    for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) this.game.layers[layer].milestoneFunctions[key].update();
+                }
+                // this.game.layers.start.buttons.givePoints.button
+                this.game.updateUI();
+                this.game.layers.start.updatePointsText();
+                this.game.layers.dice.updateDotsText();
+            } else {
+                console.log("No saved game state to load");
+                this.save(this.game); // Save initial state if nothing to load
+            }
+        } catch (err) {
+            console.error("Load failed", err);
+        }
+    }
+    async saveExists() {
+        const value = await (0, _localforageDefault.default).getItem("gameState");
+        // Check not just for an object, but also ensure it's not null or undefined
+        return value !== null && value !== undefined;
+    }
+}
+
+},{"localforage":"cTE28","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cTE28":[function(require,module,exports) {
+var global = arguments[3];
 /*!
     localForage -- Offline Storage, Improved
     Version 1.10.0
@@ -12,7 +969,7 @@ function $parcel$interopDefault(a) {
     (c) 2013-2017 Mozilla, Apache License 2.0
 */ (function(f) {
     var g;
-    $9c5688bb4ed5d6a8$exports = f();
+    module.exports = f();
 })(function() {
     var define, module1, exports;
     return (function e(t, n, r) {
@@ -41,37 +998,37 @@ function $parcel$interopDefault(a) {
     })({
         1: [
             function(_dereq_, module1, exports) {
-                (function(global1) {
+                (function(global) {
                     "use strict";
-                    var Mutation = global1.MutationObserver || global1.WebKitMutationObserver;
+                    var Mutation = global.MutationObserver || global.WebKitMutationObserver;
                     var scheduleDrain;
                     if (Mutation) {
                         var called = 0;
                         var observer = new Mutation(nextTick);
-                        var element = global1.document.createTextNode("");
+                        var element = global.document.createTextNode("");
                         observer.observe(element, {
                             characterData: true
                         });
                         scheduleDrain = function() {
                             element.data = called = ++called % 2;
                         };
-                    } else if (!global1.setImmediate && typeof global1.MessageChannel !== "undefined") {
-                        var channel = new global1.MessageChannel();
+                    } else if (!global.setImmediate && typeof global.MessageChannel !== "undefined") {
+                        var channel = new global.MessageChannel();
                         channel.port1.onmessage = nextTick;
                         scheduleDrain = function() {
                             channel.port2.postMessage(0);
                         };
-                    } else if ("document" in global1 && "onreadystatechange" in global1.document.createElement("script")) scheduleDrain = function() {
+                    } else if ("document" in global && "onreadystatechange" in global.document.createElement("script")) scheduleDrain = function() {
                         // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
                         // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-                        var scriptEl = global1.document.createElement("script");
+                        var scriptEl = global.document.createElement("script");
                         scriptEl.onreadystatechange = function() {
                             nextTick();
                             scriptEl.onreadystatechange = null;
                             scriptEl.parentNode.removeChild(scriptEl);
                             scriptEl = null;
                         };
-                        global1.document.documentElement.appendChild(scriptEl);
+                        global.document.documentElement.appendChild(scriptEl);
                     };
                     else scheduleDrain = function() {
                         setTimeout(nextTick, 0);
@@ -96,7 +1053,7 @@ function $parcel$interopDefault(a) {
                     function immediate(task) {
                         if (queue.push(task) === 1 && !draining) scheduleDrain();
                     }
-                }).call(this, typeof $parcel$global !== "undefined" ? $parcel$global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+                }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
             },
             {}
         ],
@@ -300,10 +1257,10 @@ function $parcel$interopDefault(a) {
         ],
         3: [
             function(_dereq_, module1, exports) {
-                (function(global1) {
+                (function(global) {
                     "use strict";
-                    if (typeof global1.Promise !== "function") global1.Promise = _dereq_(2);
-                }).call(this, typeof $parcel$global !== "undefined" ? $parcel$global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+                    if (typeof global.Promise !== "function") global.Promise = _dereq_(2);
+                }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
             },
             {
                 "2": 2
@@ -2209,45 +3166,31 @@ function $parcel$interopDefault(a) {
     ])(4);
 });
 
-
-var $17844dfbc928513b$exports = {};
-"use strict";
-$17844dfbc928513b$exports = function(string, maxLength, fillString) {
-    if (string == null || maxLength == null) return string;
-    var result = String(string);
-    var targetLen = typeof maxLength === "number" ? maxLength : parseInt(maxLength, 10);
-    if (isNaN(targetLen) || !isFinite(targetLen)) return result;
-    var length = result.length;
-    if (length >= targetLen) return result;
-    var filled = fillString == null ? "" : String(fillString);
-    if (filled === "") filled = " ";
-    var fillLen = targetLen - length;
-    while(filled.length < fillLen)filled += filled;
-    var truncated = filled.length > fillLen ? filled.substr(0, fillLen) : filled;
-    return result + truncated;
-};
-
-
-var $30c05137717fb899$var$n = 9e15, $30c05137717fb899$var$e = function() {
+},{}],"bXpmd":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _padEnd = require("pad-end");
+var _padEndDefault = parcelHelpers.interopDefault(_padEnd);
+var n = 9e15, e = function() {
     for(var t = [], n = -323; n <= 308; n++)t.push(Number("1e" + n));
     return function(n) {
         return t[n + 323];
     };
-}(), $30c05137717fb899$var$r = function(t) {
-    return t instanceof $30c05137717fb899$var$a ? t : new $30c05137717fb899$var$a(t);
-}, $30c05137717fb899$var$i = function(t, n) {
-    return (new $30c05137717fb899$var$a).fromMantissaExponent(t, n);
-}, $30c05137717fb899$var$o = function(t, n) {
-    return (new $30c05137717fb899$var$a).fromMantissaExponent_noNormalize(t, n);
+}(), r = function(t) {
+    return t instanceof a ? t : new a(t);
+}, i = function(t, n) {
+    return (new a).fromMantissaExponent(t, n);
+}, o = function(t, n) {
+    return (new a).fromMantissaExponent_noNormalize(t, n);
 };
-function $30c05137717fb899$var$u(t, n, e, r) {
+function u(t, n, e, r) {
     var i = n.mul(e.pow(r));
-    return $30c05137717fb899$var$a.floor(t.div(i).mul(e.sub(1)).add(1).log10() / e.log10());
+    return a.floor(t.div(i).mul(e.sub(1)).add(1).log10() / e.log10());
 }
-function $30c05137717fb899$var$s(t, n, e, r) {
-    return n.mul(e.pow(r)).mul($30c05137717fb899$var$a.sub(1, e.pow(t))).div($30c05137717fb899$var$a.sub(1, e));
+function s(t, n, e, r) {
+    return n.mul(e.pow(r)).mul(a.sub(1, e.pow(t))).div(a.sub(1, e));
 }
-var $30c05137717fb899$var$a = function() {
+var a = function() {
     function a(t) {
         this.mantissa = NaN, this.exponent = NaN, void 0 === t ? (this.m = 0, this.e = 0) : t instanceof a ? this.fromDecimal(t) : "number" == typeof t ? this.fromNumber(t) : this.fromString(t);
     }
@@ -2294,162 +3237,162 @@ var $30c05137717fb899$var$a = function() {
     }, a.fromValue_noAlloc = function(t) {
         return t instanceof a ? t : new a(t);
     }, a.abs = function(t) {
-        return $30c05137717fb899$var$r(t).abs();
+        return r(t).abs();
     }, a.neg = function(t) {
-        return $30c05137717fb899$var$r(t).neg();
+        return r(t).neg();
     }, a.negate = function(t) {
-        return $30c05137717fb899$var$r(t).neg();
+        return r(t).neg();
     }, a.negated = function(t) {
-        return $30c05137717fb899$var$r(t).neg();
+        return r(t).neg();
     }, a.sign = function(t) {
-        return $30c05137717fb899$var$r(t).sign();
+        return r(t).sign();
     }, a.sgn = function(t) {
-        return $30c05137717fb899$var$r(t).sign();
+        return r(t).sign();
     }, a.round = function(t) {
-        return $30c05137717fb899$var$r(t).round();
+        return r(t).round();
     }, a.floor = function(t) {
-        return $30c05137717fb899$var$r(t).floor();
+        return r(t).floor();
     }, a.ceil = function(t) {
-        return $30c05137717fb899$var$r(t).ceil();
+        return r(t).ceil();
     }, a.trunc = function(t) {
-        return $30c05137717fb899$var$r(t).trunc();
+        return r(t).trunc();
     }, a.add = function(t, n) {
-        return $30c05137717fb899$var$r(t).add(n);
+        return r(t).add(n);
     }, a.plus = function(t, n) {
-        return $30c05137717fb899$var$r(t).add(n);
+        return r(t).add(n);
     }, a.sub = function(t, n) {
-        return $30c05137717fb899$var$r(t).sub(n);
+        return r(t).sub(n);
     }, a.subtract = function(t, n) {
-        return $30c05137717fb899$var$r(t).sub(n);
+        return r(t).sub(n);
     }, a.minus = function(t, n) {
-        return $30c05137717fb899$var$r(t).sub(n);
+        return r(t).sub(n);
     }, a.mul = function(t, n) {
-        return $30c05137717fb899$var$r(t).mul(n);
+        return r(t).mul(n);
     }, a.multiply = function(t, n) {
-        return $30c05137717fb899$var$r(t).mul(n);
+        return r(t).mul(n);
     }, a.times = function(t, n) {
-        return $30c05137717fb899$var$r(t).mul(n);
+        return r(t).mul(n);
     }, a.div = function(t, n) {
-        return $30c05137717fb899$var$r(t).div(n);
+        return r(t).div(n);
     }, a.divide = function(t, n) {
-        return $30c05137717fb899$var$r(t).div(n);
+        return r(t).div(n);
     }, a.recip = function(t) {
-        return $30c05137717fb899$var$r(t).recip();
+        return r(t).recip();
     }, a.reciprocal = function(t) {
-        return $30c05137717fb899$var$r(t).recip();
+        return r(t).recip();
     }, a.reciprocate = function(t) {
-        return $30c05137717fb899$var$r(t).reciprocate();
+        return r(t).reciprocate();
     }, a.cmp = function(t, n) {
-        return $30c05137717fb899$var$r(t).cmp(n);
+        return r(t).cmp(n);
     }, a.compare = function(t, n) {
-        return $30c05137717fb899$var$r(t).cmp(n);
+        return r(t).cmp(n);
     }, a.eq = function(t, n) {
-        return $30c05137717fb899$var$r(t).eq(n);
+        return r(t).eq(n);
     }, a.equals = function(t, n) {
-        return $30c05137717fb899$var$r(t).eq(n);
+        return r(t).eq(n);
     }, a.neq = function(t, n) {
-        return $30c05137717fb899$var$r(t).neq(n);
+        return r(t).neq(n);
     }, a.notEquals = function(t, n) {
-        return $30c05137717fb899$var$r(t).notEquals(n);
+        return r(t).notEquals(n);
     }, a.lt = function(t, n) {
-        return $30c05137717fb899$var$r(t).lt(n);
+        return r(t).lt(n);
     }, a.lte = function(t, n) {
-        return $30c05137717fb899$var$r(t).lte(n);
+        return r(t).lte(n);
     }, a.gt = function(t, n) {
-        return $30c05137717fb899$var$r(t).gt(n);
+        return r(t).gt(n);
     }, a.gte = function(t, n) {
-        return $30c05137717fb899$var$r(t).gte(n);
+        return r(t).gte(n);
     }, a.max = function(t, n) {
-        return $30c05137717fb899$var$r(t).max(n);
+        return r(t).max(n);
     }, a.min = function(t, n) {
-        return $30c05137717fb899$var$r(t).min(n);
+        return r(t).min(n);
     }, a.clamp = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).clamp(n, e);
+        return r(t).clamp(n, e);
     }, a.clampMin = function(t, n) {
-        return $30c05137717fb899$var$r(t).clampMin(n);
+        return r(t).clampMin(n);
     }, a.clampMax = function(t, n) {
-        return $30c05137717fb899$var$r(t).clampMax(n);
+        return r(t).clampMax(n);
     }, a.cmp_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).cmp_tolerance(n, e);
+        return r(t).cmp_tolerance(n, e);
     }, a.compare_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).cmp_tolerance(n, e);
+        return r(t).cmp_tolerance(n, e);
     }, a.eq_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).eq_tolerance(n, e);
+        return r(t).eq_tolerance(n, e);
     }, a.equals_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).eq_tolerance(n, e);
+        return r(t).eq_tolerance(n, e);
     }, a.neq_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).neq_tolerance(n, e);
+        return r(t).neq_tolerance(n, e);
     }, a.notEquals_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).notEquals_tolerance(n, e);
+        return r(t).notEquals_tolerance(n, e);
     }, a.lt_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).lt_tolerance(n, e);
+        return r(t).lt_tolerance(n, e);
     }, a.lte_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).lte_tolerance(n, e);
+        return r(t).lte_tolerance(n, e);
     }, a.gt_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).gt_tolerance(n, e);
+        return r(t).gt_tolerance(n, e);
     }, a.gte_tolerance = function(t, n, e) {
-        return $30c05137717fb899$var$r(t).gte_tolerance(n, e);
+        return r(t).gte_tolerance(n, e);
     }, a.log10 = function(t) {
-        return $30c05137717fb899$var$r(t).log10();
+        return r(t).log10();
     }, a.absLog10 = function(t) {
-        return $30c05137717fb899$var$r(t).absLog10();
+        return r(t).absLog10();
     }, a.pLog10 = function(t) {
-        return $30c05137717fb899$var$r(t).pLog10();
+        return r(t).pLog10();
     }, a.log = function(t, n) {
-        return $30c05137717fb899$var$r(t).log(n);
+        return r(t).log(n);
     }, a.log2 = function(t) {
-        return $30c05137717fb899$var$r(t).log2();
+        return r(t).log2();
     }, a.ln = function(t) {
-        return $30c05137717fb899$var$r(t).ln();
+        return r(t).ln();
     }, a.logarithm = function(t, n) {
-        return $30c05137717fb899$var$r(t).logarithm(n);
+        return r(t).logarithm(n);
     }, a.pow10 = function(t) {
-        return Number.isInteger(t) ? $30c05137717fb899$var$o(1, t) : $30c05137717fb899$var$i(Math.pow(10, t % 1), Math.trunc(t));
+        return Number.isInteger(t) ? o(1, t) : i(Math.pow(10, t % 1), Math.trunc(t));
     }, a.pow = function(t, n) {
-        return "number" == typeof t && 10 === t && "number" == typeof n && Number.isInteger(n) ? $30c05137717fb899$var$o(1, n) : $30c05137717fb899$var$r(t).pow(n);
+        return "number" == typeof t && 10 === t && "number" == typeof n && Number.isInteger(n) ? o(1, n) : r(t).pow(n);
     }, a.exp = function(t) {
-        return $30c05137717fb899$var$r(t).exp();
+        return r(t).exp();
     }, a.sqr = function(t) {
-        return $30c05137717fb899$var$r(t).sqr();
+        return r(t).sqr();
     }, a.sqrt = function(t) {
-        return $30c05137717fb899$var$r(t).sqrt();
+        return r(t).sqrt();
     }, a.cube = function(t) {
-        return $30c05137717fb899$var$r(t).cube();
+        return r(t).cube();
     }, a.cbrt = function(t) {
-        return $30c05137717fb899$var$r(t).cbrt();
+        return r(t).cbrt();
     }, a.dp = function(t) {
-        return $30c05137717fb899$var$r(t).dp();
+        return r(t).dp();
     }, a.decimalPlaces = function(t) {
-        return $30c05137717fb899$var$r(t).dp();
+        return r(t).dp();
     }, a.affordGeometricSeries = function(t, n, e, i) {
-        return $30c05137717fb899$var$u($30c05137717fb899$var$r(t), $30c05137717fb899$var$r(n), $30c05137717fb899$var$r(e), i);
+        return u(r(t), r(n), r(e), i);
     }, a.sumGeometricSeries = function(t, n, e, i) {
-        return $30c05137717fb899$var$s(t, $30c05137717fb899$var$r(n), $30c05137717fb899$var$r(e), i);
+        return s(t, r(n), r(e), i);
     }, a.affordArithmeticSeries = function(t, n, e, i) {
         return function(t, n, e, r) {
             var i = n.add(r.mul(e)).sub(e.div(2)), o = i.pow(2);
             return i.neg().add(o.add(e.mul(t).mul(2)).sqrt()).div(e).floor();
-        }($30c05137717fb899$var$r(t), $30c05137717fb899$var$r(n), $30c05137717fb899$var$r(e), $30c05137717fb899$var$r(i));
+        }(r(t), r(n), r(e), r(i));
     }, a.sumArithmeticSeries = function(t, n, e, i) {
         return function(t, n, e, r) {
             var i = n.add(r.mul(e));
             return t.div(2).mul(i.mul(2).plus(t.sub(1).mul(e)));
-        }($30c05137717fb899$var$r(t), $30c05137717fb899$var$r(n), $30c05137717fb899$var$r(e), $30c05137717fb899$var$r(i));
+        }(r(t), r(n), r(e), r(i));
     }, a.efficiencyOfPurchase = function(t, n, e) {
         return function(t, n, e) {
             return t.div(n).add(t.div(e));
-        }($30c05137717fb899$var$r(t), $30c05137717fb899$var$r(n), $30c05137717fb899$var$r(e));
+        }(r(t), r(n), r(e));
     }, a.randomDecimalForTesting = function(t) {
-        if (20 * Math.random() < 1) return $30c05137717fb899$var$o(0, 0);
+        if (20 * Math.random() < 1) return o(0, 0);
         var n = 10 * Math.random();
         10 * Math.random() < 1 && (n = Math.round(n)), n *= Math.sign(2 * Math.random() - 1);
         var e = Math.floor(Math.random() * t * 2) - t;
-        return $30c05137717fb899$var$i(n, e);
+        return i(n, e);
     }, a.prototype.normalize = function() {
         if (this.m >= 1 && this.m < 10) return this;
         if (0 === this.m) return this.m = 0, this.e = 0, this;
         var t = Math.floor(Math.log10(Math.abs(this.m)));
-        return this.m = -324 === t ? 10 * this.m / 1e-323 : this.m / $30c05137717fb899$var$e(t), this.e += t, this;
+        return this.m = -324 === t ? 10 * this.m / 1e-323 : this.m / e(t), this.e += t, this;
     }, a.prototype.fromMantissaExponent = function(t, n) {
         return isFinite(t) && isFinite(n) ? (this.m = t, this.e = n, this.normalize(), this) : (t = Number.NaN, n = Number.NaN, this);
     }, a.prototype.fromMantissaExponent_noNormalize = function(t, n) {
@@ -2457,7 +3400,7 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.fromDecimal = function(t) {
         return this.m = t.m, this.e = t.e, this;
     }, a.prototype.fromNumber = function(t) {
-        return isNaN(t) ? (this.m = Number.NaN, this.e = Number.NaN) : t === Number.POSITIVE_INFINITY ? (this.m = 1, this.e = $30c05137717fb899$var$n) : t === Number.NEGATIVE_INFINITY ? (this.m = -1, this.e = $30c05137717fb899$var$n) : 0 === t ? (this.m = 0, this.e = 0) : (this.e = Math.floor(Math.log10(Math.abs(t))), this.m = -324 === this.e ? 10 * t / 1e-323 : t / $30c05137717fb899$var$e(this.e), this.normalize()), this;
+        return isNaN(t) ? (this.m = Number.NaN, this.e = Number.NaN) : t === Number.POSITIVE_INFINITY ? (this.m = 1, this.e = n) : t === Number.NEGATIVE_INFINITY ? (this.m = -1, this.e = n) : 0 === t ? (this.m = 0, this.e = 0) : (this.e = Math.floor(Math.log10(Math.abs(t))), this.m = -324 === this.e ? 10 * t / 1e-323 : t / e(this.e), this.normalize()), this;
     }, a.prototype.fromString = function(t) {
         if (-1 !== t.indexOf("e")) {
             var n = t.split("e");
@@ -2472,7 +3415,7 @@ var $30c05137717fb899$var$a = function() {
         if (this.e > 308) return this.m > 0 ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
         if (this.e < -324) return 0;
         if (-324 === this.e) return this.m > 0 ? 5e-324 : -0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005;
-        var t = this.m * $30c05137717fb899$var$e(this.e);
+        var t = this.m * e(this.e);
         if (!isFinite(t) || this.e < 0) return t;
         var n = Math.round(t);
         return Math.abs(n - t) < 1e-10 ? n : t;
@@ -2482,17 +3425,17 @@ var $30c05137717fb899$var$a = function() {
         var n = t + 1, e = Math.ceil(Math.log10(Math.abs(this.m))), r = Math.round(this.m * Math.pow(10, n - e)) * Math.pow(10, e - n);
         return parseFloat(r.toFixed(Math.max(n - e, 0)));
     }, a.prototype.toString = function() {
-        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= $30c05137717fb899$var$n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -$30c05137717fb899$var$n || 0 === this.m ? "0" : this.e < 21 && this.e > -7 ? this.toNumber().toString() : this.m + "e" + (this.e >= 0 ? "+" : "") + this.e;
+        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -n || 0 === this.m ? "0" : this.e < 21 && this.e > -7 ? this.toNumber().toString() : this.m + "e" + (this.e >= 0 ? "+" : "") + this.e;
     }, a.prototype.toExponential = function(e) {
         if (isNaN(this.m) || isNaN(this.e)) return "NaN";
-        if (this.e >= $30c05137717fb899$var$n) return this.m > 0 ? "Infinity" : "-Infinity";
-        if (this.e <= -$30c05137717fb899$var$n || 0 === this.m) return "0" + (e > 0 ? (0, (/*@__PURE__*/$parcel$interopDefault($17844dfbc928513b$exports)))(".", e + 1, "0") : "") + "e+0";
+        if (this.e >= n) return this.m > 0 ? "Infinity" : "-Infinity";
+        if (this.e <= -n || 0 === this.m) return "0" + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") + "e+0";
         if (this.e > -324 && this.e < 308) return this.toNumber().toExponential(e);
         isFinite(e) || (e = 17);
         var r = e + 1, i = Math.max(1, Math.ceil(Math.log10(Math.abs(this.m))));
         return (Math.round(this.m * Math.pow(10, r - i)) * Math.pow(10, i - r)).toFixed(Math.max(r - i, 0)) + "e" + (this.e >= 0 ? "+" : "") + this.e;
     }, a.prototype.toFixed = function(e) {
-        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= $30c05137717fb899$var$n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -$30c05137717fb899$var$n || 0 === this.m ? "0" + (e > 0 ? (0, (/*@__PURE__*/$parcel$interopDefault($17844dfbc928513b$exports)))(".", e + 1, "0") : "") : this.e >= 17 ? this.m.toString().replace(".", "").padEnd(this.e + 1, "0") + (e > 0 ? (0, (/*@__PURE__*/$parcel$interopDefault($17844dfbc928513b$exports)))(".", e + 1, "0") : "") : this.toNumber().toFixed(e);
+        return isNaN(this.m) || isNaN(this.e) ? "NaN" : this.e >= n ? this.m > 0 ? "Infinity" : "-Infinity" : this.e <= -n || 0 === this.m ? "0" + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") : this.e >= 17 ? this.m.toString().replace(".", "").padEnd(this.e + 1, "0") + (e > 0 ? (0, _padEndDefault.default)(".", e + 1, "0") : "") : this.toNumber().toFixed(e);
     }, a.prototype.toPrecision = function(t) {
         return this.e <= -7 ? this.toExponential(t - 1) : t > this.e ? this.toFixed(t - this.e - 1) : this.toExponential(t - 1);
     }, a.prototype.valueOf = function() {
@@ -2502,9 +3445,9 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.toStringWithDecimalPlaces = function(t) {
         return this.toExponential(t);
     }, a.prototype.abs = function() {
-        return $30c05137717fb899$var$o(Math.abs(this.m), this.e);
+        return o(Math.abs(this.m), this.e);
     }, a.prototype.neg = function() {
-        return $30c05137717fb899$var$o(-this.m, this.e);
+        return o(-this.m, this.e);
     }, a.prototype.negate = function() {
         return this.neg();
     }, a.prototype.negated = function() {
@@ -2522,30 +3465,30 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.trunc = function() {
         return this.e < 0 ? new a(0) : this.e < 17 ? new a(Math.trunc(this.toNumber())) : this;
     }, a.prototype.add = function(t) {
-        var n, o, u = $30c05137717fb899$var$r(t);
+        var n, o, u = r(t);
         if (0 === this.m) return u;
         if (0 === u.m) return this;
         if (this.e >= u.e ? (n = this, o = u) : (n = u, o = this), n.e - o.e > 17) return n;
-        var s = Math.round(1e14 * n.m + 1e14 * o.m * $30c05137717fb899$var$e(o.e - n.e));
-        return $30c05137717fb899$var$i(s, n.e - 14);
+        var s = Math.round(1e14 * n.m + 1e14 * o.m * e(o.e - n.e));
+        return i(s, n.e - 14);
     }, a.prototype.plus = function(t) {
         return this.add(t);
     }, a.prototype.sub = function(t) {
-        return this.add($30c05137717fb899$var$r(t).neg());
+        return this.add(r(t).neg());
     }, a.prototype.subtract = function(t) {
         return this.sub(t);
     }, a.prototype.minus = function(t) {
         return this.sub(t);
     }, a.prototype.mul = function(t) {
-        if ("number" == typeof t) return t < 1e307 && t > -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 ? $30c05137717fb899$var$i(this.m * t, this.e) : $30c05137717fb899$var$i(1e-307 * this.m * t, this.e + 307);
+        if ("number" == typeof t) return t < 1e307 && t > -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 ? i(this.m * t, this.e) : i(1e-307 * this.m * t, this.e + 307);
         var n = "string" == typeof t ? new a(t) : t;
-        return $30c05137717fb899$var$i(this.m * n.m, this.e + n.e);
+        return i(this.m * n.m, this.e + n.e);
     }, a.prototype.multiply = function(t) {
         return this.mul(t);
     }, a.prototype.times = function(t) {
         return this.mul(t);
     }, a.prototype.div = function(t) {
-        return this.mul($30c05137717fb899$var$r(t).recip());
+        return this.mul(r(t).recip());
     }, a.prototype.divide = function(t) {
         return this.div(t);
     }, a.prototype.divideBy = function(t) {
@@ -2553,13 +3496,13 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.dividedBy = function(t) {
         return this.div(t);
     }, a.prototype.recip = function() {
-        return $30c05137717fb899$var$i(1 / this.m, -this.e);
+        return i(1 / this.m, -this.e);
     }, a.prototype.reciprocal = function() {
         return this.recip();
     }, a.prototype.reciprocate = function() {
         return this.recip();
     }, a.prototype.cmp = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         if (0 === this.m) {
             if (0 === n.m) return 0;
             if (n.m < 0) return 1;
@@ -2575,7 +3518,7 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.compare = function(t) {
         return this.cmp(t);
     }, a.prototype.eq = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         return this.e === n.e && this.m === n.m;
     }, a.prototype.equals = function(t) {
         return this.eq(t);
@@ -2584,20 +3527,20 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.notEquals = function(t) {
         return this.neq(t);
     }, a.prototype.lt = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         return 0 === this.m ? n.m > 0 : 0 === n.m ? this.m <= 0 : this.e === n.e ? this.m < n.m : this.m > 0 ? n.m > 0 && this.e < n.e : n.m > 0 || this.e > n.e;
     }, a.prototype.lte = function(t) {
         return !this.gt(t);
     }, a.prototype.gt = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         return 0 === this.m ? n.m < 0 : 0 === n.m ? this.m > 0 : this.e === n.e ? this.m > n.m : this.m > 0 ? n.m < 0 || this.e > n.e : n.m < 0 && this.e < n.e;
     }, a.prototype.gte = function(t) {
         return !this.lt(t);
     }, a.prototype.max = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         return this.lt(n) ? n : this;
     }, a.prototype.min = function(t) {
-        var n = $30c05137717fb899$var$r(t);
+        var n = r(t);
         return this.gt(n) ? n : this;
     }, a.prototype.clamp = function(t, n) {
         return this.max(t).min(n);
@@ -2606,12 +3549,12 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.clampMax = function(t) {
         return this.min(t);
     }, a.prototype.cmp_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return this.eq_tolerance(e, n) ? 0 : this.cmp(e);
     }, a.prototype.compare_tolerance = function(t, n) {
         return this.cmp_tolerance(t, n);
     }, a.prototype.eq_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return a.lte(this.sub(e).abs(), a.max(this.abs(), e.abs()).mul(n));
     }, a.prototype.equals_tolerance = function(t, n) {
         return this.eq_tolerance(t, n);
@@ -2620,16 +3563,16 @@ var $30c05137717fb899$var$a = function() {
     }, a.prototype.notEquals_tolerance = function(t, n) {
         return this.neq_tolerance(t, n);
     }, a.prototype.lt_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return !this.eq_tolerance(e, n) && this.lt(e);
     }, a.prototype.lte_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return this.eq_tolerance(e, n) || this.lt(e);
     }, a.prototype.gt_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return !this.eq_tolerance(e, n) && this.gt(e);
     }, a.prototype.gte_tolerance = function(t, n) {
-        var e = $30c05137717fb899$var$r(t);
+        var e = r(t);
         return this.eq_tolerance(e, n) || this.gt(e);
     }, a.prototype.log10 = function() {
         return this.e + Math.log10(this.m);
@@ -2647,13 +3590,13 @@ var $30c05137717fb899$var$a = function() {
         return this.log(t);
     }, a.prototype.pow = function(t) {
         var n, e = t instanceof a ? t.toNumber() : t, r = this.e * e;
-        if (Number.isSafeInteger(r) && (n = Math.pow(this.m, e), isFinite(n) && 0 !== n)) return $30c05137717fb899$var$i(n, r);
+        if (Number.isSafeInteger(r) && (n = Math.pow(this.m, e), isFinite(n) && 0 !== n)) return i(n, r);
         var o = Math.trunc(r), u = r - o;
-        if (n = Math.pow(10, e * Math.log10(this.m) + u), isFinite(n) && 0 !== n) return $30c05137717fb899$var$i(n, o);
+        if (n = Math.pow(10, e * Math.log10(this.m) + u), isFinite(n) && 0 !== n) return i(n, o);
         var s = a.pow10(e * this.absLog10());
         return -1 === this.sign() ? 1 === Math.abs(e % 2) ? s.neg() : 0 === Math.abs(e % 2) ? s : new a(Number.NaN) : s;
     }, a.prototype.pow_base = function(t) {
-        return $30c05137717fb899$var$r(t).pow(this);
+        return r(t).pow(this);
     }, a.prototype.factorial = function() {
         var t = this.toNumber() + 1;
         return a.pow(t / Math.E * Math.sqrt(t * Math.sinh(1 / t) + 1 / (810 * Math.pow(t, 6))), t).mul(Math.sqrt(2 * Math.PI / t));
@@ -2661,16 +3604,16 @@ var $30c05137717fb899$var$a = function() {
         var t = this.toNumber();
         return -706 < t && t < 709 ? a.fromNumber(Math.exp(t)) : a.pow(Math.E, t);
     }, a.prototype.sqr = function() {
-        return $30c05137717fb899$var$i(Math.pow(this.m, 2), 2 * this.e);
+        return i(Math.pow(this.m, 2), 2 * this.e);
     }, a.prototype.sqrt = function() {
-        return this.m < 0 ? new a(Number.NaN) : this.e % 2 != 0 ? $30c05137717fb899$var$i(3.16227766016838 * Math.sqrt(this.m), Math.floor(this.e / 2)) : $30c05137717fb899$var$i(Math.sqrt(this.m), Math.floor(this.e / 2));
+        return this.m < 0 ? new a(Number.NaN) : this.e % 2 != 0 ? i(3.16227766016838 * Math.sqrt(this.m), Math.floor(this.e / 2)) : i(Math.sqrt(this.m), Math.floor(this.e / 2));
     }, a.prototype.cube = function() {
-        return $30c05137717fb899$var$i(Math.pow(this.m, 3), 3 * this.e);
+        return i(Math.pow(this.m, 3), 3 * this.e);
     }, a.prototype.cbrt = function() {
         var t = 1, n = this.m;
         n < 0 && (t = -1, n = -n);
         var e = t * Math.pow(n, 1 / 3), r = this.e % 3;
-        return $30c05137717fb899$var$i(1 === r || -1 === r ? 2.154434690031883 * e : 0 !== r ? 4.641588833612778 * e : e, Math.floor(this.e / 3));
+        return i(1 === r || -1 === r ? 2.154434690031883 * e : 0 !== r ? 4.641588833612778 * e : e, Math.floor(this.e / 3));
     }, a.prototype.sinh = function() {
         return this.exp().sub(this.negate().exp()).div(2);
     }, a.prototype.cosh = function() {
@@ -2704,192 +3647,593 @@ var $30c05137717fb899$var$a = function() {
         return n > 0 ? n : 0;
     }, Object.defineProperty(a, "MAX_VALUE", {
         get: function() {
-            return $30c05137717fb899$var$h;
+            return h;
         },
         enumerable: !1,
         configurable: !0
     }), Object.defineProperty(a, "MIN_VALUE", {
         get: function() {
-            return $30c05137717fb899$var$c;
+            return c;
         },
         enumerable: !1,
         configurable: !0
     }), Object.defineProperty(a, "NUMBER_MAX_VALUE", {
         get: function() {
-            return $30c05137717fb899$var$p;
+            return p;
         },
         enumerable: !1,
         configurable: !0
     }), Object.defineProperty(a, "NUMBER_MIN_VALUE", {
         get: function() {
-            return $30c05137717fb899$var$f;
+            return f;
         },
         enumerable: !1,
         configurable: !0
     }), a;
-}(), $30c05137717fb899$var$h = $30c05137717fb899$var$o(1, $30c05137717fb899$var$n), $30c05137717fb899$var$c = $30c05137717fb899$var$o(1, -$30c05137717fb899$var$n), $30c05137717fb899$var$p = $30c05137717fb899$var$r(Number.MAX_VALUE), $30c05137717fb899$var$f = $30c05137717fb899$var$r(Number.MIN_VALUE);
-var $30c05137717fb899$export$2e2bcd8739ae039 = $30c05137717fb899$var$a;
+}(), h = o(1, n), c = o(1, -n), p = r(Number.MAX_VALUE), f = r(Number.MIN_VALUE);
+exports.default = a;
 
+},{"pad-end":"bJggk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bJggk":[function(require,module,exports) {
+"use strict";
+module.exports = function(string, maxLength, fillString) {
+    if (string == null || maxLength == null) return string;
+    var result = String(string);
+    var targetLen = typeof maxLength === "number" ? maxLength : parseInt(maxLength, 10);
+    if (isNaN(targetLen) || !isFinite(targetLen)) return result;
+    var length = result.length;
+    if (length >= targetLen) return result;
+    var filled = fillString == null ? "" : String(fillString);
+    if (filled === "") filled = " ";
+    var fillLen = targetLen - length;
+    while(filled.length < fillLen)filled += filled;
+    var truncated = filled.length > fillLen ? filled.substr(0, fillLen) : filled;
+    return result + truncated;
+};
 
-class $a348cea740e504f8$export$5bfce22a6398152d {
+},{}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"8H89C":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Start", ()=>Start);
+var _layer = require("./layer");
+var _milestone = require("../milestone");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+function mapRange(x, inMin, inMax, outMin, outMax) {
+    return x.minus(inMin).times(outMax.minus(outMin)).div(inMax.minus(inMin)).plus(outMin);
+}
+class Start extends (0, _layer.Layer) {
     constructor(game){
-        this.game = game;
-        console.log("Save Manager Constructor");
-        console.log(this.game);
-    }
-    async save(game) {
-        this.game = game;
-        console.log("Saving game");
-        console.log(this.game);
-        const stateToSave = {};
-        stateToSave["visibleLayer"] = this.game.visibleLayer;
-        stateToSave["mainInterval"] = this.game.mainInterval;
-        stateToSave["fixedInterval"] = this.game.fixedInterval;
-        stateToSave["tooltipsEnabled"] = this.game.tooltipsEnabled;
-        stateToSave["layers"] = {
-            start: {
-                unlocked: this.game.layers.start.unlocked,
-                currency: this.game.layers.start.currency.toString(),
-                highestCurrency: this.game.layers.start.highestCurrency.toString(),
-                milestones: {
-                    givePoints: {
-                        level: this.game.layers.start.milestones.givePoints.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.givePoints.timesClicked.toString()
-                    },
-                    increasePointsPerClick: {
-                        level: this.game.layers.start.milestones.increasePointsPerClick.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.increasePointsPerClick.timesClicked.toString()
-                    },
-                    upgradeIncreasePointsPerClick: {
-                        level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked.toString()
-                    },
-                    ultimatePointsPerClick: {
-                        level: this.game.layers.start.milestones.ultimatePointsPerClick.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked.toString()
-                    },
-                    autoPoints: {
-                        level: this.game.layers.start.milestones.autoPoints.level.toString(),
-                        buyable: this.game.layers.start.milestones.autoPoints.buyable
-                    },
-                    autoPointsDivisor: {
-                        level: this.game.layers.start.milestones.autoPointsDivisor.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.autoPointsDivisor.timesClicked.toString()
-                    },
-                    betterAutoPoints: {
-                        level: this.game.layers.start.milestones.betterAutoPoints.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.betterAutoPoints.timesClicked.toString()
-                    },
-                    criticalPoints: {
-                        level: this.game.layers.start.milestones.criticalPoints.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.criticalPoints.timesClicked.toString()
-                    },
-                    criticalBonus: {
-                        level: this.game.layers.start.milestones.criticalBonus.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.criticalBonus.timesClicked.toString()
-                    },
-                    overCritical: {
-                        level: this.game.layers.start.milestones.overCritical.level.toString(),
-                        timesClicked: this.game.layers.start.milestones.overCritical.timesClicked.toString()
+        super(game, "start", new (0, _breakInfinityJsDefault.default)(0), "green");
+        this.upgradeColumns = [];
+        this.currencyName = "Points";
+        this.currency = new (0, _breakInfinityJsDefault.default)(0);
+        this.pointsText = document.createElement("h2");
+        this.pointsText.classList.add("start-points-text");
+        this.pointsText.textContent = `Points: ${this.currency}`;
+        this.div.appendChild(this.pointsText);
+        this.lastPointsGiveText = document.createElement("h3");
+        this.lastPointsGiveText.classList.add("start-last-points-give-text");
+        this.lastPointsGiveText.textContent = `Manual P+ 0`;
+        this.div.appendChild(this.lastPointsGiveText);
+        this.lastAutoPointsGiveText = document.createElement("h3");
+        this.lastAutoPointsGiveText.classList.add("start-last-auto-points-give-text");
+        this.lastAutoPointsGiveText.textContent = `Auto P+ 0`;
+        this.div.appendChild(this.lastAutoPointsGiveText);
+        this.upgradeColumnsDiv = document.createElement("div");
+        this.upgradeColumnsDiv.classList.add("start-upgrade-columns");
+        this.div.appendChild(this.upgradeColumnsDiv);
+        // Loop over 3 upgrade columns and add the upgrade-column class and append them to the upgradecolumnsdiv
+        for(let i = 0; i < 3; i++){
+            this.upgradeColumns.push(document.createElement("div"));
+            this.upgradeColumns[i].classList.add("upgrade-column");
+            this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
+        }
+        this.autoPointsEnabled = false;
+        this.lastPointsGive = new (0, _breakInfinityJsDefault.default)(0);
+        this.lastAutoPointsGive = new (0, _breakInfinityJsDefault.default)(0);
+        this.lastClickTimestamp = 0;
+        this.minTimePerClick = 3;
+        this.milestoneFunctions = {
+            givePoints: {
+                activate: ()=>{
+                    const currentTimestamp = Date.now();
+                    if (currentTimestamp - this.lastClickTimestamp > this.minTimePerClick) {
+                        this.lastClickTimestamp = currentTimestamp;
+                        this.addCurrencyStack();
+                    } else console.log("Slow your auto-clicker homie ;) (rate limit 3ms/activation)");
+                    this.milestoneFunctions.givePoints.update();
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = new (0, _breakInfinityJsDefault.default)(1);
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.givePoints.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
+                }
+            },
+            // Increase Points Per Click
+            increasePointsPerClick: {
+                activate: ()=>{
+                    this.buyMilestone("increasePointsPerClick");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        let cost = new (0, _breakInfinityJsDefault.default)(lvl.times(lvl.sqrt()));
+                        cost = cost.times(new (0, _breakInfinityJsDefault.default)(lvlPlusOne).log(10)).times(10);
+                        cost = cost.add(lvlPlusOne.ln()).times(10).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.increasePointsPerClick.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.increasePointsPerClick.cost)}`;
+                    this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
+                    this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level.add(1)}`;
+                }
+            },
+            // Upgrade Increase Points Per Click
+            upgradeIncreasePointsPerClick: {
+                activate: ()=>{
+                    this.buyMilestone("upgradeIncreasePointsPerClick");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const m = new (0, _breakInfinityJsDefault.default)(100);
+                        const b = new (0, _breakInfinityJsDefault.default)(0.07);
+                        const j = new (0, _breakInfinityJsDefault.default)(100000);
+                        const n = j.div(b.times(m).sinh());
+                        const lvlPlusOne = lvl.add(1);
+                        const cost = n.times(b.times(lvl).sinh()).times(new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(10)).pow(1.3).plus(150).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.upgradeIncreasePointsPerClick.cost)}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level.add(1)}`;
+                }
+            },
+            // Ultimate Points Per Click
+            ultimatePointsPerClick: {
+                activate: ()=>{
+                    this.buyMilestone("ultimatePointsPerClick");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(20000);
+                        const b = lvlPlusOne.times(6).times(lvlPlusOne);
+                        const c = b.pow(3.45);
+                        return a.add(c).floor();
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.ultimatePointsPerClick.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.ultimatePointsPerClick.cost)}`;
+                    this.buttons.ultimatePointsPerClick.lines[2].textContent = `Level: ${this.milestones.ultimatePointsPerClick.level}/${this.milestones.ultimatePointsPerClick.maxLevel}`;
+                    this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level.add(1)}`;
+                }
+            },
+            // Auto Points
+            autoPoints: {
+                activate: ()=>{
+                    this.buyMilestone("autoPoints");
+                    if (this.milestones.autoPoints.level.gt(0)) this.autoPointsEnabled = true;
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const cost = new (0, _breakInfinityJsDefault.default)(15000);
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.autoPoints.updateText();
+                },
+                updateText: ()=>{
+                    if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPoints.cost)}`;
+                    else {
+                        this.buttons.autoPoints.lines[1].textContent = "Enabled";
+                        this.buttons.autoPoints.button.classList.add("not-buyable");
                     }
                 }
             },
-            dice: {
-                unlocked: this.game.layers.dice.unlocked,
-                currency: this.game.layers.dice.currency.toString(),
-                highestCurrency: this.game.layers.dice.highestCurrency.toString(),
-                diceCount: this.game.layers.dice.diceCount,
-                diceCountCap: this.game.layers.dice.diceCountCap,
-                milestones: {}
+            // Auto Points Divisor
+            autoPointsDivisor: {
+                activate: ()=>{
+                    this.buyMilestone("autoPointsDivisor");
+                    if (this.milestones.autoPointsDivisor.level.lt(1)) this.milestones.autoPointsDivisor.level = new (0, _breakInfinityJsDefault.default)(1);
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const j = 10000;
+                        const a = new (0, _breakInfinityJsDefault.default)(1.5);
+                        const b = new (0, _breakInfinityJsDefault.default)(2.8);
+                        const c = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.times(a)).times(lvl.pow(b));
+                        const d = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(j).add(j);
+                        const cost = new (0, _breakInfinityJsDefault.default)(c.plus(d)).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.autoPointsDivisor.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPointsDivisor.cost)}`;
+                    this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
+                    this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${new (0, _breakInfinityJsDefault.default)(100).sub(this.milestones.autoPointsDivisor.level)}%`;
+                }
             },
-            coin: {
-                unlocked: this.game.layers.coin.unlocked,
-                milestones: {}
+            // Better Auto Points
+            betterAutoPoints: {
+                activate: ()=>{
+                    this.buyMilestone("betterAutoPoints");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const j = 10000;
+                        const a = new (0, _breakInfinityJsDefault.default)(1.9);
+                        const b = new (0, _breakInfinityJsDefault.default)(2.8);
+                        const c = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.times(a)).times(lvl.pow(b));
+                        const d = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln()).times(j).add(j);
+                        const cost = new (0, _breakInfinityJsDefault.default)(c.plus(d)).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.betterAutoPoints.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.betterAutoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.betterAutoPoints.cost)}`;
+                    this.buttons.betterAutoPoints.lines[2].textContent = `Level: ${this.milestones.betterAutoPoints.level}/${this.milestones.betterAutoPoints.maxLevel}`;
+                    this.buttons.betterAutoPoints.lines[3].textContent = `Divisor: ${this.milestones.betterAutoPoints.level}`;
+                }
+            },
+            // Critical Points (Crit Chance)
+            criticalPoints: {
+                activate: ()=>{
+                    this.buyMilestone("criticalPoints");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.059).times(30000)).floor();
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln() + 1).times(10);
+                        const cost = a.times(b).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.criticalPoints.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalPoints.cost)}`;
+                    this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
+                    this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
+                }
+            },
+            // Crit Bonus (Crit reward bonus %)
+            criticalBonus: {
+                activate: ()=>{
+                    this.buyMilestone("criticalBonus");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.064).times(30000));
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln() + 1).times(100);
+                        const cost = a.times(b).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.criticalBonus.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalBonus.cost)}`;
+                    this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
+                    this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}*`;
+                }
+            },
+            // Over Crit (Turn crits over 100% into BIGGGGER crits)
+            overCritical: {
+                activate: ()=>{
+                    this.buyMilestone("overCritical");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.pow(1.064).times(30000));
+                        const b = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.ln() + 1).times(100);
+                        const cost = a.times(b).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.overCritical.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.overCritical.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.overCritical.cost)}`;
+                    this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
+                    this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
+                }
             }
         };
-        // Actually save the state
-        try {
-            console.log("Saving game state", stateToSave);
-            await (0, (/*@__PURE__*/$parcel$interopDefault($9c5688bb4ed5d6a8$exports))).setItem("gameState", stateToSave);
-        } catch (err) {
-            console.error("Save failed", err);
-        }
+        this.milestones = {
+            givePoints: new (0, _milestone.Milestone)("givePoints", "Gib Points", new (0, _breakInfinityJsDefault.default)(0), "Give points when clicked", new (0, _breakInfinityJsDefault.default)(-1), this.milestoneFunctions.givePoints, this.div),
+            increasePointsPerClick: new (0, _milestone.Milestone)("increasePointsPerClick", "+PPC", new (0, _breakInfinityJsDefault.default)(10), "Increase points per click", new (0, _breakInfinityJsDefault.default)(10000), this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
+            upgradeIncreasePointsPerClick: new (0, _milestone.Milestone)("upgradeIncreasePointsPerClick", "++PPC", new (0, _breakInfinityJsDefault.default)(100), "Increase the amount that the +PPC upgrade gives", new (0, _breakInfinityJsDefault.default)(100), this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
+            ultimatePointsPerClick: new (0, _milestone.Milestone)("ultimatePointsPerClick", "+++Ultimate +++PPC", new (0, _breakInfinityJsDefault.default)(30000), "Makes +PPC and ++PPC bettererist", new (0, _breakInfinityJsDefault.default)(10), this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
+            autoPoints: new (0, _milestone.Milestone)("autoPoints", "Automates Points", new (0, _breakInfinityJsDefault.default)(7500), "Give points automatically", new (0, _breakInfinityJsDefault.default)(1), this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
+            autoPointsDivisor: new (0, _milestone.Milestone)("autoPointsDivisor", "Auto Points Divisor", new (0, _breakInfinityJsDefault.default)(10000), "Lowers the auto-points divider", new (0, _breakInfinityJsDefault.default)(99), this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
+            betterAutoPoints: new (0, _milestone.Milestone)("betterAutoPoints", "Better Auto Points", new (0, _breakInfinityJsDefault.default)(1e8), "Makes auto points BETTER than clicking!", new (0, _breakInfinityJsDefault.default)(100), this.milestoneFunctions.betterAutoPoints, this.upgradeColumns[1]),
+            criticalPoints: new (0, _milestone.Milestone)("criticalPoints", "Critical Points", new (0, _breakInfinityJsDefault.default)(30000), "Increases critical point chance", new (0, _breakInfinityJsDefault.default)(200), this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
+            criticalBonus: new (0, _milestone.Milestone)("criticalBonus", "Critical Bonus", new (0, _breakInfinityJsDefault.default)(50000), "Increases critical point bonus", new (0, _breakInfinityJsDefault.default)(1000), this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
+            overCritical: new (0, _milestone.Milestone)("overCritical", "Over Critical", new (0, _breakInfinityJsDefault.default)(250000), "Converts bonus crit chance into better crits! (Usless with sub 100% crit chance)", new (0, _breakInfinityJsDefault.default)(2500), this.milestoneFunctions.overCritical, this.upgradeColumns[2])
+        };
+        // Enable graphing feature per milestone.
+        this.milestones.increasePointsPerClick.graphEnabled = true;
+        this.milestones.upgradeIncreasePointsPerClick.graphEnabled = true;
+        this.milestones.ultimatePointsPerClick.graphEnabled = true;
+        this.milestones.autoPointsDivisor.graphEnabled = true;
+        this.milestones.criticalPoints.graphEnabled = true;
+        this.milestones.criticalBonus.graphEnabled = true;
+        this.milestones.overCritical.graphEnabled = true;
+        this.setup();
+        this.toggleVisibility();
+        //  Moves the give points button to after the points text but before the upgrades
+        // The index will need to change if I add more text in the this.div
+        if (this.div.firstChild) this.div.insertBefore(this.buttons.givePoints.button, this.div.children[3]);
+        this.milestoneFunctions.givePoints.update();
     }
-    async load(game) {
-        this.game = game;
-        try {
-            const gameState = await (0, (/*@__PURE__*/$parcel$interopDefault($9c5688bb4ed5d6a8$exports))).getItem("gameState");
-            console.log("STATE LOAD: ", gameState);
-            if (gameState) {
-                this.game.visibleLayer = gameState.visibleLayer;
-                this.game.mainInterval = gameState.mainInterval;
-                this.game.fixedInterval = gameState.fixedInterval;
-                this.game.tooltipsEnabled = gameState.tooltipsEnabled;
-                // Start Layer
-                console.log(gameState.layers.start.currency, typeof gameState.layers.start.currency);
-                this.game.layers.start.unlocked = gameState.layers.start.unlocked;
-                this.game.layers.start.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.currency);
-                this.game.layers.start.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.highestCurrency);
-                this.game.layers.start.highestCurrency = this.game.layers.start.highestCurrency.add(0.1);
-                this.game.layers.start.milestones.givePoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.givePoints.level);
-                this.game.layers.start.milestones.givePoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.givePoints.timesClicked);
-                this.game.layers.start.milestones.increasePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.increasePointsPerClick.level);
-                this.game.layers.start.milestones.increasePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.increasePointsPerClick.timesClicked);
-                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level);
-                this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked);
-                this.game.layers.start.milestones.ultimatePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.ultimatePointsPerClick.level);
-                this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.ultimatePointsPerClick.timesClicked);
-                this.game.layers.start.milestones.autoPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPoints.level);
-                this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
-                this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
-                this.game.layers.start.milestones.autoPointsDivisor.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPointsDivisor.level);
-                this.game.layers.start.milestones.autoPointsDivisor.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPointsDivisor.timesClicked);
-                this.game.layers.start.milestones.betterAutoPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.betterAutoPoints.level);
-                this.game.layers.start.milestones.betterAutoPoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.betterAutoPoints.timesClicked);
-                this.game.layers.start.milestones.criticalPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalPoints.level);
-                this.game.layers.start.milestones.criticalPoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalPoints.timesClicked);
-                this.game.layers.start.milestones.criticalBonus.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalBonus.level);
-                this.game.layers.start.milestones.criticalBonus.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.criticalBonus.timesClicked);
-                this.game.layers.start.milestones.overCritical.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.overCritical.level);
-                this.game.layers.start.milestones.overCritical.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.overCritical.timesClicked);
-                // Dice Layer
-                this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
-                this.game.layers.dice.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.dice.currency);
-                this.game.layers.dice.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.dice.highestCurrency);
-                this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
-                this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
-                // Coin Layer
-                this.game.layers.coin.unlocked = gameState.layers.coin.unlocked;
-                this.game.setupNav();
-                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].toggleVisibility(true);
-                this.game.switchLayer(this.game.visibleLayer);
-                this.game.setTooltipsState();
-                // loop over each layer and update the milestones
-                for (const layer of Object.keys(this.game.layers))this.game.layers[layer].checkMilestones();
-                //  Update milestone costs based on loaded level
-                for (const layer of Object.keys(this.game.layers))for (const key of Object.keys(this.game.layers[layer].milestones)){
-                    const ms = this.game.layers[layer].milestones[key];
-                    const msf = this.game.layers[layer].milestoneFunctions[key].cost;
-                    ms.cost = msf(ms);
-                }
-                // update the text and tooltip on each milestone
-                for (const layer of Object.keys(this.game.layers)){
-                    for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) this.game.layers[layer].milestoneFunctions[key].update();
-                }
-                // this.game.layers.start.buttons.givePoints.button
-                this.game.updateUI();
-            } else {
-                console.log("No saved game state to load");
-                this.save(this.game); // Save initial state if nothing to load
+    addCurrencyStack(rtn) {
+        let value = new (0, _breakInfinityJsDefault.default)(1);
+        if (this.milestones.increasePointsPerClick.level.gt(0)) value = value.times(this.milestones.increasePointsPerClick.level.add(1));
+        if (this.milestones.upgradeIncreasePointsPerClick.level.gt(0)) value = value.times(this.milestones.upgradeIncreasePointsPerClick.level.add(1));
+        if (this.milestones.ultimatePointsPerClick.level.gt(0)) value = value.times(this.milestones.ultimatePointsPerClick.level.add(1)).times(this.milestones.ultimatePointsPerClick.level.add(1));
+        // Crit stuff
+        if (this.milestones.criticalPoints.level.gt(0)) {
+            const rawCritChance = this.milestones.criticalPoints.level;
+            const critChance = mapRange(rawCritChance, new (0, _breakInfinityJsDefault.default)(1), new (0, _breakInfinityJsDefault.default)(200), new (0, _breakInfinityJsDefault.default)(1), new (0, _breakInfinityJsDefault.default)(100));
+            let critBonus = this.milestones.criticalBonus.level.add(1);
+            const overCrit = this.game.layers.start.milestones.overCritical.level;
+            if (rawCritChance.gt(100)) {
+                if (overCrit.gt(0)) critBonus = critBonus.times(overCrit);
             }
-        } catch (err) {
-            console.error("Load failed", err);
+            const crit = new (0, _breakInfinityJsDefault.default)(Math.random() * 100);
+            if (critChance.gte(crit)) value = value.add(value.times(critBonus));
+        }
+        if (rtn) return value;
+        this.lastPointsGive = value;
+        this.addCurrency(value);
+    }
+    addCurrency(amount) {
+        this.currency = this.currency.add(amount);
+        this.updatePointsText();
+    }
+    removeCurrency(amount) {
+        this.currency = this.currency.sub(amount);
+        this.updatePointsText();
+    }
+    updatePointsText() {
+        this.pointsText.textContent = `Points: ${this.game.formatValue(this.currency)}`;
+        this.lastPointsGiveText.textContent = `Manual P+ ${this.game.formatValue(this.lastPointsGive)}`;
+        this.lastAutoPointsGiveText.textContent = `Auto P+ ${this.game.formatValue(this.lastAutoPointsGive)}`;
+    }
+    update() {
+        if (this.currency.gt(this.highestCurrency)) this.highestCurrency = this.currency;
+        if (this.autoPointsEnabled) {
+            let value = this.addCurrencyStack(true);
+            value = value.div(new (0, _breakInfinityJsDefault.default)(100).sub(this.milestones.autoPointsDivisor.level));
+            value = value.times(new (0, _breakInfinityJsDefault.default)(this.milestones.betterAutoPoints.level.add(1).ln() + 1).add(1));
+            this.lastAutoPointsGive = value;
+            this.addCurrency(value);
         }
     }
 }
 
+},{"./layer":"bX7Wa","../milestone":"8lIwO","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bX7Wa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Layer", ()=>Layer);
+var _utils = require("../utils");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+// bind document.getElementById to $
+const $ = document.getElementById.bind(document);
+class Layer {
+    constructor(game, name, cost, layerColor){
+        this.unlocked = false;
+        this.parentElement = $("main");
+        this.visible = false;
+        this.Button = (0, _utils.Button);
+        this.game = game;
+        this.name = name;
+        this.unlockCost = cost; // Cost to show the layer
+        this.cost = cost; // Cost to buy (prob deprecate soon)
+        this.layerColor = layerColor;
+        this.currency = new (0, _breakInfinityJsDefault.default)(0);
+        this.highestCurrency = new (0, _breakInfinityJsDefault.default)(0);
+        this.currencyName = "Points";
+        this.milestones = {};
+        this.milestoneFunctions = {};
+        // create a blank div that fills the entire parent, and add it to the parent which is main
+        this.div = document.createElement("div");
+        this.parentElement.appendChild(this.div);
+        this.div.classList.add("layer", "hidden");
+        this.div.setAttribute("id", this.name);
+        this.buttons = {};
+    }
+    buyMilestone(m) {
+        const tryUpg = ()=>{
+            if (this.currency.gte(this.milestones[m].cost) && this.milestones[m].buyable) {
+                this.removeCurrency(this.milestones[m].cost);
+                this.milestones[m].levelUp();
+            }
+        };
+        if (this.game.keyPressed === "Shift") for(let i = 0; i < 10; i++)tryUpg();
+        else if (this.game.keyPressed === "z") {
+            console.log("ctrl");
+            for(let i = 0; i < 10000; i++)tryUpg();
+        } else tryUpg();
+        this.milestoneFunctions[m].update();
+    }
+    toggleVisibility(forceHide) {
+        if (forceHide) {
+            if (this.div.classList.contains("hidden")) {
+                this.visible = false;
+                return;
+            } else {
+                this.div.classList.add("hidden");
+                this.visible = false;
+                return;
+            }
+        } else if (this.visible) {
+            this.div.classList.add("hidden");
+            this.visible = false;
+        } else {
+            this.div.classList.remove("hidden");
+            this.visible = true;
+        }
+    }
+    checkMilestones() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            const unlockCost = milestone.unlockCost;
+            // Set unlocked to true (this is saved in the save file)
+            try {
+                if (this.highestCurrency.gt(unlockCost)) milestone.unlocked = true;
+            } catch (err) {
+                console.error("Error in checkMilestones", err);
+                console.log("Milestone: ", milestone, "\nUnlock Cost: ", unlockCost, "\nHighest Currency: ", this.highestCurrency, "\nLayer: ", this);
+            }
+        }
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            milestone.cost = this.milestoneFunctions[key].cost(milestone);
+        }
+        // Loop over the unlocked milestones and add them to the div if they are not already in it
+        for (const key of Object.keys(this.milestones)){
+            if (this.milestones[key].unlocked && this.buttons[key] !== undefined) try {
+                if (!this.div.contains(this.buttons[key].button)) {
+                    if (this.milestones[key].buttonContainer !== undefined) {
+                        this.milestones[key].buttonContainer.appendChild(this.buttons[key].button);
+                        this.milestoneFunctions[key].updateText();
+                    } else {
+                        this.div.appendChild(this.buttons[key].button);
+                        this.milestoneFunctions[key].updateText();
+                    }
+                }
+            } catch (err) {
+                console.log(key, this.milestones[key], "\n", this.buttons, this.buttons[key]);
+                console.error("Error in checkMilestones", err);
+            }
+        }
+    }
+    setup() {
+        for (const key of Object.keys(this.milestones)){
+            const milestone = this.milestones[key];
+            const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
+            milestoneButton.button.addEventListener("click", ()=>{
+                milestone.timesClicked = milestone.timesClicked.add(1);
+            });
+            this.buttons[key] = milestoneButton;
+        }
+        this.checkMilestones();
+    }
+    // Do not modify, its done per layer and i cba to change it :D
+    update() {}
+}
 
-class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
+},{"../utils":"gmdam","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gmdam":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Button", ()=>Button);
+class Button {
     constructor(game, milestone){
         this.lines = [];
         this.game = game;
@@ -2974,16 +4318,18 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
     }
     // Optionally, create a static factory method to directly return the button element
     static createMilestoneButton(game, milestone) {
-        const btn = new $e15866bea5b2da0a$export$353f5b6fc5456de1(game, milestone);
+        const btn = new Button(game, milestone);
         return btn; // Return the Button instance
     }
 }
 
-
-
-// bind document.getElementById to $
-const $33dc7b2aef0a6efa$var$$ = document.getElementById.bind(document);
-class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8lIwO":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Milestone", ()=>Milestone);
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class Milestone {
     constructor(name, text, unlockCost, description, maxLevel, milestoneFunctions, buttonContainer){
         this.name = name;
         this.text = text;
@@ -2991,7 +4337,7 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.unlocked = false;
         this.description = description;
         this.activate = milestoneFunctions.activate;
-        this.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.level = new (0, _breakInfinityJsDefault.default)(0);
         this.maxLevel = maxLevel;
         this.costFormula = milestoneFunctions.cost;
         this.cost = this.costFormula(this);
@@ -2999,7 +4345,7 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.graphEnabled = false;
         this.hovered = false;
         this.buttonContainer = buttonContainer;
-        this.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.timesClicked = new (0, _breakInfinityJsDefault.default)(0);
     }
     levelUp() {
         if (this.level.gte(this.maxLevel)) this.buyable = false;
@@ -3009,552 +4355,80 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         if (this.level.gte(this.maxLevel)) this.buyable = false;
     }
 }
-class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
-    constructor(game, name, cost, layerColor){
-        this.unlocked = false;
-        this.parentElement = $33dc7b2aef0a6efa$var$$("main");
-        this.visible = false;
-        this.Button = (0, $e15866bea5b2da0a$export$353f5b6fc5456de1);
-        this.game = game;
-        this.name = name;
-        this.unlockCost = cost; // Cost to show the layer
-        this.cost = cost; // Cost to buy (probs depricate soon)
-        this.layerColor = layerColor;
-        this.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.currencyName = "Points";
-        this.milestones = {};
-        this.milestoneFunctions = {};
-        // create a blank div that fills the entire parent, and add it to the parent which is main
-        this.div = document.createElement("div");
-        this.parentElement.appendChild(this.div);
-        this.div.classList.add("layer", "hidden");
-        this.div.setAttribute("id", this.name);
-        this.buttons = {};
-    }
-    toggleVisibility(forceHide) {
-        if (forceHide) {
-            if (this.div.classList.contains("hidden")) {
-                this.visible = false;
-                return;
-            } else {
-                this.div.classList.add("hidden");
-                this.visible = false;
-                return;
-            }
-        } else if (this.visible) {
-            this.div.classList.add("hidden");
-            this.visible = false;
-        } else {
-            this.div.classList.remove("hidden");
-            this.visible = true;
-        }
-    }
-    checkMilestones() {
-        for (const key of Object.keys(this.milestones)){
-            const milestone = this.milestones[key];
-            const unlockCost = milestone.unlockCost;
-            // Set unlocked to true (this is saved in the save file)
-            try {
-                if (this.highestCurrency.gt(unlockCost)) milestone.unlocked = true;
-            } catch (err) {
-                console.error("Error in checkMilestones", err);
-                console.log("Milestone: ", milestone, "\nUnlock Cost: ", unlockCost, "\nHighest Currency: ", this.highestCurrency, "\nLayer: ", this);
-            }
-        }
-        // Loop over the unlocked milestones and add them to the div if they are not already in it
-        for (const key of Object.keys(this.milestones)){
-            if (this.milestones[key].unlocked && this.buttons[key] !== undefined) try {
-                if (!this.div.contains(this.buttons[key].button)) {
-                    if (this.milestones[key].buttonContainer !== undefined) {
-                        this.milestones[key].buttonContainer.appendChild(this.buttons[key].button);
-                        this.milestoneFunctions[key].updateText();
-                    } else {
-                        this.div.appendChild(this.buttons[key].button);
-                        this.milestoneFunctions[key].updateText();
-                    }
-                }
-            } catch (err) {
-                console.log(key, this.milestones[key], "\n", this.buttons, this.buttons[key]);
-                console.error("Error in checkMilestones", err);
-            }
-        }
-    }
-    setup() {
-        for (const key of Object.keys(this.milestones)){
-            const milestone = this.milestones[key];
-            const milestoneButton = this.Button.createMilestoneButton(this.game, milestone);
-            milestoneButton.button.addEventListener("click", ()=>{
-                milestone.timesClicked = milestone.timesClicked.add(1);
-            });
-            this.buttons[key] = milestoneButton;
-        }
-        this.checkMilestones();
-    }
-    // Do not modify, its done per layer and i cba to change it :D
-    update() {}
-}
 
-
-
-function $93501a718a4426dd$var$mapRange(x, inMin, inMax, outMin, outMax) {
-    return x.minus(inMin).times(outMax.minus(outMin)).div(inMax.minus(inMin)).plus(outMin);
-}
-class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
-    constructor(game){
-        super(game, "start", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0), "green");
-        this.upgradeColumns = [];
-        this.currencyName = "Points";
-        this.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.pointsText = document.createElement("h2");
-        this.pointsText.classList.add("start-points-text");
-        this.pointsText.textContent = `Points: ${this.currency}`;
-        this.div.appendChild(this.pointsText);
-        this.lastPointsGiveText = document.createElement("h3");
-        this.lastPointsGiveText.classList.add("start-last-points-give-text");
-        this.lastPointsGiveText.textContent = `Manual P+ 0`;
-        this.div.appendChild(this.lastPointsGiveText);
-        this.lastAutoPointsGiveText = document.createElement("h3");
-        this.lastAutoPointsGiveText.classList.add("start-last-auto-points-give-text");
-        this.lastAutoPointsGiveText.textContent = `Auto P+ 0`;
-        this.div.appendChild(this.lastAutoPointsGiveText);
-        this.upgradeColumnsDiv = document.createElement("div");
-        this.upgradeColumnsDiv.classList.add("start-upgrade-columns");
-        this.div.appendChild(this.upgradeColumnsDiv);
-        // Loop over 3 upgrade columns and add the upgrade-column class and append them to the upgradecolumnsdiv
-        for(let i = 0; i < 3; i++){
-            this.upgradeColumns.push(document.createElement("div"));
-            this.upgradeColumns[i].classList.add("upgrade-column");
-            this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
-        }
-        this.autoPointsEnabled = false;
-        this.lastPointsGive = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.lastAutoPointsGive = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.milestoneFunctions = {
-            givePoints: {
-                activate: ()=>{
-                    this.game.layers.start.addCurrencyStack();
-                    this.milestoneFunctions.givePoints.update();
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.givePoints.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.givePoints.lines[0].textContent = this.milestones.givePoints.text;
-                }
-            },
-            // Increase Points Per Click
-            increasePointsPerClick: {
-                activate: ()=>{
-                    this.buyMilestone("increasePointsPerClick");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        let cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvl.times(lvl.sqrt()));
-                        cost = cost.times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne).log(10)).times(10);
-                        cost = cost.add(lvlPlusOne.ln()).times(10).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.increasePointsPerClick.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.increasePointsPerClick.cost)}`;
-                    this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
-                    this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level.add(1)}`;
-                }
-            },
-            // Upgrade Increase Points Per Click
-            upgradeIncreasePointsPerClick: {
-                activate: ()=>{
-                    this.buyMilestone("upgradeIncreasePointsPerClick");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const m = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100);
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0.07);
-                        const j = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100000);
-                        const n = j.div(b.times(m).sinh());
-                        const lvlPlusOne = lvl.add(1);
-                        const cost = n.times(b.times(lvl).sinh()).times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(10)).pow(1.3).plus(150).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.upgradeIncreasePointsPerClick.updateText();
-                },
-                updateText: ()=>{
-                    console.log("Updating Upgrade Increase Points Per Click");
-                    this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.upgradeIncreasePointsPerClick.cost)}`;
-                    this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
-                    this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level.add(1)}`;
-                }
-            },
-            // Ultimate Points Per Click
-            ultimatePointsPerClick: {
-                activate: ()=>{
-                    this.buyMilestone("ultimatePointsPerClick");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(20000);
-                        const b = lvlPlusOne.times(6).times(lvlPlusOne);
-                        const c = b.pow(3.45);
-                        return a.add(c).floor();
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.ultimatePointsPerClick.updateText();
-                },
-                updateText: ()=>{
-                    console.log("Updating Upgrade Increase Points Per Click");
-                    this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.ultimatePointsPerClick.cost)}`;
-                    this.buttons.ultimatePointsPerClick.lines[2].textContent = `Level: ${this.milestones.ultimatePointsPerClick.level}/${this.milestones.ultimatePointsPerClick.maxLevel}`;
-                    this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level.add(1)}`;
-                }
-            },
-            // Auto Points
-            autoPoints: {
-                activate: ()=>{
-                    this.buyMilestone("autoPoints");
-                    if (this.milestones.autoPoints.level.gt(0)) this.autoPointsEnabled = true;
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(15000);
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.autoPoints.updateText();
-                },
-                updateText: ()=>{
-                    if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPoints.cost)}`;
-                    else {
-                        this.buttons.autoPoints.lines[1].textContent = "Enabled";
-                        this.buttons.autoPoints.button.classList.add("not-buyable");
-                    }
-                }
-            },
-            // Auto Points Divisor
-            autoPointsDivisor: {
-                activate: ()=>{
-                    this.buyMilestone("autoPointsDivisor");
-                    if (this.milestones.autoPointsDivisor.level.lt(1)) this.milestones.autoPointsDivisor.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const j = 10000;
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1.5);
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2.8);
-                        const c = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.times(a)).times(lvl.pow(b));
-                        const d = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(j).add(j);
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(c.plus(d)).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.autoPointsDivisor.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPointsDivisor.cost)}`;
-                    this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
-                    this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100).sub(this.milestones.autoPointsDivisor.level)}%`;
-                }
-            },
-            // Better Auto Points
-            betterAutoPoints: {
-                activate: ()=>{
-                    this.buyMilestone("betterAutoPoints");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const j = 10000;
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1.9);
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2.8);
-                        const c = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.times(a)).times(lvl.pow(b));
-                        const d = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(j).add(j);
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(c.plus(d)).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.betterAutoPoints.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.betterAutoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.betterAutoPoints.cost)}`;
-                    this.buttons.betterAutoPoints.lines[2].textContent = `Level: ${this.milestones.betterAutoPoints.level}/${this.milestones.betterAutoPoints.maxLevel}`;
-                    this.buttons.betterAutoPoints.lines[3].textContent = `Divisor: ${this.milestones.betterAutoPoints.level}`;
-                }
-            },
-            // Critical Points (Crit Chance)
-            criticalPoints: {
-                activate: ()=>{
-                    this.buyMilestone("criticalPoints");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvl.pow(1.059).times(30000)).floor();
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(10);
-                        const cost = a.times(b).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.criticalPoints.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalPoints.cost)}`;
-                    this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
-                    this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
-                }
-            },
-            // Crit Bonus (Crit reward bonus %)
-            criticalBonus: {
-                activate: ()=>{
-                    this.buyMilestone("criticalBonus");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.pow(1.064).times(30000));
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(100);
-                        const cost = a.times(b).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.criticalBonus.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalBonus.cost)}`;
-                    this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
-                    this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}*`;
-                }
-            },
-            // Over Crit (Turn crits over 100% into BIGGGGER crits)
-            overCritical: {
-                activate: ()=>{
-                    this.buyMilestone("overCritical");
-                },
-                cost: (milestone, returnMax = false, forceLvl)=>{
-                    function calcCost(lvl) {
-                        const lvlPlusOne = lvl.add(1);
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.pow(1.064).times(30000));
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(100);
-                        const cost = a.times(b).floor();
-                        return cost;
-                    }
-                    let levelToUse = milestone.level;
-                    if (returnMax) levelToUse = milestone.maxLevel;
-                    if (forceLvl) levelToUse = forceLvl;
-                    return calcCost(levelToUse);
-                },
-                update: ()=>{
-                    this.milestoneFunctions.overCritical.updateText();
-                },
-                updateText: ()=>{
-                    this.buttons.overCritical.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.overCritical.cost)}`;
-                    this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
-                    this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
-                }
-            }
-        };
-        this.milestones = {
-            givePoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("givePoints", "Gib Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0), "Give points when clicked", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(-1), this.milestoneFunctions.givePoints, this.div),
-            increasePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("increasePointsPerClick", "+PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10), "Increase points per click", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10000), this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
-            upgradeIncreasePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("upgradeIncreasePointsPerClick", "++PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), "Increase the amount that the +PPC upgrade gives", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
-            ultimatePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("ultimatePointsPerClick", "+++Ultimate +++PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(30000), "Makes +PPC and ++PPC bettererist", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10), this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
-            autoPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(7500), "Give points automatically", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
-            autoPointsDivisor: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPointsDivisor", "Auto Points Divisor", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10000), "Lowers the auto-points divider", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(99), this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
-            betterAutoPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("betterAutoPoints", "Better Auto Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1e8), "Makes auto points BETTER than clicking!", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), this.milestoneFunctions.betterAutoPoints, this.upgradeColumns[1]),
-            criticalPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalPoints", "Critical Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(30000), "Increases critical point chance", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(200), this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
-            criticalBonus: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalBonus", "Critical Bonus", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(50000), "Increases critical point bonus", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1000), this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
-            overCritical: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("overCritical", "Over Critical", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(250000), "Converts bonus crit chance into better crits! (Usless with sub 100% crit chance)", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2500), this.milestoneFunctions.overCritical, this.upgradeColumns[2])
-        };
-        // Enable graphing feature per milestone.
-        this.milestones.increasePointsPerClick.graphEnabled = true;
-        this.milestones.upgradeIncreasePointsPerClick.graphEnabled = true;
-        this.milestones.ultimatePointsPerClick.graphEnabled = true;
-        this.milestones.autoPointsDivisor.graphEnabled = true;
-        this.milestones.criticalPoints.graphEnabled = true;
-        this.milestones.criticalBonus.graphEnabled = true;
-        this.milestones.overCritical.graphEnabled = true;
-        this.setup();
-        this.toggleVisibility();
-        //  Moves the give points button to after the points text but before the upgrades
-        // The index will need to change if I add more text in the this.div
-        if (this.div.firstChild) this.div.insertBefore(this.buttons.givePoints.button, this.div.children[3]);
-        this.milestoneFunctions.givePoints.update();
-    }
-    buyMilestone(m) {
-        const tryUpg = ()=>{
-            if (this.currency.gte(this.milestones[m].cost) && this.milestones[m].buyable) {
-                this.removeCurrency(this.milestones[m].cost);
-                this.milestones[m].levelUp();
-            }
-        };
-        if (this.game.keyPressed === "Shift") for(let i = 0; i < 10; i++)tryUpg();
-        else tryUpg();
-        this.milestoneFunctions[m].update();
-    }
-    addCurrencyStack(rtn) {
-        let value = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
-        if (this.milestones.increasePointsPerClick.level.gt(0)) value = value.times(this.milestones.increasePointsPerClick.level.add(1));
-        if (this.milestones.upgradeIncreasePointsPerClick.level.gt(0)) value = value.times(this.milestones.upgradeIncreasePointsPerClick.level.add(1));
-        if (this.milestones.ultimatePointsPerClick.level.gt(0)) value = value.times(this.milestones.ultimatePointsPerClick.level.add(1)).times(this.milestones.ultimatePointsPerClick.level.add(1));
-        // Crit stuff
-        if (this.milestones.criticalPoints.level.gt(0)) {
-            const rawCritChance = this.milestones.criticalPoints.level;
-            const critChance = $93501a718a4426dd$var$mapRange(rawCritChance, new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(200), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100));
-            let critBonus = this.milestones.criticalBonus.level.add(1);
-            const overCrit = this.game.layers.start.milestones.overCritical.level;
-            if (rawCritChance.gt(100)) {
-                if (overCrit.gt(0)) critBonus = critBonus.times(overCrit);
-            }
-            const crit = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(Math.random() * 100);
-            if (critChance.gte(crit)) {
-                console.log("CRIT, bonus*: ", critBonus);
-                value = value.add(value.times(critBonus));
-            }
-        }
-        if (rtn) return value;
-        this.lastPointsGive = value;
-        this.addCurrency(value);
-    }
-    addCurrency(amount) {
-        this.currency = this.currency.add(amount);
-        this.updatePointsText();
-    }
-    removeCurrency(amount) {
-        this.currency = this.currency.sub(amount);
-        this.updatePointsText();
-    }
-    updatePointsText() {
-        this.pointsText.textContent = `Points: ${this.game.formatValue(this.currency)}`;
-        this.lastPointsGiveText.textContent = `Manual P+ ${this.game.formatValue(this.lastPointsGive)}`;
-        this.lastAutoPointsGiveText.textContent = `Auto P+ ${this.game.formatValue(this.lastAutoPointsGive)}`;
-    }
-    update() {
-        if (this.currency.gt(this.highestCurrency)) this.highestCurrency = this.currency;
-        if (this.autoPointsEnabled) {
-            let value = this.addCurrencyStack(true);
-            value = value.div(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100).sub(this.milestones.autoPointsDivisor.level));
-            value = value.times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(this.milestones.betterAutoPoints.level.add(1).ln()).add(1));
-            this.lastAutoPointsGive = value;
-            this.addCurrency(value);
-        }
-    }
-}
-
-
-
-
-class $83a61abead0fd813$export$5442621d844215cb {
+},{"break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"isy6N":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SingleDice", ()=>SingleDice);
+parcelHelpers.export(exports, "Dice", ()=>Dice);
+var _layer = require("./layer");
+var _milestone = require("../milestone");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class SingleDice {
     constructor(game, diceLayer){
         this.game = game;
         this.diceLayer = diceLayer;
         this.diceValue = 1;
-        this.diceMaxValue = 25;
+        this.diceMaxValue = 6;
         this.parentDiv = this.diceLayer.diceArrayContainer;
         this.container = document.createElement("div");
         this.diceText = document.createElement("div");
         this.diceText.classList.add("dice-text");
         this.div = document.createElement("div");
         this.div.classList.add("dice");
-        this.div.addEventListener("click", this.click.bind(this));
         this.container.appendChild(this.diceText);
         this.container.appendChild(this.div);
         this.parentDiv.appendChild(this.container);
         this.diceText.textContent = this.diceValue.toString();
-        this.dicePips = [];
+        this.diceDots = [];
         for(let i = 0; i < 25; i++){
-            const pip = document.createElement("div");
-            pip.classList.add("dot", "not-dot");
-            this.dicePips.push(pip);
-            this.div.appendChild(pip);
-        // pip.textContent = i.toString();
+            const dot = document.createElement("div");
+            dot.classList.add("dot", "not-dot");
+            this.diceDots.push(dot);
+            this.div.appendChild(dot);
+        // dot.textContent = i.toString();
         }
         this.diceFace(this.diceValue);
     }
-    hidePips(pipsToHide) {
-        for(let i = 0; i < pipsToHide.length; i++)this.dicePips[pipsToHide[i]].classList.remove("not-dot");
+    hideDots(dotsToHide) {
+        for(let i = 0; i < dotsToHide.length; i++)this.diceDots[dotsToHide[i]].classList.remove("not-dot");
+    }
+    startRoll() {
+        this.div.classList.add("rotate");
+    }
+    completeRoll() {
+        this.diceValue = Math.floor(Math.random() * this.diceMaxValue) + 1;
+        this.diceFace(this.diceValue);
+        this.div.classList.remove("rotate");
+        return new (0, _breakInfinityJsDefault.default)(this.diceValue);
     }
     diceFace(faceValue) {
         this.diceText.textContent = this.diceValue.toString();
-        this.dicePips.forEach((pip)=>{
-            pip.classList.add("not-dot");
+        this.diceDots.forEach((dot)=>{
+            dot.classList.add("not-dot");
         });
-        console.log(this.dicePips);
         switch(faceValue){
             case 1:
-                this.hidePips([
+                this.hideDots([
                     12
                 ]);
                 break;
             case 2:
-                this.hidePips([
+                this.hideDots([
                     6,
                     18
                 ]);
                 break;
             case 3:
-                this.hidePips([
+                this.hideDots([
                     6,
                     8,
                     17
                 ]);
                 break;
             case 4:
-                this.hidePips([
+                this.hideDots([
                     6,
                     8,
                     16,
@@ -3562,7 +4436,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 5:
-                this.hidePips([
+                this.hideDots([
                     6,
                     8,
                     16,
@@ -3571,7 +4445,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 6:
-                this.hidePips([
+                this.hideDots([
                     6,
                     7,
                     8,
@@ -3581,7 +4455,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 7:
-                this.hidePips([
+                this.hideDots([
                     6,
                     7,
                     8,
@@ -3592,7 +4466,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 8:
-                this.hidePips([
+                this.hideDots([
                     6,
                     7,
                     8,
@@ -3604,7 +4478,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 9:
-                this.hidePips([
+                this.hideDots([
                     6,
                     7,
                     8,
@@ -3617,7 +4491,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 10:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3631,7 +4505,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 11:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3646,7 +4520,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 12:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3662,7 +4536,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 13:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3679,7 +4553,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 14:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3697,7 +4571,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 15:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3716,7 +4590,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 16:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3736,7 +4610,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 17:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3757,7 +4631,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 18:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3779,7 +4653,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 19:
-                this.hidePips([
+                this.hideDots([
                     1,
                     5,
                     3,
@@ -3803,7 +4677,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 20:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3827,7 +4701,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 21:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3852,7 +4726,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 22:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3878,7 +4752,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 23:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3905,7 +4779,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 24:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3933,7 +4807,7 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 ]);
                 break;
             case 25:
-                this.hidePips([
+                this.hideDots([
                     0,
                     1,
                     2,
@@ -3963,38 +4837,46 @@ class $83a61abead0fd813$export$5442621d844215cb {
                 break;
         }
     }
-    click() {
-        this.div.style.transform = "rotate(360deg)";
-        // timeout remove rotation
-        setTimeout(()=>{
-            this.div.style.transform = "rotate(0deg)";
-        }, 500);
-        this.diceValue = Math.floor(Math.random() * this.diceMaxValue) + 1;
-        this.diceFace(this.diceValue);
-    // roll the dice
-    }
 }
-class $83a61abead0fd813$export$8be8c2ff45d443a3 extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
+class Dice extends (0, _layer.Layer) {
     constructor(game){
-        super(game, "dice", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1e15), "white");
+        super(game, "dice", new (0, _breakInfinityJsDefault.default)(1e15), "white");
+        this.upgradeColumns = [];
         this.layerColor = "blue";
-        this.currencyName = "Pips";
-        this.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.currencyName = "Dots";
+        this.currency = new (0, _breakInfinityJsDefault.default)(0);
+        this.highestCurrency = new (0, _breakInfinityJsDefault.default)(0);
+        this.dotsText = document.createElement("h2");
+        this.dotsText.classList.add("dots-text");
+        this.dotsText.textContent = `Dots: ${this.currency}`;
+        this.div.appendChild(this.dotsText);
         this.diceArrayContainer = document.createElement("div");
         this.diceArrayContainer.classList.add("dice-container");
         this.div.appendChild(this.diceArrayContainer);
+        this.diceArrayContainer.addEventListener("click", this.rollDice.bind(this));
+        this.upgradeColumnsDiv = document.createElement("div");
+        this.upgradeColumnsDiv.classList.add("dice-upgrade-columns");
+        this.div.appendChild(this.upgradeColumnsDiv);
+        for(let i = 0; i < 3; i++){
+            this.upgradeColumns.push(document.createElement("div"));
+            this.upgradeColumns[i].classList.add("upgrade-column");
+            this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
+        }
         this.diceCount = 1;
-        this.diceCountCap = 3;
+        this.rollTimeout = 1000;
+        this.previousRollTimestamp = 0;
+        this.canRoll = true;
         this.diceArray = [];
+        this.rollArray = [];
         this.milestoneFunctions = {
             addDice: {
                 activate: ()=>{
+                    this.buyMilestone("addDice");
                     this.milestoneFunctions.addDice.update();
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
+                        const cost = new (0, _breakInfinityJsDefault.default)(lvl.add(1).times(25)).pow(lvl.add(1).pow(1.2)).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -4002,39 +4884,128 @@ class $83a61abead0fd813$export$8be8c2ff45d443a3 extends (0, $33dc7b2aef0a6efa$ex
                     if (forceLvl) levelToUse = forceLvl;
                     return calcCost(levelToUse);
                 },
-                update: ()=>{},
-                updateText: ()=>{}
+                update: ()=>{
+                    this.diceCount = this.milestones.addDice.level.toNumber() + 1;
+                    this.setupDice();
+                    this.milestoneFunctions.addDice.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.addDice.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.addDice.cost)} Dots`;
+                    this.buttons.addDice.lines[2].textContent = `Level: ${this.milestones.addDice.level}/${this.milestones.addDice.maxLevel}`;
+                }
+            },
+            diceTimeout: {
+                activate: ()=>{
+                    this.buyMilestone("diceTimeout");
+                    this.milestoneFunctions.diceTimeout.update();
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, _breakInfinityJsDefault.default)(25);
+                        const b = new (0, _breakInfinityJsDefault.default)(1.7);
+                        const c = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.div(a).add(b)).sqrt();
+                        const cost = new (0, _breakInfinityJsDefault.default)(lvlPlusOne.times(a.pow(c))).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.rollTimeout = 1000 / (this.milestones.diceTimeout.level.toNumber() * 18);
+                    this.milestoneFunctions.diceTimeout.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.diceTimeout.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.diceTimeout.cost)} Dots`;
+                    this.buttons.diceTimeout.lines[2].textContent = `Level: ${this.milestones.diceTimeout.level}/${this.milestones.diceTimeout.maxLevel}`;
+                    this.buttons.diceTimeout.lines[3].textContent = `Timeout: ${this.rollTimeout}ms`;
+                }
             }
         };
         this.milestones = {
-            addDice: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("addDice", "+1 Dice", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0), "Adds a new dice!", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(5), this.milestoneFunctions.addDice, this.div)
+            addDice: new (0, _milestone.Milestone)("addDice", "+1 Dice", new (0, _breakInfinityJsDefault.default)(0), "Adds a new dice!", new (0, _breakInfinityJsDefault.default)(5), this.milestoneFunctions.addDice, this.upgradeColumns[1]),
+            diceTimeout: new (0, _milestone.Milestone)("diceTimeout", "Dice Cooldown", new (0, _breakInfinityJsDefault.default)(100), "Rolls dice faster!", new (0, _breakInfinityJsDefault.default)(50), this.milestoneFunctions.diceTimeout, this.upgradeColumns[2])
         };
         this.init();
         this.setup();
     }
+    rollDice() {
+        if (!this.canRoll) return;
+        this.diceArrayContainer.classList.remove("can-roll");
+        this.previousRollTimestamp = Date.now();
+        this.canRoll = false;
+        this.diceArray.forEach((dice)=>dice.startRoll());
+    }
+    processRolls() {
+        // this function will allow us to process using different rule sets for rolls later
+        // like doubles, triples, etc.
+        this.rollArray.forEach((roll)=>this.addCurrency(roll));
+        this.rollArray = [];
+    }
+    addCurrency(amount) {
+        this.currency = this.currency.add(amount);
+        this.updateDotsText();
+    }
+    removeCurrency(amount) {
+        this.currency = this.currency.sub(amount);
+        this.updateDotsText();
+    }
+    updateDotsText() {
+        this.dotsText.textContent = `Dots: ${this.game.formatValue(this.currency)}`;
+    }
+    setupDice() {
+        // if diceArray length is less than diceCount, add dice to fill the array
+        while(this.diceArray.length < this.diceCount)this.diceArray.push(new SingleDice(this.game, this));
+    }
     init() {
-        this.diceArray.push(new $83a61abead0fd813$export$5442621d844215cb(this.game, this));
+        this.setupDice();
+        this.updateDotsText();
+        this.update();
     }
-    update() {}
+    // TODO: This is currently ran every 1000ms (mainInterval) - This is not ideal as this will over write the
+    // timeout on the dice roll, this needs to be moved to a new interval, should probably make a new one that
+    // has its own interval time set to the diceTimeout upgrades value???
+    update() {
+        if (this.currency.gte(this.highestCurrency)) this.highestCurrency = this.currency;
+        if (!this.canRoll && Date.now() >= this.previousRollTimestamp + this.rollTimeout) {
+            this.diceArray.forEach((dice)=>{
+                this.rollArray.push(dice.completeRoll());
+            });
+            this.diceArrayContainer.classList.add("can-roll");
+            this.canRoll = true;
+            this.processRolls();
+        }
+    }
 }
 
-
-
-class $fec1aad84a4e3499$export$19600bc7e7f23c95 extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
+},{"./layer":"bX7Wa","../milestone":"8lIwO","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aXwEX":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Coin", ()=>Coin);
+var _layer = require("./layer");
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class Coin extends (0, _layer.Layer) {
     constructor(game){
-        super(game, "coin", 10000000, "yellow");
+        super(game, "coin", new (0, _breakInfinityJsDefault.default)(1e64), "yellow");
     }
 }
 
-
-
-class $f9544c9499cf351f$export$a52303878d5ad02c {
+},{"./layer":"bX7Wa","break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"D4z9g":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "FormulaGraph", ()=>FormulaGraph);
+var _breakInfinityJs = require("break_infinity.js");
+var _breakInfinityJsDefault = parcelHelpers.interopDefault(_breakInfinityJs);
+class FormulaGraph {
     constructor(game){
-        this.xMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.xMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.yMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.yMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.step = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
+        this.xMin = new (0, _breakInfinityJsDefault.default)(0);
+        this.xMax = new (0, _breakInfinityJsDefault.default)(0);
+        this.yMin = new (0, _breakInfinityJsDefault.default)(0);
+        this.yMax = new (0, _breakInfinityJsDefault.default)(0);
+        this.step = new (0, _breakInfinityJsDefault.default)(1);
         this.game = game;
         this.container = document.createElement("div");
         this.container.id = "formulaGraph";
@@ -4042,18 +5013,18 @@ class $f9544c9499cf351f$export$a52303878d5ad02c {
         this.container.classList.add("formula-graph");
         this.container.style.top = "50vh";
         this.container.style.left = "0";
-        this.xMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
-        this.yMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.xMax = new (0, _breakInfinityJsDefault.default)(0);
+        this.yMax = new (0, _breakInfinityJsDefault.default)(0);
         document.getElementById("main").appendChild(this.container);
     }
     createGraph(milestone) {
         this.milestone = milestone;
         this.milestoneFunc = milestone.costFormula;
-        this.xMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.xMin = new (0, _breakInfinityJsDefault.default)(0);
         this.xMax = this.milestone.maxLevel;
-        this.yMin = this.milestoneFunc(this.milestone, false, new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1));
+        this.yMin = this.milestoneFunc(this.milestone, false, new (0, _breakInfinityJsDefault.default)(1));
         this.yMax = this.milestoneFunc(this.milestone, true);
-        this.step = this.xMax.div(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(32));
+        this.step = this.xMax.div(new (0, _breakInfinityJsDefault.default)(32));
         console.log(this.xMin, this.xMax, this.yMin, this.yMax, this.step);
         console.log(this.xMax, this.yMax);
         this.drawGraph();
@@ -4087,8 +5058,8 @@ class $f9544c9499cf351f$export$a52303878d5ad02c {
             ctx.strokeStyle = "red";
             ctx.lineWidth = 2;
             // Borked
-            const xCoord = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvasPad).add(x.div(this.xMax)).times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.width).sub(2).times(canvasPad)).toNumber();
-            const yCoord = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.height).sub(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvasPad)).sub(y.div(this.yMax).times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.height).sub(2).times(canvasPad)))).toNumber();
+            const xCoord = new (0, _breakInfinityJsDefault.default)(canvasPad).add(x.div(this.xMax)).times(new (0, _breakInfinityJsDefault.default)(canvas.width).sub(2).times(canvasPad)).toNumber();
+            const yCoord = new (0, _breakInfinityJsDefault.default)(new (0, _breakInfinityJsDefault.default)(canvas.height).sub(new (0, _breakInfinityJsDefault.default)(canvasPad)).sub(y.div(this.yMax).times(new (0, _breakInfinityJsDefault.default)(canvas.height).sub(2).times(canvasPad)))).toNumber();
             ctx.lineTo(xCoord, yCoord);
         }
         // ctx.beginPath();
@@ -4109,188 +5080,6 @@ class $f9544c9499cf351f$export$a52303878d5ad02c {
     }
 }
 
+},{"break_infinity.js":"bXpmd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["bMKAI","4j3ZX"], "4j3ZX", "parcelRequireef97")
 
-
-class $98b122bb987399aa$export$985739bfa5723e08 {
-    constructor(){
-        this.fixedInterval = 3000 // Used for more process intense operations that need to be done less frequently
-        ;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.formulaGraphEnabled = false;
-        console.log("Game Constructor");
-        this.saveManager = new (0, $a348cea740e504f8$export$5bfce22a6398152d)(this);
-        this.formulaGraph = new (0, $f9544c9499cf351f$export$a52303878d5ad02c)(this);
-        this.displayingGraph = false;
-        this.navBar = $98b122bb987399aa$var$$("navBar");
-        this.utilityBar = $98b122bb987399aa$var$$("utilityBar");
-        this.mainInterval = 1000;
-        this.keyPressed = "";
-        this.autoSaveEnabled = true;
-        this.autosaveInterval = 30000;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.layers = {
-            start: new (0, $93501a718a4426dd$export$568b89e600fc77eb)(this),
-            dice: new (0, $83a61abead0fd813$export$8be8c2ff45d443a3)(this),
-            coin: new (0, $fec1aad84a4e3499$export$19600bc7e7f23c95)(this)
-        };
-        this.textElements = {
-            "start": document.createElement("div"),
-            "dice": document.createElement("div")
-        };
-        for (const key of Object.keys(this.textElements)){
-            this.textElements[key].classList.add("d-flex", "gap-2");
-            this.textElements[key].setAttribute("id", key);
-            $98b122bb987399aa$var$$("header-data").appendChild(this.textElements[key]);
-        }
-        this.layers.start.unlocked = true;
-        this.visibleLayer = "start";
-        this.tooltipsEnabled = true;
-        this.utilityButton(this, "Save", this.save);
-        this.utilityButton(this, "Load", this.load);
-        this.utilityButton(this, "AutoSave", this.toggleAutoSave);
-        this.utilityButton(this, "Toggle Tooltips", this.toggleTooltips);
-        this.utilityButton(this, "Enable Graphs", this.enableGraphs);
-        this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
-        this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
-        this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
-        this.setupNav();
-        document.addEventListener("contextmenu", (event)=>{
-            event.preventDefault();
-            // Can make custom right click menu if I can be bothered.
-            // simulate left click
-            const clickEvent = new MouseEvent("click", {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            });
-            event.target?.dispatchEvent(clickEvent);
-        });
-        document.addEventListener("keydown", (event)=>{
-            this.keyPressed = event.key;
-            switch(this.keyPressed){
-                case "q":
-                    this.layers.start.currency = this.layers.start.currency.times(10);
-                    break;
-                case "1":
-                    this.switchLayer("start");
-                    break;
-                case "2":
-                    this.switchLayer("dice");
-                    break;
-                case "3":
-                    this.switchLayer("coin");
-                    break;
-                case "g":
-                    this.formulaGraphEnabled = !this.formulaGraphEnabled;
-                    break;
-                case "m":
-                    this.layers.start.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1e16);
-                    break;
-            }
-        });
-        document.addEventListener("keyup", (event)=>{
-            this.keyPressed = "";
-        });
-        document.addEventListener("mousemove", (event)=>{
-            this.mouseX = event.clientX;
-            this.mouseY = event.clientY;
-        });
-    }
-    utilityButton(game, txt, func) {
-        const btn = document.createElement("button");
-        btn.innerText = txt;
-        btn.classList.add("btn", "btn-transparent", "btn-hover");
-        btn.addEventListener("click", func.bind(game));
-        this.utilityBar.appendChild(btn);
-    }
-    autoSave() {
-        if (this.autoSaveEnabled) {
-            if (this.layers.start.currency.eq(0)) return;
-            console.log("AutoSaving");
-            this.save();
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.add("auto-save-on");
-        } else {
-            const autoSaveBtn = Array.from(this.utilityBar.children).filter((child)=>child.textContent === "AutoSave")[0];
-            autoSaveBtn.classList.remove("auto-save-on");
-        }
-    }
-    save() {
-        this.saveManager.save(this);
-    }
-    load() {
-        this.saveManager.load(this);
-    }
-    toggleAutoSave() {
-        this.autoSaveEnabled = !this.autoSaveEnabled;
-    }
-    // Is called every mainInterval time (1000ms default)
-    update() {
-        for (const layer of Object.keys(this.layers))this.layers[layer].update();
-        this.updateUI();
-    }
-    // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
-    fixedIntervalUpdate() {
-        for (const layer of Object.keys(this.layers)){
-            if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) this.layers[layer].highestCurrency = this.layers[layer].currency;
-            this.layers[layer].checkMilestones();
-        }
-        if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
-            console.log("Unlocking Layer: ", this.layers.dice.name, "Cost: ", this.layers.dice.unlockCost.toString());
-            this.layers.dice.unlocked = true;
-        }
-        this.setupNav();
-    }
-    toggleTooltips() {
-        this.tooltipsEnabled = !this.tooltipsEnabled;
-        this.setTooltipsState();
-    }
-    enableGraphs() {
-        this.formulaGraphEnabled = !this.formulaGraphEnabled;
-    }
-    setTooltipsState() {
-        for (const layer of Object.keys(this.layers))for (const key of Object.keys(this.layers[layer].buttons)){
-            const btn = this.layers[layer].buttons[key];
-            btn.toggleTooltip();
-        // element.setAttribute('tooltipenabled', 'enabled');
-        }
-    }
-    setupNav() {
-        this.navBar.innerHTML = "";
-        for (const layer of Object.keys(this.layers))if (this.layers[layer].unlocked && !this.navBar.querySelector(`#${layer}`)) {
-            const layerButton = document.createElement("button");
-            layerButton.setAttribute("id", layer);
-            layerButton.innerText = this.layers[layer].name.toUpperCase();
-            layerButton.addEventListener("click", ()=>this.switchLayer(layer));
-            this.navBar.appendChild(layerButton);
-        }
-        for (const button of this.navBar.children)if (button.id === this.visibleLayer) button.classList.add("selected");
-        else button.classList.remove("selected");
-    }
-    switchLayer(layerName) {
-        console.log("Switching to layer", layerName);
-        for (const layer of Object.keys(this.layers))this.layers[layer].toggleVisibility(true);
-        this.layers[layerName].toggleVisibility();
-        for (const button of this.navBar.children)if (button.id === layerName) button.classList.add("selected");
-        else button.classList.remove("selected");
-    }
-    formatValue(value, places = 2) {
-        if (value.lt(1000)) return value.toFixed(places).toString();
-        else return `${value.m.toFixed(places)}e${value.e}`;
-    }
-    updateUI() {
-        this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + " P";
-    }
-}
-let $98b122bb987399aa$var$game;
-// bind document.getElementById to $
-const $98b122bb987399aa$var$$ = document.getElementById.bind(document);
-document.addEventListener("DOMContentLoaded", function() {
-    $98b122bb987399aa$var$game = new $98b122bb987399aa$export$985739bfa5723e08();
-    window.game = $98b122bb987399aa$var$game;
-});
-
-
-//# sourceMappingURL=index.ced336cf.js.map
+//# sourceMappingURL=index.ca39cc5e.js.map

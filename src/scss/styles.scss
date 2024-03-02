@@ -1,4 +1,3 @@
-
 $text: #f7f7f7;
 $text-alt: #ffffff;
 $background: #050705;
@@ -8,306 +7,333 @@ $accent: #45e463;
 $danger: #b81919;
 
 // Import Bootstrap and override default colors
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
-@import "node_modules/bootstrap/scss/mixins";
+@import 'node_modules/bootstrap/scss/functions';
+@import 'node_modules/bootstrap/scss/variables';
+@import 'node_modules/bootstrap/scss/mixins';
 
 // Override the Bootstrap color variables before importing the rest of Bootstrap
 $theme-colors: (
-    "text": $text,
-    "text-alt": $text-alt,
-    "background": $background,
-    "primary": $primary,
-    "secondary": $secondary,
-    "accent": $accent,
-    "danger": $danger
+	'text': $text,
+	'text-alt': $text-alt,
+	'background': $background,
+	'primary': $primary,
+	'secondary': $secondary,
+	'accent': $accent,
+	'danger': $danger,
 );
 
 // Now import the rest of Bootstrap
-@import "node_modules/bootstrap/scss/bootstrap";
+@import 'node_modules/bootstrap/scss/bootstrap';
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 html {
-    height: 100vh;
-    width: 100vw;
+	height: 100vh;
+	width: 100vw;
 }
 body {
-    background-color: $background;
-    color: $text;
-    height: 90%;
-    font-family: 'Roboto', sans-serif;
+	background-color: $background;
+	color: $text;
+	height: 90%;
+	font-family: 'Roboto', sans-serif;
 }
 
 body .btn-hover {
-    border-radius: 0;
-    border-bottom: 2px solid transparent; 
-    transition: all 0.3s ease;
-    color: $text;
+	border-radius: 0;
+	border-bottom: 2px solid transparent;
+	transition: all 0.3s ease;
+	color: $text;
 
-    &:hover {
-        border-bottom: 2px solid $accent; 
-    }
+	&:hover {
+		border-bottom: 2px solid $accent;
+	}
 }
 
 // Utility bar with more specific styles
 body .utility-bar {
-    background-color: $background;
-    color: $text;
+	background-color: $background;
+	color: $text;
 
-    display: flex;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    
-    button {
-        color: $text;
-        &:hover {
-            color: rgba(255, 209, 60, 0.9);
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
 
-        }
-    }
+	button {
+		color: $text;
+		&:hover {
+			color: rgba(255, 209, 60, 0.9);
+		}
+	}
 
-    .auto-save-on {
-        color: $text;
-        &:hover {
-            color: rgba(26, 255, 0, 0.9);
-        }
-    }
+	.auto-save-on {
+		color: $text;
+		&:hover {
+			color: rgba(26, 255, 0, 0.9);
+		}
+	}
 
-
-
-    * {
-        padding-inline: 1rem;    
-    }
-
+	* {
+		padding-inline: 1rem;
+	}
 }
 
 body .nav-bar {
-    background-color: $background;
-    color: $text;
+	background-color: $background;
+	color: $text;
 
-    display: flex;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	gap: 2rem;
 
-    height: fit-content;
-    
-    button {
-        min-width: fit-content;
-        width: 10%;
-        color: $text;
-        background-color: transparent;
-        border: 1px solid transparent;
-        &:hover {
-            color: $accent;
+	height: fit-content;
 
-        }
-    }
+	button {
+		min-width: fit-content;
+		width: 10%;
+		color: $text;
+		background-color: transparent;
+		border: 1px solid transparent;
+		&:hover {
+			color: $accent;
+		}
+	}
 }
 
 .selected {
-    background-color: transparent !important;
-    font-weight: bold !important;
-    border-bottom: 2px solid $accent !important;
+	background-color: transparent !important;
+	font-weight: bold !important;
+	border-bottom: 2px solid $accent !important;
 }
 
 button {
-    background-color: $primary;
-    color: $text;
-    border: 1px solid $primary;
-    border-radius: 0;
-    transition: all 0.3s ease;
+	background-color: $primary;
+	color: $text;
+	border: 1px solid $primary;
+	border-radius: 0;
+	transition: all 0.3s ease;
 
-    &:hover {
-        background-color: $accent;
-        border: 1px solid $accent;
-        color: $text-alt;
-    }
+	&:hover {
+		background-color: $accent;
+		border: 1px solid $accent;
+		color: $text-alt;
+	}
 }
 
 .hidden {
-    display: none !important;
+	display: none !important;
 }
 
 main {
-    width: 100%;
-    height: inherit;
-    border-bottom: 1px solid $text;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+	width: 100%;
+	height: inherit;
+	border-bottom: 1px solid $text;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
 
-    .splitter {
-        height: 2px;
-        background-color: $secondary;
-        width: 100%;
-        margin-block: 0.5rem;
-    }
+	.splitter {
+		height: 2px;
+		background-color: $secondary;
+		width: 100%;
+		margin-block: 0.5rem;
+	}
 
-    .layer {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        width: 90%;
-        height: min(fit-content, 30%);
-        gap: 1rem;
+	.layer {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		width: 90%;
+		height: min(fit-content, 30%);
+		gap: 1rem;
 
-        button {
-            padding: 0 !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            border: 2px solid $secondary;
-            display: flex !important;
-            flex-direction: column !important;
-            min-width: 16ch;
-            width: 100%;
-            max-width: 265px;
-            color: $text !important;
-            justify-content: center !important;
-            align-items: center !important;
-            text-align: center !important;
+		button {
+			padding: 0 !important;
+			margin: 0 !important;
+			border-radius: 0 !important;
+			border: 2px solid $secondary;
+			display: flex !important;
+			flex-direction: column !important;
+			min-width: 16ch;
+			width: 100%;
+			max-width: 265px;
+			color: $text !important;
+			justify-content: center !important;
+			align-items: center !important;
+			text-align: center !important;
 
-            &:hover {
-                background-color: $secondary !important;
-                border: 2px solid $accent;
-                color: $text-alt !important;
-            }
+			&:hover {
+				background-color: $secondary !important;
+				border: 2px solid $accent;
+				color: $text-alt !important;
+			}
 
-            h1 {
-                margin: 0 !important;
-                padding: 0 !important;
-                border-bottom: 2px solid white;
-                font-size: 1.4rem;
-                font-weight: bold !important;
-            }
-            .givePoints {
-                border-bottom: none !important;
-                padding: 0.8rem !important;
-            }
-        }
+			h1 {
+				margin: 0 !important;
+				padding: 0 !important;
+				border-bottom: 2px solid white;
+				font-size: 1.4rem;
+				font-weight: bold !important;
+			}
+			.givePoints {
+				border-bottom: none !important;
+				padding: 0.8rem !important;
+			}
+		}
 
+		.start-upgrade-columns {
+			display: grid;
+			grid-template-columns: repeat(3, 33%);
+			width: 100%;
+			height: 100%;
+			gap: 1rem;
 
-        .start-upgrade-columns {
-            display: grid;
-            grid-template-columns: repeat(3, 33%);
-            width: 100%;
-            height: 100%;
-            gap: 1rem;
+			.upgrade-column {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-start;
+				align-items: center;
+				gap: 1rem;
+			}
+		}
 
-            .upgrade-column {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                gap: 1rem;
-            }
-        }
+		.dice-upgrade-columns {
+			display: grid;
+			grid-template-columns: repeat(3, 33%);
+			width: 100%;
+			height: 100%;
+			gap: 1rem;
 
-    }
+			.upgrade-column {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-start;
+				align-items: center;
+				gap: 1rem;
+			}
+		}
+	}
+
+	.rotate {
+		animation: rotating 1s linear infinite;
+		@keyframes rotating {
+			from {
+				transform: rotate(0deg);
+			}
+			to {
+				transform: rotate(360deg);
+			}
+		}
+	}
 }
 
 .start-points-text {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin: 0;
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin: 0;
 }
 
 .start-last-points-give-text {
-    font-size: 1.1rem;
-    margin: 0;
-    line-height: 60%;
+	font-size: 1.1rem;
+	margin: 0;
+	line-height: 60%;
 }
 
 .start-last-auto-points-give-text {
-    font-size: 1rem;
-    margin: 0;
-    line-height: 60%;
+	font-size: 1rem;
+	margin: 0;
+	line-height: 60%;
 }
 
 .not-buyable {
-    border: 2px solid $danger !important;
-    cursor: not-allowed !important;
+	border: 2px solid $danger !important;
+	cursor: not-allowed !important;
 }
 
-
 .dynamic-tooltip {
-    position: absolute !important;
-    z-index: 1000 !important;
-    color: $text !important;
-    background-color: $background !important;
-    border-radius: 0.3rem !important;
-    border: 2px solid $accent !important;
-    padding: 0.4rem !important;
+	position: absolute !important;
+	z-index: 1000 !important;
+	color: $text !important;
+	background-color: $background !important;
+	border-radius: 0.3rem !important;
+	border: 2px solid $accent !important;
+	padding: 0.4rem !important;
 }
 
 main .formula-graph {
-    width: 10vw;
-    aspect-ratio: 1 / 1;
-    position: absolute;
+	width: 10vw;
+	aspect-ratio: 1 / 1;
+	position: absolute;
 }
 
 main .dice-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
 
-    width: 80%; 
-    height: auto;
+	width: 80%;
+	height: auto;
 
-    padding-bottom: 1rem;
-    
+	padding-bottom: 1rem;
 
-    border: 2px inset $text;
+	border: 2px inset rgba(255, 51, 0, 0.678);
+	border-radius: 0.4rem;
+	cursor: pointer;
 
-    .dice-text {
-        margin-bottom: 1rem;
-        font-size: 1.5rem;
-        font-weight: bold;
-        border-bottom: 2px solid $text;
-    }
+	.dice-text {
+		margin-bottom: 1rem;
+		font-size: 1.5rem;
+		font-weight: bold;
+		border-bottom: 2px solid $text;
+	}
 
-    .dice {
-        width: 10vw; 
-        aspect-ratio: 1 / 1;
-        max-width: 8rem; 
-        max-height: 8rem; 
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(5, 1fr);
-        gap: 4%;
-        padding: 0.4rem;
-        justify-items: center;
-        align-items: center;
-        text-align: center;
-        border: 2px solid $text;
-        border-radius: 18%;
-        background-color: white;
-        cursor: pointer;
-        transition: all 0.4s;
+	.dice {
+		width: 7vw;
+		aspect-ratio: 1 / 1;
+		max-width: 8rem;
+		max-height: 8rem;
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		grid-template-rows: repeat(5, 1fr);
+		gap: 4%;
+		padding: 0.4rem;
+		justify-items: center;
+		align-items: center;
+		text-align: center;
+		border: 2px solid $text;
+		border-radius: 18%;
+		background-color: white;
+		cursor: pointer;
+		transition: all 0.4s;
 
-        .dot {
-            display: block;
-            width: 90%;
-            height: 90%;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 1);
-        }
+		.dot {
+			display: block;
+			width: 90%;
+			height: 90%;
+			border-radius: 50%;
+			background-color: rgba(0, 0, 0, 1);
+		}
 
-        .not-dot {
-            background-color: rgba(0, 0, 0, 0);
-        }
-    }
+		.not-dot {
+			background-color: rgba(0, 0, 0, 0);
+		}
+	}
+}
+
+main .can-roll {
+	border: 2px solid $accent;
 }
