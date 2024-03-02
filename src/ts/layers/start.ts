@@ -129,15 +129,12 @@ export class Start extends Layer {
 			upgradeIncreasePointsPerClick: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones
-								.upgradeIncreasePointsPerClick.cost &&
-						this.game.layers.start.milestones
-							.upgradeIncreasePointsPerClick.buyable
+						this.currency.gte(
+							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost) &&
+							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable
 					) {
 						this.removeCurrency(
-							this.game.layers.start.milestones
-								.upgradeIncreasePointsPerClick.cost,
+							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost,
 						);
 						this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
 						this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
@@ -182,15 +179,11 @@ export class Start extends Layer {
 			ultimatePointsPerClick: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones
-								.ultimatePointsPerClick.cost &&
-						this.game.layers.start.milestones.ultimatePointsPerClick
-							.buyable
+						this.currency.gte(this.game.layers.start.milestones.ultimatePointsPerClick.cost) &&
+						this.game.layers.start.milestones.ultimatePointsPerClick.buyable
 					) {
 						this.removeCurrency(
-							this.game.layers.start.milestones
-								.ultimatePointsPerClick.cost,
+							this.game.layers.start.milestones.ultimatePointsPerClick.cost,
 						);
 						this.game.layers.start.milestones.ultimatePointsPerClick.levelUp();
 						this.milestoneFunctions.ultimatePointsPerClick.update();
@@ -226,9 +219,9 @@ export class Start extends Layer {
 			autoPoints: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones.autoPoints.cost &&
-						this.game.layers.start.milestones.autoPoints.buyable
+						this.currency.gte(
+							this.game.layers.start.milestones.autoPoints.cost) &&
+							this.game.layers.start.milestones.autoPoints.buyable
 					) {
 						this.removeCurrency(
 							this.game.layers.start.milestones.autoPoints.cost,
@@ -273,19 +266,16 @@ export class Start extends Layer {
 			autoPointsDivisor: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones.autoPointsDivisor
-								.cost &&
-						this.game.layers.start.milestones.autoPointsDivisor
-							.buyable
+						this.currency.gte(
+							this.game.layers.start.milestones.autoPointsDivisor.cost) &&
+							this.game.layers.start.milestones.autoPointsDivisor.buyable
 					) {
 						this.removeCurrency(
 							this.game.layers.start.milestones.autoPointsDivisor
 								.cost,
 						);
 						if (this.pointAutoDivisor.gte(2)) {
-							this.pointAutoDivisor =
-								this.pointAutoDivisor.sub(1);
+							this.pointAutoDivisor = this.pointAutoDivisor.sub(1);
 							this.game.layers.start.milestones.autoPointsDivisor.levelUp();
 							this.milestoneFunctions.autoPointsDivisor.update();
 						}
@@ -323,9 +313,7 @@ export class Start extends Layer {
 			criticalPoints: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones.criticalPoints
-								.cost &&
+						this.currency.gte(this.game.layers.start.milestones.criticalPoints.cost) &&
 						this.game.layers.start.milestones.criticalPoints.buyable
 					) {
 						this.removeCurrency(
@@ -369,14 +357,11 @@ export class Start extends Layer {
 			criticalBonus: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones.criticalBonus
-								.cost &&
+						this.currency.gte(this.game.layers.start.milestones.criticalBonus.cost) &&
 						this.game.layers.start.milestones.criticalBonus.buyable
 					) {
 						this.removeCurrency(
-							this.game.layers.start.milestones.criticalBonus
-								.cost,
+							this.game.layers.start.milestones.criticalBonus.cost,
 						);
 						this.game.layers.start.milestones.criticalBonus.levelUp();
 						this.milestoneFunctions.criticalBonus.update();
@@ -415,9 +400,7 @@ export class Start extends Layer {
 			overCritical: {
 				activate: () => {
 					if (
-						this.currency >=
-							this.game.layers.start.milestones.overCritical
-								.cost &&
+						this.currency.gte(this.game.layers.start.milestones.overCritical.cost) &&
 						this.game.layers.start.milestones.overCritical.buyable
 					) {
 						this.removeCurrency(
@@ -627,7 +610,7 @@ export class Start extends Layer {
 	}
 
 	removeCurrency(amount: Decimal) {
-		this.currency = this.currency.add(amount);
+		this.currency = this.currency.sub(amount);
 		this.updatePointsText();
 	}
 

@@ -29,7 +29,7 @@ export class FormulaGraph {
         this.milestone = milestone;
         this.milestoneFunc = milestone.costFormula;
         this.xMin =  0;
-        this.xMax = this.milestone.maxLevel;
+        this.xMax = this.milestone.maxLevel.toNumber();
         this.yMin = this.milestoneFunc(this.milestone, false, 1);
         this.yMax = this.milestoneFunc(this.milestone, true);
 

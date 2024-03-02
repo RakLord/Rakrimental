@@ -25,6 +25,7 @@
     "autoprefixer": "^10.4.17",
     "parcel": "^2.11.0",
     "postcss": "^8.4.35",
-    "prettier": "3.2.5"
+    "prettier": "3.2.5",
+    "break_infinity.js": "^2.2.0"
   }
 }

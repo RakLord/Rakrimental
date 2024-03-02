@@ -123,7 +123,7 @@ export class Layer {
             const milestone = this.milestones[key];
             const unlockCost = milestone.unlockCost;
             // Set unlocked to true (this is saved in the save file)
-            if (this.highestCurrency >= unlockCost) {
+            if (this.highestCurrency.gt(unlockCost)) {
                 milestone.unlocked = true;
             }
         }

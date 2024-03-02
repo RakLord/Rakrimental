@@ -13278,6 +13278,17 @@ main .layer .start-upgrade-columns .upgrade-column {
   display: flex;
 }
 
+.start-points-text {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.start-last-points-give-text {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
 .not-buyable {
   cursor: not-allowed !important;
   border: 2px solid #b81919 !important;
@@ -13349,4 +13360,4 @@ main .dice-container .dice .not-dot {
   background-color: #0000;
 }
 
-/*# sourceMappingURL=index.a53d4189.css.map */
+/*# sourceMappingURL=index.815ab1b7.css.map */
