@@ -2764,6 +2764,10 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                         level: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level.toString(),
                         timesClicked: this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked.toString()
                     },
+                    ultimatePointsPerClick: {
+                        level: this.game.layers.start.milestones.ultimatePointsPerClick.level.toString(),
+                        timesClicked: this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked.toString()
+                    },
                     autoPoints: {
                         level: this.game.layers.start.milestones.autoPoints.level.toString(),
                         buyable: this.game.layers.start.milestones.autoPoints.buyable
@@ -2788,7 +2792,8 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
             },
             dice: {
                 unlocked: this.game.layers.dice.unlocked,
-                currency: this.game.layers.dice.currency,
+                currency: this.game.layers.dice.currency.toString(),
+                highestCurrency: this.game.layers.dice.highestCurrency.toString(),
                 diceCount: this.game.layers.dice.diceCount,
                 diceCountCap: this.game.layers.dice.diceCountCap,
                 milestones: {}
@@ -2820,15 +2825,16 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 console.log(gameState.layers.start.currency, typeof gameState.layers.start.currency);
                 this.game.layers.start.unlocked = gameState.layers.start.unlocked;
                 this.game.layers.start.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.currency);
-                // set highestCurrency to the new Decimal of the saved value if it is more than 0 otherwise set it to a new decimal 0
                 this.game.layers.start.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.highestCurrency);
-                if (this.game.layers.start.highestCurrency.lte(0)) this.game.layers.start.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
+                this.game.layers.start.highestCurrency = this.game.layers.start.highestCurrency.add(0.1);
                 this.game.layers.start.milestones.givePoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.givePoints.level);
                 this.game.layers.start.milestones.givePoints.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.givePoints.timesClicked);
                 this.game.layers.start.milestones.increasePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.increasePointsPerClick.level);
                 this.game.layers.start.milestones.increasePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.increasePointsPerClick.timesClicked);
                 this.game.layers.start.milestones.upgradeIncreasePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.level);
                 this.game.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.upgradeIncreasePointsPerClick.timesClicked);
+                this.game.layers.start.milestones.ultimatePointsPerClick.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.ultimatePointsPerClick.level);
+                this.game.layers.start.milestones.ultimatePointsPerClick.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.ultimatePointsPerClick.timesClicked);
                 this.game.layers.start.milestones.autoPoints.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.autoPoints.level);
                 this.game.layers.start.autoPointsEnabled = !gameState.layers.start.milestones.autoPoints.buyable;
                 this.game.layers.start.milestones.autoPoints.buyable = gameState.layers.start.milestones.autoPoints.buyable;
@@ -2842,7 +2848,8 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 this.game.layers.start.milestones.overCritical.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.start.milestones.overCritical.timesClicked);
                 // Dice Layer
                 this.game.layers.dice.unlocked = gameState.layers.dice.unlocked;
-                this.game.layers.dice.currency = gameState.layers.dice.currency;
+                this.game.layers.dice.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.dice.currency);
+                this.game.layers.dice.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(gameState.layers.dice.highestCurrency);
                 this.game.layers.dice.diceCount = gameState.layers.dice.diceCount;
                 this.game.layers.dice.diceCountCap = gameState.layers.dice.diceCountCap;
                 // Coin Layer
@@ -2863,7 +2870,6 @@ class $a348cea740e504f8$export$5bfce22a6398152d {
                 for (const layer of Object.keys(this.game.layers)){
                     for (const key of Object.keys(this.game.layers[layer].milestones))if (this.game.layers[layer].milestoneFunctions[key].update) this.game.layers[layer].milestoneFunctions[key].update();
                 }
-                console.log(game.layers.start.pointsPerClick);
                 // this.game.layers.start.buttons.givePoints.button
                 this.game.updateUI();
             } else {
@@ -2990,6 +2996,7 @@ class $33dc7b2aef0a6efa$export$70e287e52ce0fe9c {
         this.timesClicked = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
     }
     levelUp() {
+        if (this.level.gte(this.maxLevel)) this.buyable = false;
         if (!this.buyable) return;
         this.level = this.level.add(1);
         this.cost = this.costFormula(this);
@@ -3004,7 +3011,8 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
         this.Button = (0, $e15866bea5b2da0a$export$353f5b6fc5456de1);
         this.game = game;
         this.name = name;
-        this.cost = cost;
+        this.unlockCost = cost; // Cost to show the layer
+        this.cost = cost; // Cost to buy (probs depricate soon)
         this.layerColor = layerColor;
         this.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
         this.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
@@ -3041,7 +3049,12 @@ class $33dc7b2aef0a6efa$export$936d0764594b6eb3 {
             const milestone = this.milestones[key];
             const unlockCost = milestone.unlockCost;
             // Set unlocked to true (this is saved in the save file)
-            if (this.highestCurrency.gt(unlockCost)) milestone.unlocked = true;
+            try {
+                if (this.highestCurrency.gt(unlockCost)) milestone.unlocked = true;
+            } catch (err) {
+                console.error("Error in checkMilestones", err);
+                console.log("Milestone: ", milestone, "\nUnlock Cost: ", unlockCost, "\nHighest Currency: ", this.highestCurrency, "\nLayer: ", this);
+            }
         }
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)){
@@ -3093,8 +3106,12 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.div.appendChild(this.pointsText);
         this.lastPointsGiveText = document.createElement("h3");
         this.lastPointsGiveText.classList.add("start-last-points-give-text");
-        this.lastPointsGiveText.textContent = `+ 0`;
+        this.lastPointsGiveText.textContent = `Manual P+ 0`;
         this.div.appendChild(this.lastPointsGiveText);
+        this.lastAutoPointsGiveText = document.createElement("h3");
+        this.lastAutoPointsGiveText.classList.add("start-last-auto-points-give-text");
+        this.lastAutoPointsGiveText.textContent = `Auto P+ 0`;
+        this.div.appendChild(this.lastAutoPointsGiveText);
         this.upgradeColumnsDiv = document.createElement("div");
         this.upgradeColumnsDiv.classList.add("start-upgrade-columns");
         this.div.appendChild(this.upgradeColumnsDiv);
@@ -3105,8 +3122,8 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
         }
         this.autoPointsEnabled = false;
-        this.pointAutoDivisor = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100);
         this.lastPointsGive = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.lastAutoPointsGive = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
         this.milestoneFunctions = {
             givePoints: {
                 activate: ()=>{
@@ -3133,12 +3150,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Increase Points Per Click
             increasePointsPerClick: {
                 activate: ()=>{
-                    console.log("Activating Increase Points Per Click");
-                    if (this.currency.gte(this.game.layers.start.milestones.increasePointsPerClick.cost) && this.game.layers.start.milestones.increasePointsPerClick.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.increasePointsPerClick.cost);
-                        this.game.layers.start.milestones.increasePointsPerClick.levelUp();
-                        this.milestoneFunctions.increasePointsPerClick.update();
-                    }
+                    this.buyMilestone("increasePointsPerClick");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
@@ -3157,7 +3169,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.increasePointsPerClick.updateText();
                 },
                 updateText: ()=>{
-                    this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.increasePointsPerClick.cost}`;
+                    this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.increasePointsPerClick.cost)}`;
                     this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
                     this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level.add(1)}`;
                 }
@@ -3165,11 +3177,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Upgrade Increase Points Per Click
             upgradeIncreasePointsPerClick: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost) && this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost);
-                        this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
-                        this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
-                    }
+                    this.buyMilestone("upgradeIncreasePointsPerClick");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
@@ -3191,7 +3199,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                 },
                 updateText: ()=>{
                     console.log("Updating Upgrade Increase Points Per Click");
-                    this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
+                    this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.upgradeIncreasePointsPerClick.cost)}`;
                     this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
                     this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level.add(1)}`;
                 }
@@ -3199,16 +3207,15 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Ultimate Points Per Click
             ultimatePointsPerClick: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.ultimatePointsPerClick.cost) && this.game.layers.start.milestones.ultimatePointsPerClick.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.ultimatePointsPerClick.cost);
-                        this.game.layers.start.milestones.ultimatePointsPerClick.levelUp();
-                        this.milestoneFunctions.ultimatePointsPerClick.update();
-                    }
+                    this.buyMilestone("ultimatePointsPerClick");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(7777);
-                        return cost;
+                        const lvlPlusOne = lvl.add(1);
+                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(20000);
+                        const b = lvlPlusOne.times(6).times(lvlPlusOne);
+                        const c = b.pow(3.45);
+                        return a.add(c).floor();
                     }
                     let levelToUse = milestone.level;
                     if (returnMax) levelToUse = milestone.maxLevel;
@@ -3220,7 +3227,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                 },
                 updateText: ()=>{
                     console.log("Updating Upgrade Increase Points Per Click");
-                    this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.ultimatePointsPerClick.cost}`;
+                    this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.ultimatePointsPerClick.cost)}`;
                     this.buttons.ultimatePointsPerClick.lines[2].textContent = `Level: ${this.milestones.ultimatePointsPerClick.level}/${this.milestones.ultimatePointsPerClick.maxLevel}`;
                     this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level.add(1)}`;
                 }
@@ -3228,16 +3235,12 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Auto Points
             autoPoints: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.autoPoints.cost) && this.game.layers.start.milestones.autoPoints.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.autoPoints.cost);
-                        this.autoPointsEnabled = true;
-                        this.game.layers.start.milestones.autoPoints.levelUp();
-                        this.milestoneFunctions.autoPoints.update();
-                    }
+                    this.buyMilestone("autoPoints");
+                    if (this.milestones.autoPoints.level.gt(0)) this.autoPointsEnabled = true;
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
-                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(7777);
+                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(15000);
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3249,7 +3252,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.autoPoints.updateText();
                 },
                 updateText: ()=>{
-                    if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
+                    if (this.milestones.autoPoints.buyable) this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPoints.cost)}`;
                     else {
                         this.buttons.autoPoints.lines[1].textContent = "Enabled";
                         this.buttons.autoPoints.button.classList.add("not-buyable");
@@ -3259,22 +3262,18 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Auto Points Divisor
             autoPointsDivisor: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.autoPointsDivisor.cost) && this.game.layers.start.milestones.autoPointsDivisor.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.autoPointsDivisor.cost);
-                        if (this.pointAutoDivisor.gte(2)) {
-                            this.pointAutoDivisor = this.pointAutoDivisor.sub(1);
-                            this.game.layers.start.milestones.autoPointsDivisor.levelUp();
-                            this.milestoneFunctions.autoPointsDivisor.update();
-                        }
-                    }
+                    this.buyMilestone("autoPointsDivisor");
+                    if (this.milestones.autoPointsDivisor.level.lt(1)) this.milestones.autoPointsDivisor.level = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
                         const lvlPlusOne = lvl.add(1);
-                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.pow(1.3));
-                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(1000);
-                        const c = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(20000);
-                        const cost = a.times(b).plus(c).floor();
+                        const j = 10000;
+                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1.5);
+                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2.8);
+                        const c = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.times(a)).times(lvl.pow(b));
+                        const d = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(j).add(j);
+                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(c.plus(d)).floor();
                         return cost;
                     }
                     let levelToUse = milestone.level;
@@ -3286,19 +3285,45 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.autoPointsDivisor.updateText();
                 },
                 updateText: ()=>{
-                    this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.milestones.autoPointsDivisor.cost}`;
+                    this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPointsDivisor.cost)}`;
                     this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
-                    this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${this.pointAutoDivisor}`;
+                    this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100).sub(this.milestones.autoPointsDivisor.level)}%`;
+                }
+            },
+            // Better Auto Points
+            betterAutoPoints: {
+                activate: ()=>{
+                    this.buyMilestone("betterAutoPoints");
+                },
+                cost: (milestone, returnMax = false, forceLvl)=>{
+                    function calcCost(lvl) {
+                        const lvlPlusOne = lvl.add(1);
+                        const j = 10000;
+                        const a = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1.9);
+                        const b = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2.8);
+                        const c = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.times(a)).times(lvl.pow(b));
+                        const d = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(lvlPlusOne.ln()).times(j).add(j);
+                        const cost = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(c.plus(d)).floor();
+                        return cost;
+                    }
+                    let levelToUse = milestone.level;
+                    if (returnMax) levelToUse = milestone.maxLevel;
+                    if (forceLvl) levelToUse = forceLvl;
+                    return calcCost(levelToUse);
+                },
+                update: ()=>{
+                    this.milestoneFunctions.betterAutoPoints.updateText();
+                },
+                updateText: ()=>{
+                    this.buttons.betterAutoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.betterAutoPoints.cost)}`;
+                    this.buttons.betterAutoPoints.lines[2].textContent = `Level: ${this.milestones.betterAutoPoints.level}/${this.milestones.betterAutoPoints.maxLevel}`;
+                    this.buttons.betterAutoPoints.lines[3].textContent = `Divisor: ${this.milestones.betterAutoPoints.level}`;
                 }
             },
             // Critical Points (Crit Chance)
             criticalPoints: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.criticalPoints.cost) && this.game.layers.start.milestones.criticalPoints.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.criticalPoints.cost);
-                        this.game.layers.start.milestones.criticalPoints.levelUp();
-                        this.milestoneFunctions.criticalPoints.update();
-                    }
+                    this.buyMilestone("criticalPoints");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
@@ -3317,7 +3342,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.criticalPoints.updateText();
                 },
                 updateText: ()=>{
-                    this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.milestones.criticalPoints.cost}`;
+                    this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalPoints.cost)}`;
                     this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
                     this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
                 }
@@ -3325,11 +3350,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             // Crit Bonus (Crit reward bonus %)
             criticalBonus: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.criticalBonus.cost) && this.game.layers.start.milestones.criticalBonus.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.criticalBonus.cost);
-                        this.game.layers.start.milestones.criticalBonus.levelUp();
-                        this.milestoneFunctions.criticalBonus.update();
-                    }
+                    this.buyMilestone("criticalBonus");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
@@ -3348,19 +3369,15 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.criticalBonus.updateText();
                 },
                 updateText: ()=>{
-                    this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.milestones.criticalBonus.cost}`;
+                    this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalBonus.cost)}`;
                     this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
-                    this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}%`;
+                    this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}*`;
                 }
             },
             // Over Crit (Turn crits over 100% into BIGGGGER crits)
             overCritical: {
                 activate: ()=>{
-                    if (this.currency.gte(this.game.layers.start.milestones.overCritical.cost) && this.game.layers.start.milestones.overCritical.buyable) {
-                        this.removeCurrency(this.game.layers.start.milestones.overCritical.cost);
-                        this.game.layers.start.milestones.overCritical.levelUp();
-                        this.milestoneFunctions.overCritical.update();
-                    }
+                    this.buyMilestone("overCritical");
                 },
                 cost: (milestone, returnMax = false, forceLvl)=>{
                     function calcCost(lvl) {
@@ -3379,7 +3396,7 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
                     this.milestoneFunctions.overCritical.updateText();
                 },
                 updateText: ()=>{
-                    this.buttons.overCritical.lines[1].textContent = `Cost: ${this.milestones.overCritical.cost}`;
+                    this.buttons.overCritical.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.overCritical.cost)}`;
                     this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
                     this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
                 }
@@ -3389,12 +3406,13 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
             givePoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("givePoints", "Gib Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0), "Give points when clicked", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(-1), this.milestoneFunctions.givePoints, this.div),
             increasePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("increasePointsPerClick", "+PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10), "Increase points per click", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10000), this.milestoneFunctions.increasePointsPerClick, this.upgradeColumns[0]),
             upgradeIncreasePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("upgradeIncreasePointsPerClick", "++PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), "Increase the amount that the +PPC upgrade gives", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), this.milestoneFunctions.upgradeIncreasePointsPerClick, this.upgradeColumns[0]),
-            ultimatePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("ultimatePointsPerClick", "Ultimate PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(30000), "Makes +PPC and ++PPC bettererist", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10), this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
-            autoPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1000), "Give points automatically", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
+            ultimatePointsPerClick: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("ultimatePointsPerClick", "+++Ultimate +++PPC", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(30000), "Makes +PPC and ++PPC bettererist", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10), this.milestoneFunctions.ultimatePointsPerClick, this.upgradeColumns[0]),
+            autoPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPoints", "Automates Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(7500), "Give points automatically", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), this.milestoneFunctions.autoPoints, this.upgradeColumns[1]),
             autoPointsDivisor: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("autoPointsDivisor", "Auto Points Divisor", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10000), "Lowers the auto-points divider", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(99), this.milestoneFunctions.autoPointsDivisor, this.upgradeColumns[1]),
+            betterAutoPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("betterAutoPoints", "Better Auto Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1e8), "Makes auto points BETTER than clicking!", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100), this.milestoneFunctions.betterAutoPoints, this.upgradeColumns[1]),
             criticalPoints: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalPoints", "Critical Points", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(30000), "Increases critical point chance", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(200), this.milestoneFunctions.criticalPoints, this.upgradeColumns[2]),
             criticalBonus: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("criticalBonus", "Critical Bonus", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(50000), "Increases critical point bonus", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1000), this.milestoneFunctions.criticalBonus, this.upgradeColumns[2]),
-            overCritical: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("overCritical", "Over Critical", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(250000), "Converts bonus crit chance into better crits!", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2500), this.milestoneFunctions.overCritical, this.upgradeColumns[2])
+            overCritical: new (0, $33dc7b2aef0a6efa$export$70e287e52ce0fe9c)("overCritical", "Over Critical", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(250000), "Converts bonus crit chance into better crits! (Usless with sub 100% crit chance)", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(2500), this.milestoneFunctions.overCritical, this.upgradeColumns[2])
         };
         // Enable graphing feature per milestone.
         this.milestones.increasePointsPerClick.graphEnabled = true;
@@ -3407,14 +3425,27 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.setup();
         this.toggleVisibility();
         //  Moves the give points button to after the points text but before the upgrades
-        if (this.div.firstChild) this.div.insertBefore(this.buttons.givePoints.button, this.div.children[2]);
+        // The index will need to change if I add more text in the this.div
+        if (this.div.firstChild) this.div.insertBefore(this.buttons.givePoints.button, this.div.children[3]);
         this.milestoneFunctions.givePoints.update();
+    }
+    buyMilestone(m) {
+        const tryUpg = ()=>{
+            if (this.currency.gte(this.milestones[m].cost) && this.milestones[m].buyable) {
+                this.removeCurrency(this.milestones[m].cost);
+                this.milestones[m].levelUp();
+            }
+        };
+        if (this.game.keyPressed === "Shift") for(let i = 0; i < 10; i++)tryUpg();
+        else tryUpg();
+        this.milestoneFunctions[m].update();
     }
     addCurrencyStack(rtn) {
         let value = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
         if (this.milestones.increasePointsPerClick.level.gt(0)) value = value.times(this.milestones.increasePointsPerClick.level.add(1));
         if (this.milestones.upgradeIncreasePointsPerClick.level.gt(0)) value = value.times(this.milestones.upgradeIncreasePointsPerClick.level.add(1));
-        if (this.milestones.ultimatePointsPerClick.level.gt(0)) value = value.times(this.milestones.ultimatePointsPerClick.level.add(1));
+        if (this.milestones.ultimatePointsPerClick.level.gt(0)) value = value.times(this.milestones.ultimatePointsPerClick.level.add(1)).times(this.milestones.ultimatePointsPerClick.level.add(1));
+        // Crit stuff
         if (this.milestones.criticalPoints.level.gt(0)) {
             const rawCritChance = this.milestones.criticalPoints.level;
             const critChance = $93501a718a4426dd$var$mapRange(rawCritChance, new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(200), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1), new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100));
@@ -3431,7 +3462,6 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         }
         if (rtn) return value;
         this.lastPointsGive = value;
-        console.log("+", value);
         this.addCurrency(value);
     }
     addCurrency(amount) {
@@ -3443,11 +3473,19 @@ class $93501a718a4426dd$export$568b89e600fc77eb extends (0, $33dc7b2aef0a6efa$ex
         this.updatePointsText();
     }
     updatePointsText() {
-        this.pointsText.textContent = `Points: ${this.currency.toString()}`;
-        this.lastPointsGiveText.textContent = `+ ${this.lastPointsGive}`;
+        this.pointsText.textContent = `Points: ${this.game.formatValue(this.currency)}`;
+        this.lastPointsGiveText.textContent = `Manual P+ ${this.game.formatValue(this.lastPointsGive)}`;
+        this.lastAutoPointsGiveText.textContent = `Auto P+ ${this.game.formatValue(this.lastAutoPointsGive)}`;
     }
     update() {
-        if (this.autoPointsEnabled) this.addCurrency(this.addCurrencyStack(true).div(this.pointAutoDivisor));
+        if (this.currency.gt(this.highestCurrency)) this.highestCurrency = this.currency;
+        if (this.autoPointsEnabled) {
+            let value = this.addCurrencyStack(true);
+            value = value.div(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(100).sub(this.milestones.autoPointsDivisor.level));
+            value = value.times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(this.milestones.betterAutoPoints.level.add(1).ln()).add(1));
+            this.lastAutoPointsGive = value;
+            this.addCurrency(value);
+        }
     }
 }
 
@@ -3932,8 +3970,11 @@ class $83a61abead0fd813$export$5442621d844215cb {
 }
 class $83a61abead0fd813$export$8be8c2ff45d443a3 extends (0, $33dc7b2aef0a6efa$export$936d0764594b6eb3) {
     constructor(game){
-        super(game, "dice", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(10000000), "white");
+        super(game, "dice", new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1e15), "white");
         this.layerColor = "blue";
+        this.currencyName = "Pips";
+        this.currency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.highestCurrency = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
         this.diceArrayContainer = document.createElement("div");
         this.diceArrayContainer.classList.add("dice-container");
         this.div.appendChild(this.diceArrayContainer);
@@ -3980,13 +4021,14 @@ class $fec1aad84a4e3499$export$19600bc7e7f23c95 extends (0, $33dc7b2aef0a6efa$ex
 }
 
 
+
 class $f9544c9499cf351f$export$a52303878d5ad02c {
     constructor(game){
-        this.xMin = 0;
-        this.xMax = 0;
-        this.yMin = 0;
-        this.yMax = 0;
-        this.step = 1;
+        this.xMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.xMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.yMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.yMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.step = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1);
         this.game = game;
         this.container = document.createElement("div");
         this.container.id = "formulaGraph";
@@ -3994,18 +4036,18 @@ class $f9544c9499cf351f$export$a52303878d5ad02c {
         this.container.classList.add("formula-graph");
         this.container.style.top = "50vh";
         this.container.style.left = "0";
-        this.xMax = 0;
-        this.yMax = 0;
+        this.xMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.yMax = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
         document.getElementById("main").appendChild(this.container);
     }
     createGraph(milestone) {
         this.milestone = milestone;
         this.milestoneFunc = milestone.costFormula;
-        this.xMin = 0;
-        this.xMax = this.milestone.maxLevel.toNumber();
-        this.yMin = this.milestoneFunc(this.milestone, false, 1);
+        this.xMin = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(0);
+        this.xMax = this.milestone.maxLevel;
+        this.yMin = this.milestoneFunc(this.milestone, false, new (0, $30c05137717fb899$export$2e2bcd8739ae039)(1));
         this.yMax = this.milestoneFunc(this.milestone, true);
-        this.step = this.xMax / 32;
+        this.step = this.xMax.div(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(32));
         console.log(this.xMin, this.xMax, this.yMin, this.yMax, this.step);
         console.log(this.xMax, this.yMax);
         this.drawGraph();
@@ -4034,12 +4076,13 @@ class $f9544c9499cf351f$export$a52303878d5ad02c {
         // Move to the starting point with padding considered
         // xMax = maxLevel
         // yMax = maxCost
-        for(let x = this.xMin; x <= this.xMax; x += this.step){
+        for(let x = this.xMin; x.lte(this.xMax); x = x.add(this.step)){
             const y = this.milestoneFunc(this.milestone, false, x);
             ctx.strokeStyle = "red";
             ctx.lineWidth = 2;
-            const xCoord = canvasPad + x / this.xMax * (canvas.width - 2 * canvasPad);
-            const yCoord = canvas.height - canvasPad - y / this.yMax * (canvas.height - 2 * canvasPad);
+            // Borked
+            const xCoord = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvasPad).add(x.div(this.xMax)).times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.width).sub(2).times(canvasPad)).toNumber();
+            const yCoord = new (0, $30c05137717fb899$export$2e2bcd8739ae039)(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.height).sub(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvasPad)).sub(y.div(this.yMax).times(new (0, $30c05137717fb899$export$2e2bcd8739ae039)(canvas.height).sub(2).times(canvasPad)))).toNumber();
             ctx.lineTo(xCoord, yCoord);
         }
         // ctx.beginPath();
@@ -4184,11 +4227,14 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
     }
     // Is called every fixedInterval time (3000ms) - This does not decrease with game speed/upgrades.
     fixedIntervalUpdate() {
-        for (const layer of Object.keys(this.layers))if (this.layers[layer].currency > this.layers[layer].highestCurrency) {
-            this.layers[layer].highestCurrency = this.layers[layer].currency;
+        for (const layer of Object.keys(this.layers)){
+            if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) this.layers[layer].highestCurrency = this.layers[layer].currency;
             this.layers[layer].checkMilestones();
         }
-        if (this.layers.start.highestCurrency.gt(10)) this.layers.dice.unlocked = true;
+        if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
+            console.log("Unlocking Layer: ", this.layers.dice.name, "Cost: ", this.layers.dice.unlockCost.toString());
+            this.layers.dice.unlocked = true;
+        }
         this.setupNav();
     }
     toggleTooltips() {
@@ -4224,8 +4270,12 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         for (const button of this.navBar.children)if (button.id === layerName) button.classList.add("selected");
         else button.classList.remove("selected");
     }
+    formatValue(value, places = 2) {
+        if (value.lt(1000)) return value.toFixed(places).toString();
+        else return `${value.m.toFixed(places)}e${value.e}`;
+    }
     updateUI() {
-        this.textElements.start.innerText = this.layers.start.currency.toString() + " P";
+        this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + " P";
     }
 }
 let $98b122bb987399aa$var$game;
@@ -4237,4 +4287,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//# sourceMappingURL=index.df6beb5d.js.map
+//# sourceMappingURL=index.9b6e771c.js.map

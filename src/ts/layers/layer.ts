@@ -41,12 +41,14 @@ export class Milestone {
     }
 
     levelUp() {
+        if (this.level.gte(this.maxLevel)) this.buyable = false;
         if (!this.buyable) return;
         this.level = this.level.add(1);
         this.cost = this.costFormula(this);
         if (this.level.gte(this.maxLevel)) {
             this.buyable = false;
         }
+
     }
 }
 
@@ -74,7 +76,8 @@ export class Layer {
         this.Button = Button;
         this.game = game;
         this.name = name;
-        this.cost = cost;
+        this.unlockCost = cost; // Cost to show the layer
+        this.cost = cost;  // Cost to buy (probs depricate soon)
         this.layerColor = layerColor;
         this.currency = new Decimal(0);
         this.highestCurrency = new Decimal(0);
@@ -123,9 +126,16 @@ export class Layer {
             const milestone = this.milestones[key];
             const unlockCost = milestone.unlockCost;
             // Set unlocked to true (this is saved in the save file)
-            if (this.highestCurrency.gt(unlockCost)) {
-                milestone.unlocked = true;
+            try {
+                if (this.highestCurrency.gt(unlockCost)) {
+                    milestone.unlocked = true;
+                }
             }
+            catch(err) {
+                console.error("Error in checkMilestones", err);
+                console.log("Milestone: ", milestone, "\nUnlock Cost: ", unlockCost, "\nHighest Currency: ", this.highestCurrency, "\nLayer: ", this)
+            }
+
         }
         // Loop over the unlocked milestones and add them to the div if they are not already in it
         for (const key of Object.keys(this.milestones)) {

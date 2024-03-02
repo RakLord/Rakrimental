@@ -176,12 +176,13 @@ export class Game {
     fixedIntervalUpdate () {
 
         for (const layer of Object.keys(this.layers)) {
-            if (this.layers[layer].currency > this.layers[layer].highestCurrency) {
+            if (this.layers[layer].currency.gt(this.layers[layer].highestCurrency)) {
                 this.layers[layer].highestCurrency = this.layers[layer].currency;
-                this.layers[layer].checkMilestones();
             }
+            this.layers[layer].checkMilestones();
         }
-        if (this.layers.start.highestCurrency.gt(10)) {
+        if (this.layers.start.highestCurrency.gt(this.layers.dice.unlockCost)) {
+            console.log("Unlocking Layer: ", this.layers.dice.name, "Cost: ", this.layers.dice.unlockCost.toString());
             this.layers.dice.unlocked = true;
         }
 
@@ -242,9 +243,18 @@ export class Game {
             }
         }
     }
+    
+    formatValue(value: Decimal, places: number = 2): string {
+        if (value.lt(1000)) {
+            return value.toFixed(places).toString();
+        }
+        else {
+            return `${value.m.toFixed(places)}e${value.e}`;
         
+        }
+    }
     updateUI() {
-        this.textElements.start.innerText = this.layers.start.currency.toString() + " P";
+        this.textElements.start.innerText = this.formatValue(this.layers.start.currency) + " P";
     }
 }
 

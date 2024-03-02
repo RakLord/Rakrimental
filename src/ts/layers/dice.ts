@@ -191,8 +191,12 @@ export class Dice extends Layer {
 	diceArray: SingleDice[];
 
 	constructor(game: Game) {
-		super(game, 'dice', new Decimal(10000000), 'white');
+		super(game, 'dice', new Decimal(1e15), 'white');
 		this.layerColor = 'blue';
+
+		this.currencyName = 'Pips';
+		this.currency = new Decimal(0);
+		this.highestCurrency = new Decimal(0);
 
 		this.diceArrayContainer = document.createElement('div');
 		this.diceArrayContainer.classList.add('dice-container');

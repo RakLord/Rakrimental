@@ -1,16 +1,17 @@
 import { Game } from './main';
 import { Milestone } from './layers/layer';
+import Decimal from 'break_infinity.js';
 
 export class FormulaGraph {
     game: Game;
     container: HTMLElement;
     milestone?: Milestone;
     milestoneFunc?: any;
-    xMin: number = 0;
-    xMax: number = 0;
-    yMin: number = 0;
-    yMax: number = 0;
-    step: number = 1;
+    xMin: Decimal = new Decimal(0);
+    xMax: Decimal = new Decimal(0);
+    yMin: Decimal = new Decimal(0);
+    yMax: Decimal = new Decimal(0);
+    step: Decimal = new Decimal(1);
     constructor(game: Game) {
         this.game = game
         this.container = document.createElement('div');
@@ -19,8 +20,8 @@ export class FormulaGraph {
         this.container.classList.add('formula-graph');
         this.container.style.top = '50vh';
         this.container.style.left = '0';
-        this.xMax = 0;
-        this.yMax = 0;
+        this.xMax = new Decimal(0);
+        this.yMax = new Decimal(0);
 
         document.getElementById('main')!.appendChild(this.container);
     }
@@ -28,12 +29,12 @@ export class FormulaGraph {
     createGraph(milestone: Milestone) {
         this.milestone = milestone;
         this.milestoneFunc = milestone.costFormula;
-        this.xMin =  0;
-        this.xMax = this.milestone.maxLevel.toNumber();
-        this.yMin = this.milestoneFunc(this.milestone, false, 1);
+        this.xMin =  new Decimal(0);
+        this.xMax = this.milestone.maxLevel;
+        this.yMin = this.milestoneFunc(this.milestone, false, new Decimal(1));
         this.yMax = this.milestoneFunc(this.milestone, true);
 
-        this.step = this.xMax / 32;
+        this.step = this.xMax.div(new Decimal(32));
         console.log(this.xMin, this.xMax, this.yMin, this.yMax, this.step)
 
         console.log(this.xMax, this.yMax)
@@ -73,14 +74,15 @@ export class FormulaGraph {
         // xMax = maxLevel
         // yMax = maxCost
         
-        for (let x = this.xMin; x <= this.xMax; x += this.step) {
+        for (let x = this.xMin; x.lte(this.xMax); x = x.add(this.step)) {
             const y = this.milestoneFunc(this.milestone, false, x);
 
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
 
-            const xCoord = canvasPad + (x / this.xMax) * (canvas.width - 2 * canvasPad); 
-            const yCoord = (canvas.height - canvasPad) - (y / this.yMax) * (canvas.height - 2 * canvasPad);
+            // Borked
+            const xCoord = (new Decimal(canvasPad).add(x.div(this.xMax)).times(new Decimal(canvas.width).sub(2).times(canvasPad))).toNumber(); 
+            const yCoord = (new Decimal(new Decimal(canvas.height).sub(new Decimal(canvasPad)).sub((y.div(this.yMax)).times(new Decimal(canvas.height).sub(2).times(canvasPad))))).toNumber();
 
             ctx.lineTo(xCoord, yCoord);
         }

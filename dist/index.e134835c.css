@@ -13287,6 +13287,13 @@ main .layer .start-upgrade-columns .upgrade-column {
 .start-last-points-give-text {
   margin: 0;
   font-size: 1.1rem;
+  line-height: 60%;
+}
+
+.start-last-auto-points-give-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 60%;
 }
 
 .not-buyable {
@@ -13360,4 +13367,4 @@ main .dice-container .dice .not-dot {
   background-color: #0000;
 }
 
-/*# sourceMappingURL=index.815ab1b7.css.map */
+/*# sourceMappingURL=index.e134835c.css.map */

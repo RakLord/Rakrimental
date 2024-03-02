@@ -17,13 +17,14 @@ function mapRange(
 		.plus(outMin);
 }
 export class Start extends Layer {
-	pointAutoDivisor: Decimal;
 	autoPointsEnabled: boolean;
 	pointsText: HTMLElement;
 	lastPointsGiveText: HTMLElement;
+	lastAutoPointsGiveText: HTMLElement;
 	upgradeColumnsDiv: HTMLElement;
 	upgradeColumns: HTMLElement[] = [];
 	lastPointsGive: Decimal;
+	lastAutoPointsGive: Decimal;
 
 	constructor(game: Game) {
 		super(game, 'start', new Decimal(0), 'green');
@@ -37,8 +38,13 @@ export class Start extends Layer {
 
 		this.lastPointsGiveText = document.createElement('h3');
 		this.lastPointsGiveText.classList.add('start-last-points-give-text');
-		this.lastPointsGiveText.textContent = `+ 0`;
+		this.lastPointsGiveText.textContent = `Manual P+ 0`;
 		this.div.appendChild(this.lastPointsGiveText);
+
+		this.lastAutoPointsGiveText = document.createElement('h3');
+		this.lastAutoPointsGiveText.classList.add('start-last-auto-points-give-text');
+		this.lastAutoPointsGiveText.textContent = `Auto P+ 0`;
+		this.div.appendChild(this.lastAutoPointsGiveText);
 
 		this.upgradeColumnsDiv = document.createElement('div');
 		this.upgradeColumnsDiv.classList.add('start-upgrade-columns');
@@ -50,8 +56,8 @@ export class Start extends Layer {
 			this.upgradeColumnsDiv.appendChild(this.upgradeColumns[i]);
 		}
 		this.autoPointsEnabled = false;
-		this.pointAutoDivisor = new Decimal(100);
 		this.lastPointsGive = new Decimal(0);
+		this.lastAutoPointsGive = new Decimal(0);
 
 		this.milestoneFunctions = {
 			givePoints: {
@@ -86,16 +92,7 @@ export class Start extends Layer {
 			// Increase Points Per Click
 			increasePointsPerClick: {
 				activate: () => {
-                    console.log('Activating Increase Points Per Click')
-					if (
-						this.currency.gte(this.game.layers.start.milestones.increasePointsPerClick.cost) && this.game.layers.start.milestones.increasePointsPerClick.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.increasePointsPerClick.cost,
-						);
-						this.game.layers.start.milestones.increasePointsPerClick.levelUp();
-						this.milestoneFunctions.increasePointsPerClick.update();
-					}
+					this.buyMilestone('increasePointsPerClick');
 				},
 				cost: (
 					milestone: Milestone,
@@ -119,7 +116,7 @@ export class Start extends Layer {
 					this.milestoneFunctions.increasePointsPerClick.updateText();
 				},
 				updateText: () => {
-					this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.increasePointsPerClick.cost}`;
+					this.buttons.increasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.increasePointsPerClick.cost)}`;
 					this.buttons.increasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.increasePointsPerClick.level}/${this.milestones.increasePointsPerClick.maxLevel}`;
 					this.buttons.increasePointsPerClick.lines[3].textContent = `+${this.milestones.increasePointsPerClick.level.add(1)}`;
 				},
@@ -128,17 +125,7 @@ export class Start extends Layer {
 			// Upgrade Increase Points Per Click
 			upgradeIncreasePointsPerClick: {
 				activate: () => {
-					if (
-						this.currency.gte(
-							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost) &&
-							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.upgradeIncreasePointsPerClick.cost,
-						);
-						this.game.layers.start.milestones.upgradeIncreasePointsPerClick.levelUp();
-						this.milestoneFunctions.upgradeIncreasePointsPerClick.update();
-					}
+					this.buyMilestone('upgradeIncreasePointsPerClick');
 				},
 				cost: (
 					milestone: Milestone,
@@ -170,7 +157,7 @@ export class Start extends Layer {
 				},
 				updateText: () => {
 					console.log('Updating Upgrade Increase Points Per Click');
-					this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.upgradeIncreasePointsPerClick.cost}`;
+					this.buttons.upgradeIncreasePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.upgradeIncreasePointsPerClick.cost)}`;
 					this.buttons.upgradeIncreasePointsPerClick.lines[2].textContent = `Level: ${this.milestones.upgradeIncreasePointsPerClick.level}/${this.milestones.upgradeIncreasePointsPerClick.maxLevel}`;
 					this.buttons.upgradeIncreasePointsPerClick.lines[3].textContent = `*${this.milestones.upgradeIncreasePointsPerClick.level.add(1)}`;
 				},
@@ -178,16 +165,7 @@ export class Start extends Layer {
 			// Ultimate Points Per Click
 			ultimatePointsPerClick: {
 				activate: () => {
-					if (
-						this.currency.gte(this.game.layers.start.milestones.ultimatePointsPerClick.cost) &&
-						this.game.layers.start.milestones.ultimatePointsPerClick.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.ultimatePointsPerClick.cost,
-						);
-						this.game.layers.start.milestones.ultimatePointsPerClick.levelUp();
-						this.milestoneFunctions.ultimatePointsPerClick.update();
-					}
+					this.buyMilestone('ultimatePointsPerClick');
 				},
 				cost: (
 					milestone: Milestone,
@@ -195,8 +173,11 @@ export class Start extends Layer {
 					forceLvl?: Decimal,
 				): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
-						const cost = new Decimal(7777);
-						return cost;
+						const lvlPlusOne = lvl.add(1);
+						const a = new Decimal(20000);
+						const b = lvlPlusOne.times(6).times(lvlPlusOne);
+						const c = b.pow(3.45);
+						return a.add(c).floor();
 					}
 
 					let levelToUse = milestone.level;
@@ -209,7 +190,7 @@ export class Start extends Layer {
 				},
 				updateText: () => {
 					console.log('Updating Upgrade Increase Points Per Click');
-					this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.milestones.ultimatePointsPerClick.cost}`;
+					this.buttons.ultimatePointsPerClick.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.ultimatePointsPerClick.cost)}`;
 					this.buttons.ultimatePointsPerClick.lines[2].textContent = `Level: ${this.milestones.ultimatePointsPerClick.level}/${this.milestones.ultimatePointsPerClick.maxLevel}`;
 					this.buttons.ultimatePointsPerClick.lines[3].textContent = `*${this.milestones.ultimatePointsPerClick.level.add(1)}`;
 				},
@@ -218,17 +199,9 @@ export class Start extends Layer {
 			// Auto Points
 			autoPoints: {
 				activate: () => {
-					if (
-						this.currency.gte(
-							this.game.layers.start.milestones.autoPoints.cost) &&
-							this.game.layers.start.milestones.autoPoints.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.autoPoints.cost,
-						);
+					this.buyMilestone('autoPoints');
+					if (this.milestones.autoPoints.level.gt(0)) {
 						this.autoPointsEnabled = true;
-						this.game.layers.start.milestones.autoPoints.levelUp();
-						this.milestoneFunctions.autoPoints.update();
 					}
 				},
 				cost: (
@@ -237,7 +210,7 @@ export class Start extends Layer {
 					forceLvl?: Decimal,
 				): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
-						const cost = new Decimal(7777);
+						const cost = new Decimal(15000);
 						return cost;
 					}
 
@@ -251,7 +224,7 @@ export class Start extends Layer {
 				},
 				updateText: () => {
 					if (this.milestones.autoPoints.buyable) {
-						this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.milestones.autoPoints.cost}`;
+						this.buttons.autoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPoints.cost)}`;
 					} else {
 						this.buttons.autoPoints.lines[1].textContent =
 							'Enabled';
@@ -265,21 +238,12 @@ export class Start extends Layer {
 			// Auto Points Divisor
 			autoPointsDivisor: {
 				activate: () => {
-					if (
-						this.currency.gte(
-							this.game.layers.start.milestones.autoPointsDivisor.cost) &&
-							this.game.layers.start.milestones.autoPointsDivisor.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.autoPointsDivisor
-								.cost,
-						);
-						if (this.pointAutoDivisor.gte(2)) {
-							this.pointAutoDivisor = this.pointAutoDivisor.sub(1);
-							this.game.layers.start.milestones.autoPointsDivisor.levelUp();
-							this.milestoneFunctions.autoPointsDivisor.update();
-						}
+					this.buyMilestone('autoPointsDivisor');
+					if (this.milestones.autoPointsDivisor.level.lt(1)) {
+						this.milestones.autoPointsDivisor.level = new Decimal(1);
 					}
+					
+
 				},
 				cost: (
 					milestone: Milestone,
@@ -288,10 +252,12 @@ export class Start extends Layer {
 				): Decimal => {
 					function calcCost(lvl: Decimal): Decimal {
 						const lvlPlusOne = lvl.add(1);
-						const a = new Decimal(lvlPlusOne.pow(1.3));
-						const b = new Decimal(lvlPlusOne.ln()).times(1000);
-						const c = new Decimal(20000);
-						const cost = a.times(b).plus(c).floor();
+						const j = 10000
+						const a = new Decimal(1.5);
+						const b = new Decimal(2.8);
+						const c = new Decimal(lvlPlusOne.times(a)).times(lvl.pow(b));
+						const d = new Decimal(lvlPlusOne.ln()).times(j).add(j);
+						const cost = new Decimal(c.plus(d)).floor();
 						return cost;
 					}
 
@@ -304,25 +270,50 @@ export class Start extends Layer {
 					this.milestoneFunctions.autoPointsDivisor.updateText();
 				},
 				updateText: () => {
-					this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.milestones.autoPointsDivisor.cost}`;
+					this.buttons.autoPointsDivisor.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.autoPointsDivisor.cost)}`;
 					this.buttons.autoPointsDivisor.lines[2].textContent = `Level: ${this.milestones.autoPointsDivisor.level}/${this.milestones.autoPointsDivisor.maxLevel}`;
-					this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${this.pointAutoDivisor}`;
+					this.buttons.autoPointsDivisor.lines[3].textContent = `Divisor: ${new Decimal(100).sub(this.milestones.autoPointsDivisor.level)}%`;
+				},
+			},
+			// Better Auto Points
+			betterAutoPoints: {
+				activate: () => {
+					this.buyMilestone('betterAutoPoints');
+				},
+				cost: (
+					milestone: Milestone,
+					returnMax: boolean = false,
+					forceLvl?: Decimal,
+				): Decimal => {
+					function calcCost(lvl: Decimal): Decimal {
+						const lvlPlusOne = lvl.add(1);
+						const j = 10000
+						const a = new Decimal(1.9);
+						const b = new Decimal(2.8);
+						const c = new Decimal(lvlPlusOne.times(a)).times(lvl.pow(b));
+						const d = new Decimal(lvlPlusOne.ln()).times(j).add(j);
+						const cost = new Decimal(c.plus(d)).floor();
+						return cost;
+					}
+
+					let levelToUse = milestone.level;
+					if (returnMax) levelToUse = milestone.maxLevel;
+					if (forceLvl) levelToUse = forceLvl;
+					return calcCost(levelToUse);
+				},
+				update: () => {
+					this.milestoneFunctions.betterAutoPoints.updateText();
+				},
+				updateText: () => {
+					this.buttons.betterAutoPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.betterAutoPoints.cost)}`;
+					this.buttons.betterAutoPoints.lines[2].textContent = `Level: ${this.milestones.betterAutoPoints.level}/${this.milestones.betterAutoPoints.maxLevel}`;
+					this.buttons.betterAutoPoints.lines[3].textContent = `Divisor: ${this.milestones.betterAutoPoints.level}`;
 				},
 			},
 			// Critical Points (Crit Chance)
 			criticalPoints: {
 				activate: () => {
-					if (
-						this.currency.gte(this.game.layers.start.milestones.criticalPoints.cost) &&
-						this.game.layers.start.milestones.criticalPoints.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.criticalPoints
-								.cost,
-						);
-						this.game.layers.start.milestones.criticalPoints.levelUp();
-						this.milestoneFunctions.criticalPoints.update();
-					}
+					this.buyMilestone('criticalPoints');
 				},
 				cost: (
 					milestone: Milestone,
@@ -348,7 +339,7 @@ export class Start extends Layer {
 					this.milestoneFunctions.criticalPoints.updateText();
 				},
 				updateText: () => {
-					this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.milestones.criticalPoints.cost}`;
+					this.buttons.criticalPoints.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalPoints.cost)}`;
 					this.buttons.criticalPoints.lines[2].textContent = `Level: ${this.milestones.criticalPoints.level}/${this.milestones.criticalPoints.maxLevel}`;
 					this.buttons.criticalPoints.lines[3].textContent = `Crit Chance: ${this.milestones.criticalPoints.level}%`;
 				},
@@ -356,16 +347,7 @@ export class Start extends Layer {
 			// Crit Bonus (Crit reward bonus %)
 			criticalBonus: {
 				activate: () => {
-					if (
-						this.currency.gte(this.game.layers.start.milestones.criticalBonus.cost) &&
-						this.game.layers.start.milestones.criticalBonus.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.criticalBonus.cost,
-						);
-						this.game.layers.start.milestones.criticalBonus.levelUp();
-						this.milestoneFunctions.criticalBonus.update();
-					}
+					this.buyMilestone('criticalBonus');
 				},
 				cost: (
 					milestone: Milestone,
@@ -391,24 +373,15 @@ export class Start extends Layer {
 					this.milestoneFunctions.criticalBonus.updateText();
 				},
 				updateText: () => {
-					this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.milestones.criticalBonus.cost}`;
+					this.buttons.criticalBonus.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.criticalBonus.cost)}`;
 					this.buttons.criticalBonus.lines[2].textContent = `Level: ${this.milestones.criticalBonus.level}/${this.milestones.criticalBonus.maxLevel}`;
-					this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}%`;
+					this.buttons.criticalBonus.lines[3].textContent = `Crit Bonus: ${this.milestones.criticalBonus.level}*`;
 				},
 			},
 			// Over Crit (Turn crits over 100% into BIGGGGER crits)
 			overCritical: {
 				activate: () => {
-					if (
-						this.currency.gte(this.game.layers.start.milestones.overCritical.cost) &&
-						this.game.layers.start.milestones.overCritical.buyable
-					) {
-						this.removeCurrency(
-							this.game.layers.start.milestones.overCritical.cost,
-						);
-						this.game.layers.start.milestones.overCritical.levelUp();
-						this.milestoneFunctions.overCritical.update();
-					}
+					this.buyMilestone('overCritical');
 				},
 				cost: (
 					milestone: Milestone,
@@ -434,7 +407,7 @@ export class Start extends Layer {
 					this.milestoneFunctions.overCritical.updateText();
 				},
 				updateText: () => {
-					this.buttons.overCritical.lines[1].textContent = `Cost: ${this.milestones.overCritical.cost}`;
+					this.buttons.overCritical.lines[1].textContent = `Cost: ${this.game.formatValue(this.milestones.overCritical.cost)}`;
 					this.buttons.overCritical.lines[2].textContent = `Level: ${this.milestones.overCritical.level}/${this.milestones.overCritical.maxLevel}`;
 					this.buttons.overCritical.lines[3].textContent = `Over Crit: ${this.milestones.overCritical.level}`;
 				},
@@ -474,7 +447,7 @@ export class Start extends Layer {
 
 			ultimatePointsPerClick: new Milestone(
 				'ultimatePointsPerClick',
-				'Ultimate PPC',
+				'+++Ultimate +++PPC',
 				new Decimal(30000),
 				'Makes +PPC and ++PPC bettererist',
 				new Decimal(10),
@@ -485,7 +458,7 @@ export class Start extends Layer {
 			autoPoints: new Milestone(
 				'autoPoints',
 				'Automates Points',
-				new Decimal(1000),
+				new Decimal(7500),
 				'Give points automatically',
 				new Decimal(1),
 				this.milestoneFunctions.autoPoints,
@@ -499,6 +472,16 @@ export class Start extends Layer {
 				'Lowers the auto-points divider',
 				new Decimal(99),
 				this.milestoneFunctions.autoPointsDivisor,
+				this.upgradeColumns[1],
+			),
+
+			betterAutoPoints: new Milestone(
+				'betterAutoPoints',
+				'Better Auto Points',
+				new Decimal(1e8),
+				'Makes auto points BETTER than clicking!',
+				new Decimal(100),
+				this.milestoneFunctions.betterAutoPoints,
 				this.upgradeColumns[1],
 			),
 
@@ -526,7 +509,7 @@ export class Start extends Layer {
 				'overCritical',
 				'Over Critical',
 				new Decimal(250000),
-				'Converts bonus crit chance into better crits!',
+				'Converts bonus crit chance into better crits! (Usless with sub 100% crit chance)',
 				new Decimal(2500),
 				this.milestoneFunctions.overCritical,
 				this.upgradeColumns[2],
@@ -546,13 +529,34 @@ export class Start extends Layer {
 		this.toggleVisibility();
 
 		//  Moves the give points button to after the points text but before the upgrades
+		// The index will need to change if I add more text in the this.div
 		if (this.div.firstChild) {
 			this.div.insertBefore(
 				this.buttons.givePoints.button,
-				this.div.children[2],
+				this.div.children[3],
 			);
 		}
 		this.milestoneFunctions.givePoints.update();
+	}
+
+	buyMilestone(m: string) {
+		const tryUpg = (): void => {
+			if (
+				this.currency.gte(this.milestones[m].cost) &&
+				this.milestones[m].buyable
+			) {
+				this.removeCurrency(this.milestones[m].cost);
+				this.milestones[m].levelUp();
+				
+			}
+		}
+		if (this.game.keyPressed === 'Shift') {
+			for (let i = 0; i < 10; i++) {
+				tryUpg();
+			}
+		} else tryUpg();
+
+		this.milestoneFunctions[m].update();
 	}
 
 	addCurrencyStack(rtn?: boolean) {
@@ -568,10 +572,10 @@ export class Start extends Layer {
 			);
 		}
 		if (this.milestones.ultimatePointsPerClick.level.gt(0)) {
-			value = value.times(
-				this.milestones.ultimatePointsPerClick.level.add(1),
-			);
+			value = value.times(this.milestones.ultimatePointsPerClick.level.add(1)).times(this.milestones.ultimatePointsPerClick.level.add(1));
 		}
+
+		// Crit stuff
 		if (this.milestones.criticalPoints.level.gt(0)) {
 			const rawCritChance = this.milestones.criticalPoints.level;
 			const critChance = mapRange(
@@ -600,7 +604,6 @@ export class Start extends Layer {
 			return value;
 		}
 		this.lastPointsGive = value;
-		console.log('+', value);
 		this.addCurrency(value);
 	}
 
@@ -615,15 +618,21 @@ export class Start extends Layer {
 	}
 
 	updatePointsText() {
-		this.pointsText.textContent = `Points: ${this.currency.toString()}`;
-		this.lastPointsGiveText.textContent = `+ ${this.lastPointsGive}`;
+		this.pointsText.textContent = `Points: ${this.game.formatValue(this.currency)}`;
+		this.lastPointsGiveText.textContent = `Manual P+ ${this.game.formatValue(this.lastPointsGive)}`;
+		this.lastAutoPointsGiveText.textContent = `Auto P+ ${this.game.formatValue(this.lastAutoPointsGive)}`;
 	}
 
 	update() {
+		if (this.currency.gt(this.highestCurrency)) {
+			this.highestCurrency = this.currency;
+		}
 		if (this.autoPointsEnabled) {
-			this.addCurrency(
-				this.addCurrencyStack(true)!.div(this.pointAutoDivisor),
-			);
+			let value = this.addCurrencyStack(true)!;
+			value = value.div(new Decimal(100).sub(this.milestones.autoPointsDivisor.level))
+			value = value.times(new Decimal(this.milestones.betterAutoPoints.level.add(1).ln()).add(1));
+			this.lastAutoPointsGive = value;
+			this.addCurrency(value);
 		}
 	}
 }
