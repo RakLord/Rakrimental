@@ -3,7 +3,7 @@ import {Milestone} from './milestone';
 
 export class Button {
 	button: HTMLButtonElement;
-	tooltopVisable: boolean;
+	tooltipVisible: boolean;
 	milestone: Milestone;
 	game: Game;
 
@@ -13,7 +13,7 @@ export class Button {
 		this.game = game;
 		this.milestone = milestone;
 		this.button = document.createElement('button');
-		this.tooltopVisable = true;
+		this.tooltipVisible = true;
 		this.button.setAttribute('tabindex', '-1');
 
 		// add 4 divs to the this.lines array
@@ -77,7 +77,7 @@ export class Button {
 
 		// Tooltip
 		this.button.addEventListener('mouseover', (event) => {
-			if (!this.tooltopVisable) return;
+			if (!this.tooltipVisible) return;
 			const descriptionDiv = document.createElement('div');
 			descriptionDiv.textContent = this.milestone.description;
 			descriptionDiv.className = 'dynamic-tooltip';
@@ -109,8 +109,8 @@ export class Button {
 	}
 
 	toggleTooltip(forceState?: boolean) {
-		if (forceState) this.tooltopVisable = forceState;
-		else this.tooltopVisable = !this.tooltopVisable;
+		if (forceState) this.tooltipVisible = forceState;
+		else this.tooltipVisible = !this.tooltipVisible;
 	}
 
 	updateTooltip() {

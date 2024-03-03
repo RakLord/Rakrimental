@@ -7,12 +7,14 @@ import {Coin} from './layers/coin';
 import {FormulaGraph} from './graph';
 import {DevTools} from './devtools';
 import {Settings} from './settings';
+import {Help} from './help';
 
 import Decimal from 'break_infinity.js';
 
 export class Game {
 	saveManager: SaveManager;
 	settings: Settings;
+	help: Help;
 	devTools: DevTools;
 	textElements: {[key: string]: HTMLElement}; // Hold text displays (may refactor soon)
 	mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
@@ -23,7 +25,6 @@ export class Game {
 	layers: {[key: string]: Layer};
 	visibleLayer: string; // Holds the name of the currently visible layer
 	navBar: HTMLElement;
-	utilityBar: HTMLElement;
 	keyPressed: string;
 
 	mouseX: number = 0;
@@ -35,12 +36,12 @@ export class Game {
 	constructor() {
 		console.log('Game Constructor');
 		this.settings = new Settings(this);
+		this.help = new Help(this);
 		this.saveManager = new SaveManager(this);
 		this.devTools = new DevTools(this);
 		this.formulaGraph = new FormulaGraph(this);
 		this.displayingGraph = false;
 		this.navBar = $('navBar')!;
-		this.utilityBar = $('utilityBar')!;
 		this.mainInterval = 1000;
 		this.keyPressed = '';
 		this.mouseX = 0;
@@ -65,9 +66,6 @@ export class Game {
 		this.layers.start.unlocked = true;
 
 		this.visibleLayer = 'start';
-
-		this.utilityButton(this, 'Save', this.save);
-		this.utilityButton(this, 'Load', this.load);
 
 		this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
 		this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
@@ -109,7 +107,9 @@ export class Game {
 				case '`':
 					this.devTools.toggleVisibility();
 					break;
-
+				case 'i':
+					this.help.toggleVisibility();
+					break;
 				case 'Escape':
 					this.settings.toggleVisibility();
 
@@ -139,14 +139,6 @@ export class Game {
 			}
 		} else {
 		}
-	}
-
-	utilityButton(game: Game, txt: string, func: () => any) {
-		const btn = document.createElement('button');
-		btn.innerText = txt;
-		btn.classList.add('btn', 'btn-transparent', 'btn-hover');
-		btn.addEventListener('click', func.bind(game));
-		this.utilityBar.appendChild(btn);
 	}
 
 	autoSave() {
@@ -257,4 +249,6 @@ const $ = document.getElementById.bind(document);
 document.addEventListener('DOMContentLoaded', function () {
 	game = new Game();
 	(window as any).game = game;
+	game.settings.visible = false;
+	game.settings.toggleVisibility(false);
 });

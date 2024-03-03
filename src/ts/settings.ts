@@ -74,6 +74,8 @@ export class Settings {
 		this.addRow('AutoLoad', {type: 'string', text: 'Auto Load'}, {type: 'checkBox', value: 'autoLoadEnabled'});
 		this.addRow('Tooltips', {type: 'string', text: 'Tooltips'}, {type: 'checkBox', value: 'tooltipsEnabled'});
 		this.addRow('Graphs', {type: 'string', text: 'Graphs'}, {type: 'checkBox', value: 'graphsEnabled'});
+		this.addRow('Divider', {type: 'divider', text: 'divider'}, {type: 'divider', text: 'divider'});
+		this.addRow('SaveLoad', {type: 'save', text: 'Save'}, {type: 'load', text: 'Load'});
 	}
 
 	addRow(label: string, options1: {[key: string]: any}, options2: {[key: string]: any}): void {
@@ -87,11 +89,22 @@ export class Settings {
 
 		row.appendChild(col1);
 		row.appendChild(col2);
+		if (options1.type === 'divider') {
+			row.classList.add('divider');
+			return;
+		}
 
 		switch (options1.type) {
 			case 'string':
 				col1.textContent = options1.text;
 				col1.classList.add('string');
+				break;
+			case 'save':
+				col1.appendChild(
+					this.newButton(options1.text, () => {
+						this.game.save();
+					}),
+				);
 				break;
 		}
 
@@ -99,7 +112,21 @@ export class Settings {
 			case 'checkBox':
 				this.checkboxes.push(new Checkbox(this.game, options2.value, col2));
 				break;
+			case 'load':
+				col2.appendChild(
+					this.newButton(options2.text, () => {
+						this.game.load();
+					}),
+				);
+				break;
 		}
+	}
+
+	newButton(label: string, callback: () => void): HTMLElement {
+		let button = document.createElement('button');
+		button.textContent = label;
+		button.addEventListener('click', callback);
+		return button;
 	}
 
 	updateCheckboxes(): void {
@@ -114,7 +141,7 @@ export class Settings {
 	}
 
 	toggleVisibility(forceState?: boolean): void {
-		if (forceState) {
+		if (forceState !== undefined) {
 			this.visible = forceState;
 		} else {
 			this.visible = !this.visible;

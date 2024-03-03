@@ -2949,7 +2949,7 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         this.game = game;
         this.milestone = milestone;
         this.button = document.createElement("button");
-        this.tooltopVisable = true;
+        this.tooltipVisible = true;
         this.button.setAttribute("tabindex", "-1");
         // add 4 divs to the this.lines array
         this.lines.push(document.createElement("h1"));
@@ -2993,7 +2993,7 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         });
         // Tooltip
         this.button.addEventListener("mouseover", (event)=>{
-            if (!this.tooltopVisable) return;
+            if (!this.tooltipVisible) return;
             const descriptionDiv = document.createElement("div");
             descriptionDiv.textContent = this.milestone.description;
             descriptionDiv.className = "dynamic-tooltip";
@@ -3017,8 +3017,8 @@ class $e15866bea5b2da0a$export$353f5b6fc5456de1 {
         return this;
     }
     toggleTooltip(forceState) {
-        if (forceState) this.tooltopVisable = forceState;
-        else this.tooltopVisable = !this.tooltopVisable;
+        if (forceState) this.tooltipVisible = forceState;
+        else this.tooltipVisible = !this.tooltipVisible;
     }
     updateTooltip() {
         const tooltip = document.querySelector(".tooltip");
@@ -4387,6 +4387,20 @@ class $39efdbf859f77093$export$c72f6eaae7b9adff {
             type: "checkBox",
             value: "graphsEnabled"
         });
+        this.addRow("Divider", {
+            type: "divider",
+            text: "divider"
+        }, {
+            type: "divider",
+            text: "divider"
+        });
+        this.addRow("SaveLoad", {
+            type: "save",
+            text: "Save"
+        }, {
+            type: "load",
+            text: "Load"
+        });
     }
     addRow(label, options1, options2) {
         let row = document.createElement("div");
@@ -4398,17 +4412,37 @@ class $39efdbf859f77093$export$c72f6eaae7b9adff {
         col2.classList.add("col");
         row.appendChild(col1);
         row.appendChild(col2);
+        if (options1.type === "divider") {
+            row.classList.add("divider");
+            return;
+        }
         switch(options1.type){
             case "string":
                 col1.textContent = options1.text;
                 col1.classList.add("string");
+                break;
+            case "save":
+                col1.appendChild(this.newButton(options1.text, ()=>{
+                    this.game.save();
+                }));
                 break;
         }
         switch(options2.type){
             case "checkBox":
                 this.checkboxes.push(new $39efdbf859f77093$export$48513f6b9f8ce62d(this.game, options2.value, col2));
                 break;
+            case "load":
+                col2.appendChild(this.newButton(options2.text, ()=>{
+                    this.game.load();
+                }));
+                break;
         }
+    }
+    newButton(label, callback) {
+        let button = document.createElement("button");
+        button.textContent = label;
+        button.addEventListener("click", callback);
+        return button;
     }
     updateCheckboxes() {
         for (const checkbox of this.checkboxes)checkbox.update();
@@ -4418,11 +4452,117 @@ class $39efdbf859f77093$export$c72f6eaae7b9adff {
         this.game.setTooltipsState(this.game.settings.config.tooltipsEnabled);
     }
     toggleVisibility(forceState) {
-        if (forceState) this.visible = forceState;
+        if (forceState !== undefined) this.visible = forceState;
         else this.visible = !this.visible;
         if (this.visible) this.div.classList.remove("hidden");
         else this.div.classList.add("hidden");
         this.setStates();
+    }
+}
+
+
+class $9ad722fc725da03c$export$1be7516c0280bee8 {
+    constructor(game){
+        this.game = game;
+        this.visible = false;
+        this.div = document.createElement("div");
+        this.div.classList.add("help", "hidden");
+        document.body.appendChild(this.div);
+        this.iconDiv = document.createElement("div");
+        this.iconDiv.classList.add("help-icon");
+        this.iconDiv.innerHTML = "?";
+        this.iconDiv.addEventListener("click", ()=>{
+            this.toggleVisibility();
+        });
+        document.body.appendChild(this.iconDiv);
+        this.setupHelp();
+    }
+    toggleVisibility(forceState) {
+        if (forceState) this.visible = forceState;
+        else this.visible = !this.visible;
+        console.log(this.visible);
+        if (this.visible) this.div.classList.remove("hidden");
+        else this.div.classList.add("hidden");
+    }
+    setupHelp() {
+        const header = document.createElement("h2");
+        header.classList.add("header");
+        header.innerText = "Help & Info";
+        this.div.appendChild(header);
+        const credits = document.createElement("p");
+        credits.classList.add("credits");
+        credits.innerText = "Game by: Rak";
+        this.div.appendChild(credits);
+        const info = document.createElement("div");
+        info.classList.add("info");
+        const text = [
+            "Hello, Im rak \uD83E\uDD9D",
+            "This is a game I am working on in my spare time.",
+            "Updates are frequent when I have time!",
+            "Current content ends early during 2nd layer."
+        ];
+        for (const line of text){
+            const p = document.createElement("p");
+            p.innerText = line;
+            info.appendChild(p);
+        }
+        this.div.appendChild(info);
+        let divider = document.createElement("div");
+        divider.classList.add("divider");
+        this.div.appendChild(divider);
+        const hotKeys = document.createElement("div");
+        hotKeys.classList.add("hotkeys");
+        const tableHeader = document.createElement("h3");
+        tableHeader.innerText = "Hotkeys";
+        tableHeader.classList.add("header");
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        table.appendChild(thead);
+        const tr = document.createElement("tr");
+        thead.appendChild(tr);
+        const th1 = document.createElement("th");
+        tr.appendChild(th1);
+        th1.innerText = "Key";
+        const th2 = document.createElement("th");
+        tr.appendChild(th2);
+        th2.innerText = "Action";
+        const tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+        const hotkeys = [
+            [
+                "Numbers",
+                "Switch Layer"
+            ],
+            [
+                "Escape",
+                "Open/close settings"
+            ],
+            [
+                "i",
+                "Open/close help"
+            ],
+            [
+                "Shift + Click",
+                "Buy 10 of an upgrade"
+            ],
+            [
+                "z",
+                "Buy upto 10,000 of an upgrade"
+            ]
+        ];
+        for (const hotkey of hotkeys){
+            const tr = document.createElement("tr");
+            tbody.appendChild(tr);
+            const td1 = document.createElement("td");
+            tr.appendChild(td1);
+            td1.innerText = hotkey[0];
+            const td2 = document.createElement("td");
+            tr.appendChild(td2);
+            td2.innerText = hotkey[1];
+        }
+        hotKeys.appendChild(tableHeader);
+        hotKeys.appendChild(table);
+        this.div.appendChild(hotKeys);
     }
 }
 
@@ -4436,12 +4576,12 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         this.mouseY = 0;
         console.log("Game Constructor");
         this.settings = new (0, $39efdbf859f77093$export$c72f6eaae7b9adff)(this);
+        this.help = new (0, $9ad722fc725da03c$export$1be7516c0280bee8)(this);
         this.saveManager = new (0, $a348cea740e504f8$export$5bfce22a6398152d)(this);
         this.devTools = new (0, $29b5203ce7c45e11$export$d4d8c31640dc9976)(this);
         this.formulaGraph = new (0, $f9544c9499cf351f$export$a52303878d5ad02c)(this);
         this.displayingGraph = false;
         this.navBar = $98b122bb987399aa$var$$("navBar");
-        this.utilityBar = $98b122bb987399aa$var$$("utilityBar");
         this.mainInterval = 1000;
         this.keyPressed = "";
         this.mouseX = 0;
@@ -4462,8 +4602,6 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         }
         this.layers.start.unlocked = true;
         this.visibleLayer = "start";
-        this.utilityButton(this, "Save", this.save);
-        this.utilityButton(this, "Load", this.load);
         this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
         this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
         this.setupNav();
@@ -4500,6 +4638,9 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
                 case "`":
                     this.devTools.toggleVisibility();
                     break;
+                case "i":
+                    this.help.toggleVisibility();
+                    break;
                 case "Escape":
                     this.settings.toggleVisibility();
                     break;
@@ -4521,13 +4662,6 @@ class $98b122bb987399aa$export$985739bfa5723e08 {
         if (await this.saveManager.saveExists()) {
             if (this.settings.config.autoLoadEnabled) this.load();
         }
-    }
-    utilityButton(game, txt, func) {
-        const btn = document.createElement("button");
-        btn.innerText = txt;
-        btn.classList.add("btn", "btn-transparent", "btn-hover");
-        btn.addEventListener("click", func.bind(game));
-        this.utilityBar.appendChild(btn);
     }
     autoSave() {
         if (this.settings.config.autoSaveEnabled) {
@@ -4601,7 +4735,9 @@ const $98b122bb987399aa$var$$ = document.getElementById.bind(document);
 document.addEventListener("DOMContentLoaded", function() {
     $98b122bb987399aa$var$game = new $98b122bb987399aa$export$985739bfa5723e08();
     window.game = $98b122bb987399aa$var$game;
+    $98b122bb987399aa$var$game.settings.visible = false;
+    $98b122bb987399aa$var$game.settings.toggleVisibility(false);
 });
 
 
-//# sourceMappingURL=index.b84c1c59.js.map
+//# sourceMappingURL=index.93ece553.js.map
