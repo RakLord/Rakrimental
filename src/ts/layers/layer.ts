@@ -96,7 +96,9 @@ export class Layer {
 			const unlockCost = milestone.unlockCost;
 			// Set unlocked to true (this is saved in the save file)
 			try {
+				if (!milestone) return;
 				if (this.highestCurrency.gt(unlockCost)) {
+					if (milestone.name === 'overCritical' && this.game.layers.start.milestones.criticalPoints.level.lte(100)) return;
 					milestone.unlocked = true;
 				}
 			} catch (err) {
@@ -114,6 +116,7 @@ export class Layer {
 			if (this.milestones[key].unlocked && this.buttons[key] !== undefined) {
 				try {
 					if (!this.div.contains(this.buttons[key].button)) {
+						console.log('Adding button to div', key, this.milestones[key], this.buttons[key]);
 						if (this.milestones[key].buttonContainer !== undefined) {
 							this.milestones[key].buttonContainer.appendChild(this.buttons[key].button);
 							this.milestoneFunctions[key].updateText();

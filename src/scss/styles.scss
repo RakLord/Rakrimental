@@ -337,3 +337,111 @@ main .dice-container {
 main .can-roll {
 	border: 2px solid $accent;
 }
+
+.dev-tools {
+	position: absolute;
+	bottom: 0;
+	right: 50%;
+	transform: translateX(50%);
+	background-color: $background;
+	color: $text;
+	border: 2px solid $accent;
+	border-radius: 0.7rem;
+	padding: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	gap: 0.5rem;
+
+	height: 40vh;
+	width: 20vw;
+	max-width: 220px;
+	min-width: 100px;
+
+	transition: opacity 0.3s ease;
+
+	.dev-tools-header {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1.3rem;
+	}
+
+	button {
+		width: 100%;
+		height: fit-content;
+		padding: 0.6rem;
+		text-align: center;
+		border: 2px solid $text;
+		border-radius: 0.6rem;
+	}
+
+	// make a transition for the dev tools to fade in and out
+	&.hidden {
+		opacity: 0;
+		pointer-events: none;
+		visibility: hidden;
+	}
+}
+
+.settings {
+	position: absolute;
+	top: 50%;
+	right: 50%;
+	transform: translate(50%, -50%);
+	border: 2px solid $text;
+	border-radius: 0.7rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	width: 90vw;
+	height: 90vh;
+	background-color: $background;
+	opacity: 90%;
+
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+
+	.header {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1.8rem;
+		border-bottom: 2px solid $text;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 60%;
+		max-width: 400px;
+		height: 2rem;
+		margin-block: 0.3rem;
+		background-color: $background;
+		opacity: 100%;
+		.string {
+			width: 40%;
+			padding-inline: 0.5rem;
+			font-size: 1.2rem;
+		}
+
+		.checkbox {
+			width: 12%;
+			min-width: 0.6rem;
+			aspect-ratio: 1 / 1 !important;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: red;
+			border: 1px solid $text;
+			cursor: pointer;
+		}
+		.checked {
+			background-color: $accent;
+		}
+	}
+}

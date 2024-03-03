@@ -1,31 +1,33 @@
 {
-  "name": "rakrimental",
-  "version": "1.0.0",
-  "description": "waaa",
-  "scripts": {
-    "start": "parcel ./src/index.html",
-    "build": "parcel build ./src/index.html  --no-optimize"
-  },
-  "keywords": [],
-  "author": "Rak",
-  "license": "ISC",
-  "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
-    "break_infinity.js": "^2.2.0",
-    "localforage": "^1.10.0",
-    "lodash": "^4.17.21",
-    "typescript": "^5.3.3"
-  },
-  "devDependencies": {
-    "@parcel/transformer-sass": "^2.11.0",
-    "@types/bootstrap": "^5.2.10",
-    "@types/localforage": "^0.0.34",
-    "@types/lodash": "^4.14.202",
-    "autoprefixer": "^10.4.17",
-    "parcel": "^2.11.0",
-    "postcss": "^8.4.35",
-    "prettier": "3.2.5",
-    "break_infinity.js": "^2.2.0"
-  }
+	"name": "rakrimental",
+	"version": "1.0.0",
+	"description": "waaa",
+	"scripts": {
+		"start": "parcel ./src/index.html",
+		"cleanup": "rimraf --glob ./Dist/ ./.parcel-cache/",
+		"build": "npm run cleanup && parcel build ./src/index.html --no-optimize --public-url ./"
+	},
+	"keywords": [],
+	"author": "Rak",
+	"license": "ISC",
+	"dependencies": {
+		"@popperjs/core": "^2.11.8",
+		"bootstrap": "^5.3.3",
+		"break_infinity.js": "^2.2.0",
+		"localforage": "^1.10.0",
+		"lodash": "^4.17.21",
+		"typescript": "^5.3.3"
+	},
+	"devDependencies": {
+		"@parcel/transformer-sass": "^2.11.0",
+		"@types/bootstrap": "^5.2.10",
+		"@types/localforage": "^0.0.34",
+		"@types/lodash": "^4.14.202",
+		"autoprefixer": "^10.4.17",
+		"break_infinity.js": "^2.2.0",
+		"parcel": "^2.11.0",
+		"postcss": "^8.4.35",
+		"prettier": "3.2.5",
+		"rimraf": "^5.0.5"
+	}
 }

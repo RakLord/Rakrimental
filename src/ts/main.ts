@@ -5,43 +5,44 @@ import {Start} from './layers/start';
 import {Dice} from './layers/dice';
 import {Coin} from './layers/coin';
 import {FormulaGraph} from './graph';
+import {DevTools} from './devtools';
+import {Settings} from './settings';
+
 import Decimal from 'break_infinity.js';
 
 export class Game {
 	saveManager: SaveManager;
+	settings: Settings;
+	devTools: DevTools;
 	textElements: {[key: string]: HTMLElement}; // Hold text displays (may refactor soon)
 	mainInterval: number; // Used for the main game loop - This can be decreased over time to make the game run faster
 	gameTimer: number; // Holds the setInterval function for the mainInterval
 	fixedInterval: number = 3000; // Used for more process intense operations that need to be done less frequently
 	fixedTimer: number; // Holds the setInterval function for the fixedInterval
-	autosaveInterval: number; // Used for autosaving
 	autosaveTimer: number; // Holds the setInterval function for the autosaveInterval
 	layers: {[key: string]: Layer};
 	visibleLayer: string; // Holds the name of the currently visible layer
 	navBar: HTMLElement;
 	utilityBar: HTMLElement;
-	tooltipsEnabled: boolean;
 	keyPressed: string;
-	autoSaveEnabled: boolean;
 
 	mouseX: number = 0;
 	mouseY: number = 0;
 
-	formulaGraphEnabled: boolean = false;
 	displayingGraph: boolean;
 	formulaGraph: FormulaGraph;
 
 	constructor() {
 		console.log('Game Constructor');
+		this.settings = new Settings(this);
 		this.saveManager = new SaveManager(this);
+		this.devTools = new DevTools(this);
 		this.formulaGraph = new FormulaGraph(this);
 		this.displayingGraph = false;
 		this.navBar = $('navBar')!;
 		this.utilityBar = $('utilityBar')!;
 		this.mainInterval = 1000;
 		this.keyPressed = '';
-		this.autoSaveEnabled = true;
-		this.autosaveInterval = 30000;
 		this.mouseX = 0;
 		this.mouseY = 0;
 		this.layers = {
@@ -64,17 +65,12 @@ export class Game {
 		this.layers.start.unlocked = true;
 
 		this.visibleLayer = 'start';
-		this.tooltipsEnabled = true;
 
 		this.utilityButton(this, 'Save', this.save);
 		this.utilityButton(this, 'Load', this.load);
-		this.utilityButton(this, 'AutoSave', this.toggleAutoSave);
-		this.utilityButton(this, 'Toggle Tooltips', this.toggleTooltips);
-		this.utilityButton(this, 'Enable Graphs', this.enableGraphs);
 
 		this.gameTimer = setInterval(this.update.bind(this), this.mainInterval);
 		this.fixedTimer = setInterval(this.fixedIntervalUpdate.bind(this), this.fixedInterval);
-		this.autosaveTimer = setInterval(this.autoSave.bind(this), this.autosaveInterval);
 
 		this.setupNav();
 
@@ -92,6 +88,7 @@ export class Game {
 
 		document.addEventListener('keydown', (event) => {
 			this.keyPressed = event.key;
+			console.log('Key Pressed:', this.keyPressed);
 			switch (this.keyPressed) {
 				case 'q':
 					this.layers.start.currency = this.layers.start.currency.times(10);
@@ -106,11 +103,16 @@ export class Game {
 				case '3':
 					this.switchLayer('coin');
 					break;
-				case 'g':
-					this.formulaGraphEnabled = !this.formulaGraphEnabled;
-					break;
 				case 'm':
 					this.layers.start.currency = new Decimal(1e16);
+					break;
+				case '`':
+					this.devTools.toggleVisibility();
+					break;
+
+				case 'Escape':
+					this.settings.toggleVisibility();
+
 					break;
 			}
 		});
@@ -122,17 +124,23 @@ export class Game {
 			this.mouseY = event.clientY;
 		});
 
+		this.settings.init();
+
 		this.tryLoad();
+		this.autosaveTimer = setInterval(this.autoSave.bind(this), this.settings.config.autoSaveInterval);
 	}
 
 	async tryLoad() {
+		await this.saveManager.loadSettings(this);
+
 		if (await this.saveManager.saveExists()) {
-			this.load();
+			if (this.settings.config.autoLoadEnabled) {
+				this.load();
+			}
 		} else {
-			console.log('No saved game state to load');
-			this.save(); // Save initial state if nothing to load
 		}
 	}
+
 	utilityButton(game: Game, txt: string, func: () => any) {
 		const btn = document.createElement('button');
 		btn.innerText = txt;
@@ -142,15 +150,10 @@ export class Game {
 	}
 
 	autoSave() {
-		if (this.autoSaveEnabled) {
+		if (this.settings.config.autoSaveEnabled) {
 			if (this.layers.start.currency.eq(0)) return;
 			console.log('AutoSaving');
 			this.save();
-			const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === 'AutoSave')[0];
-			autoSaveBtn.classList.add('auto-save-on');
-		} else {
-			const autoSaveBtn = Array.from(this.utilityBar.children).filter((child) => child.textContent === 'AutoSave')[0];
-			autoSaveBtn.classList.remove('auto-save-on');
 		}
 	}
 
@@ -160,10 +163,6 @@ export class Game {
 
 	load() {
 		this.saveManager.load(this);
-	}
-
-	toggleAutoSave() {
-		this.autoSaveEnabled = !this.autoSaveEnabled;
 	}
 
 	// Is called every mainInterval time (1000ms default)
@@ -189,20 +188,12 @@ export class Game {
 		this.setupNav();
 	}
 
-	toggleTooltips() {
-		this.tooltipsEnabled = !this.tooltipsEnabled;
-		this.setTooltipsState();
-	}
-
-	enableGraphs() {
-		this.formulaGraphEnabled = !this.formulaGraphEnabled;
-	}
-
-	setTooltipsState() {
+	setTooltipsState(forcedState?: boolean) {
 		for (const layer of Object.keys(this.layers)) {
 			for (const key of Object.keys(this.layers[layer].buttons)) {
 				const btn = this.layers[layer].buttons[key];
-				btn.toggleTooltip();
+				if (forcedState) btn.toggleTooltip(forcedState);
+				else btn.toggleTooltip(forcedState);
 				// element.setAttribute('tooltipenabled', 'enabled');
 			}
 		}

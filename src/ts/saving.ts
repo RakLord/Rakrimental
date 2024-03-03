@@ -2,6 +2,9 @@ import {Game} from './main';
 import localForage from 'localforage';
 import {Milestone} from './milestone';
 import Decimal from 'break_infinity.js';
+import {Start} from './layers/start';
+import {Dice} from './layers/dice';
+import {Coin} from './layers/coin';
 
 export class SaveManager {
 	game: Game;
@@ -13,6 +16,24 @@ export class SaveManager {
 
 	async save(game: Game) {
 		this.game = game;
+
+		// Save the SETTINGS
+		const settingsToSave = {
+			autoLoadEnabled: this.game.settings.config.autoLoadEnabled,
+			autoSaveEnabled: this.game.settings.config.autoSaveEnabled,
+			tooltipsEnabled: this.game.settings.config.tooltipsEnabled,
+			graphsEnabled: this.game.settings.config.graphsEnabled,
+		};
+
+		// Attempt to save the settings
+		try {
+			console.log('Saving settings', settingsToSave);
+			await localForage.setItem('gameSettings', settingsToSave);
+		} catch (err) {
+			console.log('Save failed', err);
+		}
+
+		// Save the game state
 		console.log('Saving game');
 		console.log(this.game);
 		const stateToSave: {[key: string]: any} = {};
@@ -20,7 +41,7 @@ export class SaveManager {
 		stateToSave['visibleLayer'] = this.game.visibleLayer;
 		stateToSave['mainInterval'] = this.game.mainInterval;
 		stateToSave['fixedInterval'] = this.game.fixedInterval;
-		stateToSave['tooltipsEnabled'] = this.game.tooltipsEnabled;
+
 		stateToSave['layers'] = {
 			start: {
 				unlocked: this.game.layers.start.unlocked,
@@ -99,8 +120,37 @@ export class SaveManager {
 		}
 	}
 
+	async loadSettings(game: Game) {
+		this.game = game;
+
+		try {
+			const settings = await localForage.getItem<any>('gameSettings');
+			console.log('SETTINGS LOAD', settings);
+			if (settings) {
+				this.game.settings.config.autoLoadEnabled = settings.autoLoadEnabled;
+				this.game.settings.config.autoSaveEnabled = settings.autoSaveEnabled;
+				this.game.settings.config.tooltipsEnabled = settings.tooltipsEnabled;
+				this.game.settings.config.graphsEnabled = settings.graphsEnabled;
+			} else {
+				console.log('No saved settings to load');
+			}
+		} catch (err) {
+			console.error('Load failed', err);
+		}
+
+		try {
+			game.settings.updateCheckboxes();
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	async load(game: Game) {
 		this.game = game;
+
+		// Attempt to load the settings
+
+		// Attempt to load game state
 		try {
 			const gameState = await localForage.getItem<any>('gameState');
 			console.log('STATE LOAD: ', gameState);
@@ -109,7 +159,6 @@ export class SaveManager {
 				this.game.visibleLayer = gameState.visibleLayer;
 				this.game.mainInterval = gameState.mainInterval;
 				this.game.fixedInterval = gameState.fixedInterval;
-				this.game.tooltipsEnabled = gameState.tooltipsEnabled;
 
 				// Start Layer
 				console.log(gameState.layers.start.currency, typeof gameState.layers.start.currency);
@@ -217,5 +266,9 @@ export class SaveManager {
 		const value = await localForage.getItem('gameState');
 		// Check not just for an object, but also ensure it's not null or undefined
 		return value !== null && value !== undefined;
+	}
+
+	async deleteSave() {
+		await localForage.removeItem('gameState');
 	}
 }

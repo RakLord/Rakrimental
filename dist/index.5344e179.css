@@ -13406,4 +13406,111 @@ main .can-roll {
   border: 2px solid #45e463;
 }
 
-/*# sourceMappingURL=index.044e704e.css.map */
+.dev-tools {
+  color: #f7f7f7;
+  background-color: #050705;
+  border: 2px solid #45e463;
+  border-radius: .7rem;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: .5rem;
+  width: 20vw;
+  min-width: 100px;
+  max-width: 220px;
+  height: 40vh;
+  padding: .5rem;
+  transition: opacity .3s;
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.dev-tools .dev-tools-header {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: 1.3rem;
+  display: flex;
+}
+
+.dev-tools button {
+  text-align: center;
+  border: 2px solid #f7f7f7;
+  border-radius: .6rem;
+  width: 100%;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: .6rem;
+}
+
+.dev-tools.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.settings {
+  opacity: .9;
+  background-color: #050705;
+  border: 2px solid #f7f7f7;
+  border-radius: .7rem;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  box-shadow: 0 0 10px #00000080;
+}
+
+.settings .header {
+  border-bottom: 2px solid #f7f7f7;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: 1.8rem;
+  display: flex;
+}
+
+.settings .row {
+  opacity: 1;
+  background-color: #050705;
+  flex-direction: row;
+  align-items: center;
+  width: 60%;
+  max-width: 400px;
+  height: 2rem;
+  margin-block: .3rem;
+  display: flex;
+}
+
+.settings .row .string {
+  width: 40%;
+  padding-inline: .5rem;
+  font-size: 1.2rem;
+}
+
+.settings .row .checkbox {
+  cursor: pointer;
+  background-color: red;
+  border: 1px solid #f7f7f7;
+  justify-content: center;
+  align-items: center;
+  width: 12%;
+  min-width: .6rem;
+  display: flex;
+  aspect-ratio: 1 !important;
+}
+
+.settings .row .checked {
+  background-color: #45e463;
+}
+
+/*# sourceMappingURL=index.5344e179.css.map */
